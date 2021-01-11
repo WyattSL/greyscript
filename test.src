@@ -1,0 +1,2 @@
+Shell = get_shell
+Computer = Shell.host_computer

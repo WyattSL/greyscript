@@ -1,0 +1,103 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "GreyScript",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#number"
+		},
+		{
+			"include": "#comment"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.greyscript",
+					"match": "\\b(if|while|for|function|then|return|end if|end for|end while|end function|else|and|or|in|not|continue|break|new|null)\\b"
+				},
+				{
+					"name": "support.class",
+					"match": "\\b(Shell|Computer|File|Router|NetSession|Metaxploit|Metalib|Port|Crypto|int|float|string|String|Int|Float|bool|map|Map|list|List)\\b"
+				},
+				{
+					"name": "keyword.api.shell",
+					"match": "\\.(host_computer|scp|start_terminal|build|put|connect_service|launch)"
+				},
+				{
+					"name": "keyword.api.computer",
+					"match": "\\.(File|public_ip|lan_ip|get_router|touch|create_user|delete_user|create_group|delete_group|active_net_card|change_password|close_program|connect_ethernet|connect_wifi|current_path|get_ports|groups|is_network_active|network_devices|network_gateway|show_procs|wifi_networks)"
+				},
+				{
+					"name": "keyword.api.file",
+					"match": "\\.(path|delete|set_content|get_content|set_group|group|set_owner|owner|parent|get_files|get_folders|is_binary|is_folder|has_permission|permissions|size|name|chmod|rename|move|copy)"
+				},
+				{
+					"name": "keyword.api.metalib",
+					"match": "\\.(load|net_use|scan_address|scan|sniffer|rshell_server|rshell_client)"
+				},
+				{
+					"name": "keyword.api.metalib",
+					"match": "\\.(overflow|lib_name|version)"
+				},
+				{
+					"name": "keyword.api.crypto",
+					"match": "\\.(aircrack|airmon|decipher|smtp_user_list)"
+				},
+				{
+					"name": "keyword.api.port",
+					"match": "\\.(get_lan_ip|is_closed|port_number)"
+				},
+				{
+					"name": "keyword.api.netsession",
+					"match": "\\.(dump_lib)"
+				},
+				{
+					"name": "keyword.api.router",
+					"match": "\\.(public_ip|local_ip|device_ports|computers_lan_ip|ping_port|port_info|used_ports|bssid_name|essid_name)"
+				},
+				{
+					"name": "keyword.api.general",
+					"match": "\\b(print|time|typeof|md5|get_router|get_shell|nslookup|whois|is_valid_ip|is_lan_ip|command_info|current_date|parent_path|home_dir|program_path|active_user|user_mail_address|user_bank_address|format_columns|user_input|include_lib|exit|bitwise|masterkey)"
+				},
+				{
+					"name": "support.function",
+					"match": "((\\b(slice|abs|acos|asin|atan|tan|cos|sin|char|floor|round|range|rnd|sign|sqrt|str|ceil)\\(|\\.(split|indexOf|hasIndex|lower|upper|remove|lastIndexOf|replace|trim|indexes|code|len|val|values|to_int|char|join|push|pop|pull|shuffle|reverse|sort|sum))|\bpi\b)"
+				},
+				{
+					"name": "support.type",
+					"match": "\\b(params|true|false|globals|self)"
+				}
+			]
+		},
+		"strings": {
+			"name": "string.quoted.double.greyscript",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.greyscript",
+					"match": "\\\\."
+				}
+			]
+		},
+		"number": {
+			"patterns": [{
+				"name": "constant.numeric",
+				"match": "\\d"
+			}]
+		},
+		"comment": {
+			"name": "comment.line",
+			"begin": "//",
+			"end": "\n"
+		}
+	},
+	"scopeName": "source.src"
+}
