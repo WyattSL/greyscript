@@ -3,7 +3,17 @@
     "displayName": "GreyScript",
     "description": "Syntax highlighting for GreyScript.",
     "publisher": "WyattL",
+    "author": {
+        "name": "Wyatt",
+        "email": "wyattlipscomb20@gmail.com",
+        "url": "https://github.com/WyattSL"
+    },
     "version": "1.3.5",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/WyattSL/greyscript.git"  
+    },
+    "homepage": "https://github.com/microsoft/greyscript/blob/main/CHANGELOG.md",
     "engines": {
         "vscode": "^1.51.0"
     },
@@ -11,6 +21,11 @@
         "Programming Languages"
     ],
     "main": "./extension.js",
+    "qna": "false",
+    "bugs": {
+        "url": "https://github.com/WyattSL/greyscript/issues",
+        "email": "wyattlipscomb20@gmail.com"
+    },
     "activationEvents": [
         "onLanguage:greyscript"
     ],
