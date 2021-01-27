@@ -32,7 +32,7 @@
 				},
 				{
 					"name": "keyword.api.computer",
-					"match": "\\.(File|public_ip|lan_ip|get_router|touch|create_user|delete_user|create_group|delete_group|active_net_card|change_password|close_program|connect_ethernet|connect_wifi|current_path|get_ports|groups|is_network_active|network_devices|network_gateway|show_procs|wifi_networks)"
+					"match": "\\.(File|public_ip|lan_ip|get_router|touch|create_user|delete_user|create_group|delete_group|active_net_card|change_password|close_program|connect_ethernet|connect_wifi|current_path|get_ports|groups|is_network_active|network_devices|network_gateway|show_procs|wifi_networks|create_folder)"
 				},
 				{
 					"name": "keyword.api.file",
@@ -60,7 +60,7 @@
 				},
 				{
 					"name": "keyword.api.router",
-					"match": "\\.(public_ip|local_ip|device_ports|computers_lan_ip|ping_port|port_info|used_ports|bssid_name|essid_name)"
+					"match": "\\.(public_ip|local_ip|device_ports|computers_lan_ip|ping_port|port_info|used_ports|bssid_name|essid_name|firewall_rules)"
 				},
 				{
 					"name": "keyword.api.general",
@@ -68,7 +68,7 @@
 				},
 				{
 					"name": "support.function",
-					"match": "((\\b(slice|abs|acos|asin|atan|tan|cos|sin|char|floor|round|range|rnd|sign|sqrt|str|ceil)\\(|\\.(split|indexOf|hasIndex|lower|upper|remove|lastIndexOf|replace|trim|indexes|code|len|val|values|to_int|char|join|push|pop|pull|shuffle|reverse|sort|sum))|\bpi\b)"
+					"match": "((\\b(slice|abs|acos|asin|atan|tan|cos|sin|char|floor|round|range|rnd|sign|sqrt|str|ceil)\\(|\\.(split|indexOf|hasIndex|lower\b|upper\b|remove|lastIndexOf|replace|trim|indexes\b|code\b|len\b|val\b|values\b|to_int\b|char|join|push|pop|pull|shuffle|reverse|sort|sum\b|key\b|value\b))|\bpi\b)"
 				},
 				{
 					"name": "support.type",

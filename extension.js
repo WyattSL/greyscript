@@ -784,34 +784,53 @@ function activate(context) {
         let options = {"prompt": "Enter provided line number"}
         vscode.window.showInputBox(options).then((line) => {
             line = Number(line)
+            debug.appendLine("line: "+line)
             var text = editor.document.getText();
             var exp = new RegExp("else","gm")
+            debug.appendLine("exp1")
             debug.appendLine(exp)
             var list = text.matchAll(exp)
-            var exp2 = new RegExp("else if","gm") // TODO:  make it move cursor using pre built commands
+            debug.appendLine("list")
+            debug.appendLine(list)
+            var exp2 = new RegExp("else if","gm")
+            debug.appendLine("exp2")
+            debug.appendLine(exp2)
             var list2 = text.matchAll(exp2)
+            debug.appendLine("list2")
+            debug.appendLine(list2)
             var l = 0
             var l2 = 0
             for (i of list) {
                 var index = i.index+i[0].length;
                 var r = new vscode.Range(1,0,1,index)
-                var text = editor.document.getText(r)
-                var lines = text.split("\n").length;
-                if (lines <= line) l=l+1
+                var text = editor.document.getText();
+                var lineList = text.matchAll("\n");
+                var lines = 0;
+                for (i of lineList) {
+                    if (i.index < index) lines++
+                }
+                if (lines <= line) l++;
             }
             for (i of list2) {
                 var index = i.index+i[0].length;
-                var r = new vscode.Range(1,0,1,index)
-                var text = editor.document.getText(r)
-                var lines = text.split("\n").length;
-                if (lines <= line) l2=l2+1
+                var text = editor.document.getText();
+                var lineList = text.matchAll("\n");
+                var lines = 0;
+                for (i of lineList) {
+                    console.log(i.index+"/"+index);
+                    if (i.index < index) lines++
+                }
+                if (lines <= line) l2++;
             }
+            debug.appendLine("l: "+l)
+            debug.appendLine("l2: "+l2)
             var actualline = (line-l)+l2 // here
             debug.appendLine("actual error line: "+actualline)
             var linel = editor.document.lineAt(actualline-1).text.length;
             var pos1 = new vscode.Position(actualline-1, 0)
             var pos2 = new vscode.Position(actualline-1, linel)
             var range = new vscode.Range(pos1,pos2)
+            debug.appendLine("range: "+range)
             //editor.revealRange(range, vscode.TextEditorRevealType.InCenter)
             let options = {
                 "selection": range

@@ -1,3 +1,9 @@
+## 1.4.0
+- ``Computer.create_folder`` is now highlighted.
+- ``Router.firewall_rules`` is now highlighted.
+- Fixed accuracy errors with ``Goto Error``. (*hopefully*)
+- Properties should no longer be half-highlighted (e.g. ``val``ue)
+
 ## 1.3.5
 - ``self`` is now highlighted.
 - Fixed some highlighting issues between class definitions.
