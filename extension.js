@@ -112,6 +112,9 @@ var CompData = [
     "is_lan_ip",
     "is_valid_ip",
     "bitwise",
+    "hash",
+    "yield",
+    "launch_path",
     // Numeric
     "abs",
     "acos",
@@ -501,7 +504,20 @@ var CompTypes = { // Constant 20 Function 2 Property 9 Method 1 Variable 5 Inter
     "is_binary": 9,
     "group": 9,
     "owner": 9,
-    "permissions": 9
+    "permissions": 9,
+    "user_bank_account": 9,
+    "user_mail_address": 9,
+    "time": 9,
+    "current_date": 9,
+    "home_dir": 9,
+    "launch_path": 9,
+    "program_path": 9,
+    "active_user": 9,
+    "essid_name": 9,
+    "bssid_name": 9,
+    "used_ports": 9,
+    "public_ip": 9,
+    "local_ip": 9
 }
 
 var HoverData = {
@@ -624,6 +640,9 @@ var HoverData = {
     "is_lan_ip": "is_lan_ip(string ip) : Int\n\nReturns true if the provided address is local, false otherwise. If the provided IP is not valid, it also returns false.",
     "is_valid_ip": "is_valid_ip(string ip) : Int\n\nReturns true if the provided address is valid, false otherwise.",
     "bitwise": "bitwise(string operator, int num1, int num2) : Int\n\nBitwise operators are used for manipulating data at the bit level.\nBitwise operates on one or more bit patterns or binary numerals at the level of their individual bits. \nThey are used in numerical computations to make the calculation process faster.\nThe operator argument accepts the following operators:\n&, |, ^, <<, >>, >>>",
+    "yield": "yield : Null\n\nHalts execution for the next 60Hz tick.",
+    "hash": "hash(any valueToHash) : Int\n\nReturns a integer that is \"relatively unique\" to the given value. In the case of strings, the hash is case-sensitive. In the case of a list r map, the hash combines the hash values of all elements.",
+    "launch_path": "launch_path : String\n\nReturns the path of the program that launched this program.",
     // Numeric
     "abs": "abs(float) : Float\n\nReturns the absolute value of the provided input.",
     "acos": "acos(float) : Float\n\nReturns the arccosine of the provided input in radians.",
@@ -716,10 +735,16 @@ function activate(context) {
             let range = document.getWordRangeAtPosition(position)
             let word = document.getText(range)
             debug.appendLine(word)
+            let docs = HoverData[word];
+            if (Array.isArray(docs)) {
+                debug.appendLine("array trigger")
+                docs = docs.join("\n\n\n")
+                debug.appendLine("array out: "+docs)
+            }
             if (HoverData[word]) {
                 return new vscode.Hover({
                     language: "greyscript",
-                    value: HoverData[word]
+                    value: docs
                 });
             }
         }
@@ -804,27 +829,20 @@ function activate(context) {
                 var index = i.index+i[0].length;
                 var r = new vscode.Range(1,0,1,index)
                 var text = editor.document.getText();
-                var lineList = text.matchAll("\n");
-                var lines = 0;
-                for (i of lineList) {
-                    if (i.index < index) lines++
-                }
+                var nt = text.slice(0, index);
+                var lines = nt.split(new RegExp("\n","g")).length;
                 if (lines <= line) l++;
             }
             for (i of list2) {
                 var index = i.index+i[0].length;
                 var text = editor.document.getText();
-                var lineList = text.matchAll("\n");
-                var lines = 0;
-                for (i of lineList) {
-                    console.log(i.index+"/"+index);
-                    if (i.index < index) lines++
-                }
+                var nt = text.slice(0, index);
+                var lines = nt.split(new RegExp("\n","g")).length;
                 if (lines <= line) l2++;
             }
             debug.appendLine("l: "+l)
             debug.appendLine("l2: "+l2)
-            var actualline = (line-l)+l2 // here
+            var actualline = (line-(l-l2)) // here
             debug.appendLine("actual error line: "+actualline)
             var linel = editor.document.lineAt(actualline-1).text.length;
             var pos1 = new vscode.Position(actualline-1, 0)

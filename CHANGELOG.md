@@ -1,8 +1,10 @@
 ## 1.4.0
 - ``Computer.create_folder`` is now highlighted.
 - ``Router.firewall_rules`` is now highlighted.
-- Fixed accuracy errors with ``Goto Error``. (*hopefully*)
 - Properties should no longer be half-highlighted (e.g. ``val``ue)
+- Support functions should now have hover-data associated with them.
+- ``hash``, ``wait``, ``yield``, and ``launch_path`` are now properly highlighted and documented.
+- ``Goto Error`` should now be **far** more accurate. You should be placed either on the line, or within 1-3 lines in either direction.
 
 ## 1.3.5
 - ``self`` is now highlighted.
