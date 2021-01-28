@@ -1,3 +1,6 @@
+## 1.4.1
+- You may now use Go To Declaration to find the declaration of a variable or function. Rightclick on some text and press ``Go To Declaration`` to try it out.
+
 ## 1.4.0
 - ``Computer.create_folder`` is now highlighted.
 - ``Router.firewall_rules`` is now highlighted.

@@ -752,6 +752,23 @@ function activate(context) {
 
     if (vscode.workspace.getConfiguration("greyscript").get("hoverdocs")) context.subscriptions.push(hoverD)
 
+    let decD = vscode.languages.registerDeclarationProvider('greyscript', {
+        provideDeclaration(document, position, token) {
+            let range = document.getWordRangeAtPosition(position);
+            let word = document.getText(range);
+            let Exp = new RegExp(`(${word} = |${word}=)`);
+            let Text = document.getText();
+            let Match = Text.match(Exp);
+            let index = Match.index;
+            let nt = Text.slice(0, index);
+            let lines = nt.split(new RegExp("\n","g")).length;
+            let Pos = new vscode.Position(lines-1, word.length);
+            return new vscode.Location(document.uri, Pos);
+        }
+    });
+
+    context.subscriptions.push(decD);
+
     let compD = vscode.languages.registerCompletionItemProvider('greyscript', {
         provideCompletionItems(document,position,token,ccontext) {
             if (!vscode.workspace.getConfiguration("greyscript").get("autocomplete")) return;
