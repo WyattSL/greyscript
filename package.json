@@ -8,12 +8,12 @@
         "email": "wyattlipscomb20@gmail.com",
         "url": "https://github.com/WyattSL"
     },
-    "version": "1.4.1",
+    "version": "1.4.2",
     "repository": {
         "type": "git",
         "url": "https://github.com/WyattSL/greyscript.git"
     },
-    "homepage": "https://github.com/microsoft/greyscript/blob/main/CHANGELOG.md",
+    "homepage": "https://github.com/WyattSL/greyscript/blob/main/CHANGELOG.md",
     "engines": {
         "vscode": "^1.51.0"
     },

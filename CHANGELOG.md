@@ -1,3 +1,6 @@
+## 1.4.2
+- Visual Studio Code will now auto-indent as you type.
+
 ## 1.4.1
 - You may now use Go To Declaration to find the declaration of a variable or function. Rightclick on some text and press ``Go To Declaration`` to try it out.
 

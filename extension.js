@@ -769,6 +769,46 @@ function activate(context) {
 
     context.subscriptions.push(decD);
 
+    /*
+
+    let foldD = vscode.languages.registerFoldingRangeProvider('greyscript', {
+        provideFoldingRanges(document, foldContext, token) {
+            console.log(`Request To Provide Folding Ranges`);
+            let Text = document.getText();
+            let kind = vscode.FoldingRangeKind.Region;
+            var List = [];
+            let Exp = new RegExp(`( = |=) function`, `g`);
+            let Matches = Text.matchAll(Exp);
+            console.log(`Folding Matches`);
+            console.log(Matches);
+            var i;
+            for (i of Matches) {
+                let index = i.index;
+                console.log(`I: ${index}`);
+                let stext = Text.slice(0,index);
+                let text = Text.slice(index,Text.length);
+                console.log(`T: ${text}`);
+                let Exp = new RegExp("end function");
+                let M = text.match(Exp)
+                console.log(`M: ${M}`)
+                if (!M) continue;
+                M = M.index+index;
+                console.log(`M: ${M}`);
+                let start = stext.split("\n").length-1;
+                let etext = Text.slice(0, M);
+                let end = etext.split("\n").length-1;
+                let F = new vscode.FoldingRange(start, end, kind);
+                List.push(F);
+            };
+            console.log(`Folding Ranges`)
+            console.log(List);
+            return List;
+        }
+    })
+
+    context.subscriptions.push(foldD);
+    */
+
     let compD = vscode.languages.registerCompletionItemProvider('greyscript', {
         provideCompletionItems(document,position,token,ccontext) {
             if (!vscode.workspace.getConfiguration("greyscript").get("autocomplete")) return;
