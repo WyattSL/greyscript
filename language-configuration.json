@@ -14,16 +14,14 @@
         ["{", "}"],
         ["[", "]"],
         ["(", ")"],
-        ["\"", "\""],
-        ["'", "'"]
+        ["\"", "\""]
     ],
     // symbols that can be used to surround a selection
     "surroundingPairs": [
         ["{", "}"],
         ["[", "]"],
         ["(", ")"],
-        ["\"", "\""],
-        ["'", "'"]
+        ["\"", "\""]
     ],
     "indentationRules": {
         "increaseIndentPattern": "(else if .* then|if .* then|(= |=)function|(= |=)function\\(.*\\)|else|else;|while.+|for.+)$",
