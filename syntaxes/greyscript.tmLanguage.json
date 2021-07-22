@@ -60,7 +60,7 @@
 				},
 				{
 					"name": "keyword.api.router",
-					"match": "\\.(public_ip|local_ip|device_ports|computers_lan_ip|ping_port|port_info|used_ports|bssid_name|essid_name|firewall_rules)"
+					"match": "\\.(public_ip|local_ip|device_ports|devices_lan_ip|ping_port|port_info|used_ports|bssid_name|essid_name|firewall_rules)"
 				},
 				{
 					"name": "keyword.api.general",
