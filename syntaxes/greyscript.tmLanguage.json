@@ -64,7 +64,7 @@
 				},
 				{
 					"name": "keyword.api.general",
-					"match": "\\b(print|time|typeof|md5|get_router|get_shell|nslookup|whois|is_valid_ip|is_lan_ip|command_info|current_date|parent_path|home_dir|program_path|active_user|user_mail_address|user_bank_address|format_columns|user_input|include_lib|exit|bitwise|masterkey|yield|wait|hash|launch_path)"
+					"match": "\\b(print|time|typeof|md5|get_router|get_shell|nslookup|whois|is_valid_ip|is_lan_ip|command_info|current_date|parent_path|home_dir|program_path|active_user|user_mail_address|user_bank_address|format_columns|user_input|include_lib|import_code|exit|bitwise|masterkey|yield|wait|hash|launch_path)"
 				},
 				{
 					"name": "support.function",
