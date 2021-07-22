@@ -630,6 +630,7 @@ var HoverData = {
     "get_shell": "get_shell(opt string username, opt string password) : Shell\n\nReturns the shell that is executing the script if it is called without parameters. \nPassing a username and password, it returns a shell with those credentials if are correct.",
     "user_input": "user_input(opt string prompt, opt int isPassword) : String\n\nIt puts the program on hold to receive the user input, which will be processed as a string. If the password mode is activated, the input text will be hidden with asterisks.",
     "include_lib": "include_lib(string path) : any\n\nIncludes an external library to be used in scripting. If the library has been included correctly, it will return an object of corresponding type with the library, null otherwise",
+    "import_code": "import_code(string absolutePath) : any\n\nIncludes external code into the current code. Can be used to split code in multiple files.\nNote: The code will be added to the current code upon compiling.",
     "exit": "exit(opt string message) : Null\n\nStops the execution of the script at the time this method is executed. Optionally you can pass a string as a message that will be printed in the terminal when the program ends.",
     "user_mail_address": "Returns a string with the user's email address that is executing this script.\nThis is only defined on a player's home computer.",
     "user_bank_number": "Returns a string with the bank account number of the user who is executing this script.\nThis is only defined on a player's home computer.",
