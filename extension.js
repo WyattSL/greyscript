@@ -2,14 +2,16 @@ const vscode = require("vscode");
 const debug = vscode.window.createOutputChannel("Greyscript Debugging")
 
 var CompData = [
+    // Shell
     "host_computer",
     "start_terminal",
     "build",
     "connect_service",
     "launch",
     "ping",
-    "put",
     "scp",
+    // FtpShell
+    "put",
     // Crypto,
     "aircrack",
     "airmon",
@@ -170,8 +172,9 @@ var TypeData = {
     "connect_service": "shell",
     "launch": "shell",
     "ping": "shell",
-    "put": "shell",
     "scp": "shell",
+    // FtpShell
+    "put": "ftpshell",
     // Crypto
     "aircrack": "crypto",
     "airmon": "crypto",
@@ -322,14 +325,16 @@ var TypeData = {
 }
 
 var ArgData = {
+    // Shell
     "host_computer": 0,
     "start_terminal": 0,
     "build": 2,
     "connect_service": 4,
     "launch": 2,
     "ping": 1,
-    "put": 3,
     "scp": 3,
+    // FtpShell
+    "put": 3,
     // Crypto,
     "aircrack": 1,
     "airmon": 1,
@@ -532,14 +537,21 @@ var HoverData = {
     "if": "Use if blocks to do different things depending on some condition. \nInclude zero or more else if blocks and one optional else block.",
     "else": "Use if blocks to do different things depending on some condition. \nInclude zero or more else if blocks and one optional else block.",
     // Shell
-    "host_computer": "Shell.host_computer() : Computer\n\nReturns the computer associated with the Shell.",
-    "start_terminal": "Shell.start_terminal() : Null\n\nLaunch an active terminal from the Shell.",
+    "host_computer": [
+        "Shell.host_computer() : Computer\n\nReturns the computer associated with the Shell.",
+        "FtpShell.host_computer() : Computer\n\nReturns the computer associated with the FtpShell.",
+    ],
+    "start_terminal": [
+        "Shell.start_terminal() : Null\n\nLaunch an active terminal from the Shell.",
+        "FtpShell.start_terminal() : Null\n\nLaunch an active terminal from the FtpShell.",
+    ],
     "build": "Shell.build(string pathSource, string pathBinary) : String\n\nCompile the source code of the file that is in the provided path, and save the executable in the destination path.\nThe name of the executable is the same as that of the source file without the extension.\nThe provided paths must be absolutes.\n\nReturns a string (empty on success, or with an error on failure)",
-    "connect_service": "Shell.connect_service(string ip, int port, string username, string password) : Shell or Null\n\nConnect to a remote service. Returns a shell if the connection has been established correctly.\n\nReturns a Shell object or null on failure",
+    "connect_service": "Shell.connect_service(string ip, int port, string username, string password, opt string serviceType) : Shell or FtpShell or Null\n\nConnect to a remote service. You can specify 'ftp' in the serviceType to request a FtpShell\n\nReturns a Shell or FtpShell if the connection has been established correctly or null on failure",
     "launch": "Shell.launch(string path, string args) : Null or Int\n\nLaunches the command in the provided path.\n\nReturns null on success, or 0 on failure",
     "ping": "Shell.ping(string ip) : Int\n\nReturns true if the remote address could be reached, false otherwise. Firewalls do not block ping requests.",
-    "put": "Shell.put(string pathOrigin, string pathDestination, shell remoteShell) : Int or String\n\nCopy a file from one computer to the other through the network.\n\nReturns 1 on success, or a string (containing an error) on failure",
     "scp": "Shell.scp(string pathOrigin, string pathDestination, shell remoteShell) : Int or String\n\nCopy a file from one computer to the other through the network.\n\nReturns 1 on success, or a string (containing an error) on failure",
+    // FtpShell
+    "put": "FtpShell.put(string pathOrigin, string pathDestination, shell remoteShell) : Int or String\n\nCopy a file from one computer to the other through the network.\n\nReturns 1 on success, or a string (containing an error) on failure",
     // Crypto
     "aircrack": "Crypto.aircrack(string path) : String or Null\n\nReturns a string with the password generated from the file created by aireplay.",
     "airmon": "Crypto.airmon(string option, string interface) : Int\n\nEnables or disables the monitor mode of a network device. The option parameter can only be 'start' or 'stop'.",

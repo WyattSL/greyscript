@@ -24,11 +24,15 @@
 				},
 				{
 					"name": "support.class",
-					"match": "\\b(Shell|Computer|File|Router|NetSession|Metaxploit|Metalib|Port|Crypto|int|float|string|String|Int|Float|bool|map|Map|list|List)\\b"
+					"match": "\\b(Shell|FtpShell|Computer|File|Router|NetSession|Metaxploit|Metalib|Port|Crypto|int|float|string|String|Int|Float|bool|map|Map|list|List)\\b"
 				},
 				{
 					"name": "keyword.api.shell",
 					"match": "\\.(host_computer|scp|start_terminal|build|put|connect_service|launch)"
+				},
+				{
+					"name": "keyword.api.ftpshell",
+					"match": "\\.(host_computer|start_terminal|put)"
 				},
 				{
 					"name": "keyword.api.computer",
