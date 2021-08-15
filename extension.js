@@ -10,6 +10,12 @@ var CompData = [
     "launch",
     "ping",
     "scp",
+    "apt_show",
+    "apt_search",
+    "apt_update",
+    "apt_add_repo",
+    "apt_install",
+    "apt_check_upgrade",
     // FtpShell
     "put",
     // Crypto,
@@ -173,6 +179,12 @@ var TypeData = {
     "launch": "shell",
     "ping": "shell",
     "scp": "shell",
+    "apt_show": "shell",
+    "apt_search": "shell",
+    "apt_update": "shell",
+    "apt_add_repo": "shell",
+    "apt_install": "shell",
+    "apt_check_upgrade": "shell",
     // FtpShell
     "put": "ftpshell",
     // Crypto
@@ -333,6 +345,12 @@ var ArgData = {
     "launch": 2,
     "ping": 1,
     "scp": 3,
+    "apt_show": 1,
+    "apt_search": 1,
+    "apt_update": 0,
+    "apt_add_repo": 2,
+    "apt_install": 1,
+    "apt_check_upgrade": 1,
     // FtpShell
     "put": 3,
     // Crypto,
@@ -550,6 +568,12 @@ var HoverData = {
     "launch": "Shell.launch(string path, string args) : Null or Int\n\nLaunches the command in the provided path.\n\nReturns null on success, or 0 on failure",
     "ping": "Shell.ping(string ip) : Int\n\nReturns true if the remote address could be reached, false otherwise. Firewalls do not block ping requests.",
     "scp": "Shell.scp(string pathOrigin, string pathDestination, shell remoteShell) : Int or String\n\nCopy a file from one computer to the other through the network.\n\nReturns 1 on success, or a string (containing an error) on failure",
+    "apt_show": "Shell.apt_show(string repositoryName) : String\n\nShows all packages available in repository\nThe repository MUST be added in the /etc/apt/sources.txt file.\n\nReturns string with all pachages on success, or a string (containing an error) on failure",
+    "apt_search": "Shell.apt_search(string packageName) : String\n\nSearch specifically for the package in any of the repositories listed in /etc/apt/sources.txt\n\nReturns either a string with information about the package, or a string (containing an error) on failure",
+    "apt_update": "Shell.apt_update() : String\n\nUpdate the list of available packages after adding a new repository in /etc/apt/sources.txt, or if the remote repository has updated its information in /server/conf/repod.conf\n\nReturns string containing all repository addresses with 'Updated' prefix on success, or a string (containing an error) on failure",
+    "apt_add_repo": "Shell.apt_add_repo(string repositoryAddress, opt int port) : String\n\nAdd the repository address in the /etc/apt/sources.txt file\n\nReturns empty string on success, or a string (containing an error) on failure",
+    "apt_install": "Shell.apt_install(string packageName) : Int or String\n\nInstall the program or library from a remote repository listed in /etc/apt/sources.txt\n\nReturns 1 on success, or a string (containing an error) on failure",
+    "apt_check_upgrade": "Shell.apt_check_upgrade(string packageName) : Int or String\n\nCheck if there is a newer version of the package in the repository.\n\nReturns 1 if there is a newer version, or 0 if there is not a newer version, or a string (containing an error) on failure",
     // FtpShell
     "put": "FtpShell.put(string pathOrigin, string pathDestination, shell remoteShell) : Int or String\n\nCopy a file from one computer to the other through the network.\n\nReturns 1 on success, or a string (containing an error) on failure",
     // Crypto

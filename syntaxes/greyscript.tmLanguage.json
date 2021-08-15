@@ -28,7 +28,7 @@
 				},
 				{
 					"name": "keyword.api.shell",
-					"match": "\\.(host_computer|scp|start_terminal|build|put|connect_service|launch)"
+					"match": "\\.(host_computer|scp|start_terminal|build|put|connect_service|launch|apt_show|apt_search|apt_update|apt_add_repo|apt_install|apt_check_upgrade)"
 				},
 				{
 					"name": "keyword.api.ftpshell",
