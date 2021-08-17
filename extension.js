@@ -605,10 +605,16 @@ var HoverData = {
     "essid_name": "Router.essid_name : String\n\nReturns a string with the ESSID value of the router.",
     "firewall_rules": "Router.firewall_rules : List[string]\n\nReturns a string list with the firewall rules present in the router or switch.",
     "kernel_version": "Router.kernel_version : String\n\nReturns a string with the version of the kernel_router.so library",
-    "local_ip": "Router.local_ip : String\n\nReturns a string with the computer or router local ip address.",
+    "local_ip": [
+        "Router.local_ip : String\n\nReturns a string with the router's local ip address.",
+        "Computer.local_ip : String\n\nReturns a string with the computer's local ip address.",
+    ],
     "ping_port": "Router.ping_port(int port) : Port\n\nReturns the port object that is behind the port number provided if exists, null otherwise.",
     "port_info": "Router.port_info(port Port) : String\n\nReturns a string with the information of the port that has been provided. The port provided must not belong to another network than this router.",
-    "public_ip": "Router.public_ip : String\n\nReturns the public ip of the router or computer object.",
+    "public_ip": [
+        "Router.public_ip : String\n\nReturns a string with the router's public ip address.",
+        "Computer.public_ip : String\n\nReturns a string with the computer's public ip address.",
+    ],
     "used_ports": "Router.used_ports : List\n\nReturns an array of ports that are being used in this router.",
     // NetSession
     "dump_lib": "NetSession.dump_lib : Metalib\n\nReturns the metalib associated with the remote service.\n\n\n\nFor example, connecting to a computer with the ssh service will return a metalib libssh object.\n\nIn the case of connecting to a router, it returns a metalib kernel_router object.",
