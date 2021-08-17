@@ -36,7 +36,7 @@
 				},
 				{
 					"name": "keyword.api.computer",
-					"match": "\\.(File|public_ip|lan_ip|get_router|touch|create_user|delete_user|create_group|delete_group|active_net_card|change_password|close_program|connect_ethernet|connect_wifi|current_path|get_ports|groups|is_network_active|network_devices|network_gateway|show_procs|wifi_networks|create_folder)"
+					"match": "\\.(File|public_ip|local_ip|get_router|touch|create_user|delete_user|create_group|delete_group|active_net_card|change_password|close_program|connect_ethernet|connect_wifi|current_path|get_ports|groups|is_network_active|network_devices|network_gateway|show_procs|wifi_networks|create_folder)"
 				},
 				{
 					"name": "keyword.api.file",
