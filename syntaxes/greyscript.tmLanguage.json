@@ -24,15 +24,19 @@
 				},
 				{
 					"name": "support.class",
-					"match": "\\b(Shell|Computer|File|Router|NetSession|Metaxploit|Metalib|Port|Crypto|int|float|string|String|Int|Float|bool|map|Map|list|List)\\b"
+					"match": "\\b(Shell|FtpShell|Computer|File|Router|NetSession|Metaxploit|Metalib|Port|Crypto|int|float|string|String|Int|Float|bool|map|Map|list|List)\\b"
 				},
 				{
 					"name": "keyword.api.shell",
-					"match": "\\.(host_computer|scp|start_terminal|build|put|connect_service|launch)"
+					"match": "\\.(host_computer|scp|start_terminal|build|put|connect_service|launch|apt_show|apt_search|apt_update|apt_add_repo|apt_install|apt_check_upgrade)"
+				},
+				{
+					"name": "keyword.api.ftpshell",
+					"match": "\\.(host_computer|start_terminal|put)"
 				},
 				{
 					"name": "keyword.api.computer",
-					"match": "\\.(File|public_ip|lan_ip|get_router|touch|create_user|delete_user|create_group|delete_group|active_net_card|change_password|close_program|connect_ethernet|connect_wifi|current_path|get_ports|groups|is_network_active|network_devices|network_gateway|show_procs|wifi_networks|create_folder)"
+					"match": "\\.(File|public_ip|local_ip|get_router|touch|create_user|delete_user|create_group|delete_group|active_net_card|change_password|close_program|connect_ethernet|connect_wifi|current_path|get_ports|groups|is_network_active|network_devices|network_gateway|show_procs|wifi_networks|create_folder)"
 				},
 				{
 					"name": "keyword.api.file",
