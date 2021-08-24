@@ -1,0 +1,6 @@
+{
+    "get_shell": [
+        ["Shell = get_shell"],
+        ["RootShell = get_shell(\"root\",\"root_password\")"]
+    ]
+}
