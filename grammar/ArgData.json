@@ -2,7 +2,7 @@
     "host_computer": [],
     "start_terminal": [],
     "build": ["string", "string"],
-    "connect_service": ["string", "integer", "string", "string],
+    "connect_service": ["string", "integer", "string", "string"],
     "launch": ["string", "string"],
     "ping": ["string"],
     "scp": ["string", "string", "shell"],
