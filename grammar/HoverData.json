@@ -203,7 +203,7 @@
         "Map.values : List[string]\n\nReturns a list object containing the map's values.",
     ],
     "to_int": "String.to_int : Int\n\nConverts the string to a integer.",
-    // Maps & Lists
+    
     "push": [
         "List.push(any) : List\n\nPushes the provided input onto the end of the list. Returns the updated list, and updates the list in it's place.",
         "Map.push(any) : Map\n\nPushes the provided input onto the end of the map. Returns the updated map, and updates the map in it's place.",
@@ -220,7 +220,7 @@
         "List.sum : int\n\nReturns the total of all numeric values in a list.",
         "Map.sum : int\n\nReturns the total of all numeric values in a map.",
     ],
-    // Lists
+    
     "sort": "List.sort : List\n\nSorts a list alphanumerically.",
     "join": "List.join(seperator) : String\n\nConcatenates all items within the list and returns them in a single string.",
     "reverse": "List.reverse : Null\n\nReverses the list, rearranging the element in reverse order."
