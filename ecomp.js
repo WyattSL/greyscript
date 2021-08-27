@@ -1,5 +1,5 @@
-const NormVarReg = new RegExp(`^\s*[^'"\s]+\s?=.*`)
-const TabVarReg = new RegExp(`^\s*[^'"\s]+\[.*\]\s?=.*`);
+const NormVarReg = new RegExp(`^\s*([^'"\s]+)\s?=\s?(.*)$`)
+const TabVarReg = new RegExp(`^\s*([^'"\s]+)(\[.*\])+\s?=\s?(.*)$`);
 const FunctionReg = new RegExp(`^function(\([a-zA-Z0-9_]+((,\s?[a-zA-Z0-9_]+)*)\))?$`);
 const IfReg = new RegExp(`^\s*if (.*) then`);
 const ElseIfReg = new RegExp(`^\s*else if (.*) then`);
@@ -25,6 +25,17 @@ exports.run = (src) => {
     if (line.test(ForReg)) lt = "For";
     if (line.test(EndReg)) lt = "End";
     
+    if (lt.includes("AssignVar")) {
+      let d;
+      if (lt == "AssignVarNorm") {
+        d = line.match(NormVarReg)[1];
+      } else {
+        d = line.match(TabVarReg)[2];
+      }
+      if (line.includes("func") && !line.test(FunctionReg)) {
+        errors.push({line: line, text: "Function declaration invalid"});
+      }
+    }
     if (lt == "If") {
       nested.push("if") //TODO check conditional
     }
