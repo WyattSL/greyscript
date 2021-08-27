@@ -7,6 +7,8 @@ const ElseReg = new RegExp(`^\s*else`);
 const WhileReg = new RegExp(`^\s*while (.*)`);
 const ForReg = new RegExp(`^\s*for [a-zA-Z0-9_]+ in .*`);
 const EndReg = new RegExp(`^\s*end (if|for|while|function)`);
+const Break = new RegExp(`^\s*break$`);
+const Continue = new RegExp(`^\s*continue$`);
 
 exports.run = (src) => {
   let errors = [];
@@ -24,7 +26,14 @@ exports.run = (src) => {
     if (line.test(WhileReg)) lt = "While";
     if (line.test(ForReg)) lt = "For";
     if (line.test(EndReg)) lt = "End";
+    if (line.test(BreakReg)) lt = "Break";
+    if (line.test(ContinueReg)) lt = "Continue"
     
+    let nt = nested[nested.length-1];
+    
+    if (lt == "Break" || lt == "Continue") {
+      if (nt != "while" && nt != "for") errors.push({line: line, text: `${lt} Statement outside of loop loop`});
+    }
     if (lt.includes("AssignVar")) {
       let d;
       if (lt == "AssignVarNorm") {
