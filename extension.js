@@ -158,7 +158,7 @@ function activate(context) {
 			    let r = new vscode.Range(s, 1, e, 2)
 			    let m = "Cannot use "+m[2]+" in "+ m[1] == "Encode" ? "encryption." : "decryption.";
 			    let d = new vscode.Diagnostic(r, m, vscode.DiagnosticSeverity.Warning);
-			    outp.push(d):
+			    outp.push(d);
 		    }
 	    }
 	    return outp;
@@ -184,7 +184,7 @@ function activate(context) {
     let gecmd = vscode.commands.registerTextEditorCommand("greyScript.gotoError", (editor, edit, context) => {
         let options = {"prompt": "Enter provided line number"}
         vscode.window.showInputBox(options).then((line) => {
-            line = Number(line;
+            line = Number(line);
             //debug.appendLine("line: "+line)
             var text = editor.document.getText();
             var exp = new RegExp("else","gm")
