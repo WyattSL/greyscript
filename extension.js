@@ -147,7 +147,7 @@ function activate(context) {
     function LookForErrors(source) {
         console.log("Looking for errors")
 	    let outp = [];
-	    let reg = new RegExp(`(Encode|Decode)(?:\\s)?=(?:\\s)?function\\(.+\\).*(${Encryption.join("|")}).*end function`, "gs");
+	    let reg = new RegExp(`(Encode|Decode)(?:\\s)?=(?:\\s)?function\\(.+\\)(.*|\n*)*(${Encryption.join("|")})(.*|\n*)*end function`, "gs");
 	    let m = source.match(reg);
         console.log("Match "+m)
 	    if (m) {
