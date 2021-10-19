@@ -147,21 +147,21 @@ function activate(context) {
     function LookForErrors(source) {
         console.log("Looking for errors")
 	    let outp = [];
-	    let reg = new RegExp(`/(Encode|Decode)(?:\s)=(?\s)function\(.+\).*(${Encryption.join("|")}).*end function/`, "gs");
+	    let reg = new RegExp(`(Encode|Decode)(?:\\s)?=(?:\\s)?function\\(.+\\).*(${Encryption.join("|")}).*end function`, "gs");
 	    let m = source.match(reg);
         console.log("Match "+m)
 	    if (m) {
 		    let match;
 		    for (match of m) {
-			    let s = source.indexOf(m[2]);
-			    let e = source.indexOf(m[2])+m[2].length;
+			    let s = source.indexOf(match[2]);
+			    let e = source.indexOf(match[2])+match[2].length;
 			    let li = source.slice(0, s).split("/n").length;
 			    let ch = 1;
 			    let r = new vscode.Range(s, 1, e, 2)
-			    let m = "Cannot use "+m[2]+" in "+ m[1] == "Encode" ? "encryption." : "decryption.";
-			    let d = new vscode.Diagnostic(r, m, vscode.DiagnosticSeverity.Warning);
+			    let ms = "Cannot use "+match[2]+" in "+ match[1] == "Encode" ? "encryption." : "decryption.";
+			    let d = new vscode.Diagnostic(r, ms, vscode.DiagnosticSeverity.Warning);
 			    outp.push(d);
-		    }
+            }
 	    }
         console.log(outp.length+" errors found")
 	    return outp;
@@ -171,16 +171,20 @@ let collection = vscode.languages.createDiagnosticCollection("greyscript");
 
 	
     function readerror(document) {
+        console.log("Reading Errors")
 	   let uri = document.uri;
-	   collection.clear();
-	   let e = LookForErrors(document.GetText());
+	   //collection.clear();
+       console.log("Sniffing errors on "+uri)
+	   let e = LookForErrors(document.getText());
+       console.log("Found Errors "+e.length)
 	   collection.set(uri, e);
     }
-	let listen1 = vscode.workspace.onDidOpenTextDocument = readerror;
-	let listen2 = vscode.workspace.OnDidChangeTextDocument = function(event) {
+	let listen1 = vscode.workspace.onDidOpenTextDocument( readerror);
+	let listen2 = vscode.workspace.onDidChangeTextDocument(function(event) {
+        console.log("Doc Changed")
 		readerror(event.document);
-	}
-	
+	});
+	console.log("Hello Hackers!")
 	context.subscriptions.push(collection, listen1, listen2);
 
     let gecmd = vscode.commands.registerTextEditorCommand("greyScript.gotoError", (editor, edit, context) => {
