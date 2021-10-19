@@ -167,12 +167,16 @@ function activate(context) {
 		let collection = vscode.languages.createDiagnosticCollection("greyscript");
 
 	
-    function onChange(document) {
+    function readerror(document) {
 	   let uri = document.uri;
 	   collection.clear();
 	   let e = LookForErrors(document.GetText());
 	   collection.set(uri, e);
     }
+	vscode.workspace.onDidOpenTextDocument = readerror;
+	vscode.workspace.OnDidChangeTextDocument = function(event) {
+		readerror(event.document);
+	}
 	
 	let collection = vscode.languages.createDiagnosticCollection("greyscript");
 	ctx.subscriptions.push(collection);
