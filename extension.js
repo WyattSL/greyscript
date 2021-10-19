@@ -145,9 +145,11 @@ function activate(context) {
     if (vscode.workspace.getConfiguration("greyscript").get("autocomplete")) context.subscriptions.push(compD)
 	
     function LookForErrors(source) {
+        console.log("Looking for errors")
 	    let outp = [];
 	    let reg = new RegExp(`/(Encode|Decode)(?:\s)=(?\s)function\(.+\).*(${Encryption.join("|")}).*end function/`, "gs");
 	    let m = source.match(reg);
+        console.log("Match "+m)
 	    if (m) {
 		    let match;
 		    for (match of m) {
@@ -161,6 +163,7 @@ function activate(context) {
 			    outp.push(d);
 		    }
 	    }
+        console.log(outp.length+" errors found")
 	    return outp;
     }
 	
