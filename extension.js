@@ -22,7 +22,12 @@ function activate(context) {
                 docs = docs.join("\n\n\n")
                 debug.appendLine("array out: "+docs)
             }
-            if (HoverData[word]) {
+	    docs = docs ? new MarkdownString(docs, false) : null;
+	    if (Encryption.includes(docs)) {
+		let md = new MarkdownString("$(issues) **This function cannot be used in encryption!**", true)
+		docs.appendMarkdown(md);
+	    }
+            if (docs) {
                 return new vscode.Hover({
                     language: "greyscript",
                     value: docs
@@ -133,6 +138,11 @@ function activate(context) {
                     docs = docs.join("\n\n\n")
                     debug.appendLine("array out: "+docs)
                 }
+		docs = docs ? new MarkdownString(docs, false);
+		if (Encryption[c]) {
+			let md = new MarkdownString("$(issues) **This function cannot be used in Encryption!**", true);
+			docs.appendMarkdown(md);
+		}
                 t.documentation = docs
                 if (Ex) t.documentation = docs+"\n\n"+Exs.join("\n\n")
                 out.push(t);
