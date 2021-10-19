@@ -13,7 +13,7 @@
     "apt_install": ["string"],
     "apt_check_upgrade": ["string"],
     
-    "put": ["string", "string", "ftpshell"]
+    "put": ["string", "string", "ftpshell"],
     
     "aircrack": ["string"],
     "airmon": ["string"],
