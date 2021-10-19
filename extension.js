@@ -164,7 +164,7 @@ function activate(context) {
 	    return outp;
     }
 	
-		let collection = vscode.languages.createDiagnosticCollection("greyscript");
+let collection = vscode.languages.createDiagnosticCollection("greyscript");
 
 	
     function readerror(document) {
@@ -178,7 +178,6 @@ function activate(context) {
 		readerror(event.document);
 	}
 	
-	let collection = vscode.languages.createDiagnosticCollection("greyscript");
 	ctx.subscriptions.push(collection);
 
     let gecmd = vscode.commands.registerTextEditorCommand("greyScript.gotoError", (editor, edit, context) => {
