@@ -1,0 +1,19 @@
+[
+	"md5",
+	"touch",
+	"decipher",
+	"copy",
+	"move",
+	"rename",
+	"get_content",
+	"set_content",
+	"sniffer",
+	"net_use",
+	"scan",
+	"scan_address",
+	"user_input",
+	"clear_screen",
+	"connect_service",
+	"start_terminal",
+	"hash"
+]

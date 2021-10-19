@@ -9,11 +9,11 @@
     
     "host_computer": [
         "Shell.host_computer() : Computer\n\nReturns the computer associated with the Shell.",
-        "FtpShell.host_computer() : Computer\n\nReturns the computer associated with the FtpShell.",
+        "FtpShell.host_computer() : Computer\n\nReturns the computer associated with the FtpShell."
     ],
     "start_terminal": [
         "Shell.start_terminal() : Null\n\nLaunch an active terminal from the Shell.",
-        "FtpShell.start_terminal() : Null\n\nLaunch an active terminal from the FtpShell.",
+        "FtpShell.start_terminal() : Null\n\nLaunch an active terminal from the FtpShell."
     ],
     "build": "Shell.build(string pathSource, string pathBinary) : String\n\nCompile the source code of the file that is in the provided path, and save the executable in the destination path.\nThe name of the executable is the same as that of the source file without the extension.\nThe provided paths must be absolutes.\n\nReturns a string (empty on success, or with an error on failure)",
     "connect_service": "Shell.connect_service(string ip, int port, string username, string password, opt string serviceType) : Shell or FtpShell or Null\n\nConnect to a remote service. You can specify 'ftp' in the serviceType to request a FtpShell\n\nReturns a Shell or FtpShell if the connection has been established correctly or null on failure",
@@ -59,13 +59,13 @@
     "kernel_version": "Router.kernel_version : String\n\nReturns a string with the version of the kernel_router.so library",
     "local_ip": [
         "Router.local_ip : String\n\nReturns a string with the router's local ip address.",
-        "Computer.local_ip : String\n\nReturns a string with the computer's local ip address.",
+        "Computer.local_ip : String\n\nReturns a string with the computer's local ip address."
     ],
     "ping_port": "Router.ping_port(int port) : Port\n\nReturns the port object that is behind the port number provided if exists, null otherwise.",
     "port_info": "Router.port_info(port Port) : String\n\nReturns a string with the information of the port that has been provided. The port provided must not belong to another network than this router.",
     "public_ip": [
         "Router.public_ip : String\n\nReturns a string with the router's public ip address.",
-        "Computer.public_ip : String\n\nReturns a string with the computer's public ip address.",
+        "Computer.public_ip : String\n\nReturns a string with the computer's public ip address."
     ],
     "used_ports": "Router.used_ports : List\n\nReturns an array of ports that are being used in this router.",
     
@@ -159,7 +159,6 @@
     "str": "str(float) : String\n\nConverts the provided input into a string.",
     "ceil": "ceil(float) : Int\n\nReturns the provided input raised to the next or equal integer.",
     "pi": "pi : float\n\nReturns 3.14159265358979 (this will probably never be useful!)",
-    // Strings
     "remove": [
         "String.remove(substr) : String\n\nReturns the string without the first occurrence of the provided substring.",
         "Map.remove(key) : Map\n\nReturns the map without the first occurrence of the provided input.",
@@ -178,7 +177,7 @@
     "lastIndexOf": "String.lastIndexOf(string) : Int or Null\n\nReturns the last index of the provided input with the string. Optionally searches after begin. Returns Null if not found.",
     "slice": [
         "slice(String, opt start, opt end) : String\n\nReturns the provided string from index start to index end.",
-        "slice(List, opt start, opt end) : List\n\nReturns the provided list from index start to index end.",
+        "slice(List, opt start, opt end) : List\n\nReturns the provided list from index start to index end."
     ],
     "split": "String.split(seperator) : List[string]\n\nReturns a list object of substrings.",
     "replace": "String.replace(old,new) : String\n\nReturns the string with any instances of new replaced with old.",
@@ -186,13 +185,13 @@
     "indexes": [
         "String.indexes : List[string]\n\nReturns a list object containing indexes of all characters in the string.",
         "List.indexes : List[string]\n\nReturns a list object containing the list's indexes",
-        "Map.indexes : List[string]\n\nReturns a list object containing the map's indexes.",
+        "Map.indexes : List[string]\n\nReturns a list object containing the map's indexes."
     ],
     "code": "String.code : Int\n\nReturns the unicode code point of the first character in the string.",
     "len": [
         "String.len : Int\n\nReturns the length of the provided object.",
         "List.len : Int\n\nReturns the length of the provided object.",
-        "Map.len : Int\n\nReturns the length of the provided object.",
+        "Map.len : Int\n\nReturns the length of the provided object."
     ],
     "lower": "String.lower : String\n\nReturns the lowercase string.",
     "upper": "String.upper : String\n\nReturns the uppercase string.",
@@ -200,25 +199,25 @@
     "values": [
         "String.values : List[string]\n\nReturns a list object containing values of all characters in the string.",
         "List.values : List[string]\n\nReturns a list object containing the list's values",
-        "Map.values : List[string]\n\nReturns a list object containing the map's values.",
+        "Map.values : List[string]\n\nReturns a list object containing the map's values."
     ],
     "to_int": "String.to_int : Int\n\nConverts the string to a integer.",
     
     "push": [
         "List.push(any) : List\n\nPushes the provided input onto the end of the list. Returns the updated list, and updates the list in it's place.",
-        "Map.push(any) : Map\n\nPushes the provided input onto the end of the map. Returns the updated map, and updates the map in it's place.",
+        "Map.push(any) : Map\n\nPushes the provided input onto the end of the map. Returns the updated map, and updates the map in it's place."
     ],
     "pop": [
         "List.pop : Any\n\nReturns the key of the first element in the map or list, and removes that element from the map or list.",
-        "Map.pop : Any\n\nReturns the key of the first element in the map or list, and removes that element from the map or list.",
+        "Map.pop : Any\n\nReturns the key of the first element in the map or list, and removes that element from the map or list."
     ],
     "shuffle": [
         "Map.shuffle : Null\n\nRandomly remaps values in a map or list, leaving the keys in their original order.",
-        "List.shuffle : Null\n\nRandomly remaps values in a map or list, leaving the keys in their original order.",
+        "List.shuffle : Null\n\nRandomly remaps values in a map or list, leaving the keys in their original order."
     ],
     "sum": [
         "List.sum : int\n\nReturns the total of all numeric values in a list.",
-        "Map.sum : int\n\nReturns the total of all numeric values in a map.",
+        "Map.sum : int\n\nReturns the total of all numeric values in a map."
     ],
     
     "sort": "List.sort : List\n\nSorts a list alphanumerically.",
