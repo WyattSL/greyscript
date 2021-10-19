@@ -163,6 +163,19 @@ function activate(context) {
 	    }
 	    return outp;
     }
+	
+		let collection = vscode.languages.createDiagnosticCollection("greyscript");
+
+	
+    function onChange(document) {
+	   let uri = document.uri;
+	   collection.clear();
+	   let e = LookForErrors(document.GetText());
+	   collection.set(uri, e);
+    }
+	
+	let collection = vscode.languages.createDiagnosticCollection("greyscript");
+	ctx.subscriptions.push(collection);
 
     let gecmd = vscode.commands.registerTextEditorCommand("greyScript.gotoError", (editor, edit, context) => {
         let options = {"prompt": "Enter provided line number"}
