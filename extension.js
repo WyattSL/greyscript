@@ -157,10 +157,12 @@ function activate(context) {
 			    let e = source.indexOf(match[2])+match[2].length;
 			    let li = source.slice(0, s).split("/n").length;
 			    let eli = source.slice(e, source.length).split("/n").length;
-			    let ch = 1;
-			    let r = new vscode.Range(li, 1, eli, 2)
+			    let max = source.slice(0, s)
+			    let sch = max.slice(max.lastIndexOf("\\n"), max.indexOf(match[2])).length;
+			    let ech = max.slice(max.lastIndexOf("\\n"), max.indexOf(match[2])+match[2].length).length;
+			    let r = new vscode.Range(li, sch, eli, ech)
 			    let ms = "Cannot use "+match[2]+" in "+ (match[1] == "Encode" ? "encryption." : "decryption.");
-			    let d = new vscode.Diagnostic(r, ms, vscode.DiagnosticSeverity.Warning);
+			    let d = new vscode.Diagnostic(r, ms, vscode.DiagnosticSeverity.Error);
 			    outp.push(d);
             }
 	    }
