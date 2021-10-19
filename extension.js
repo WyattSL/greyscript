@@ -8,6 +8,7 @@ var ReturnData = require("./grammar/ReturnData.json")
 var Examples = require("./grammar/Examples.json")
 var CompTypes = require("./grammar/CompletionTypes.json") // Constant 20 Function 2 Property 9 Method 1 Variable 5 Interface 7
 var HoverData = require("./grammar/HoverData.json");
+var Encryption = require("./grammar/Encryption.json");
 
 function activate(context) {
     let hoverD = vscode.languages.registerHoverProvider('greyscript', {
@@ -15,22 +16,19 @@ function activate(context) {
             if (!vscode.workspace.getConfiguration("greyscript").get("hoverdocs")) return;
             let range = document.getWordRangeAtPosition(position)
             let word = document.getText(range)
-            //debug.appendLine(word)
+            debug.appendLine(word)
             let docs = HoverData[word];
             if (Array.isArray(docs)) {
                 debug.appendLine("array trigger")
                 docs = docs.join("\n\n\n")
                 debug.appendLine("array out: "+docs)
             }
-	    docs = docs ? new MarkdownString(docs, false) : null;
-	    if (Encryption.includes(docs)) {
-		let md = new MarkdownString("$(issues) **This function cannot be used in encryption!**", true)
-		docs.appendMarkdown(md);
-	    }
+	    if (Encryption.includes(word)) docs = docs + "\n\n\**This function cannot be used in encryption.*";
             if (docs) {
+                debug.appendLine("h doc "+docs)
                 return new vscode.Hover({
                     language: "greyscript",
-                    value: docs
+                    value: new vscode.MarkdownString(docs, true)
                 });
             }
         }
@@ -104,7 +102,6 @@ function activate(context) {
             let output = []
             let match = function(c) {
                 let w = word;
-                debug.appendLine("match function! W: " + w + " C: " + c + " matches: " + c.includes(w))
                 return c.includes(w)
             }
             output = CompData.filter(match)
@@ -134,17 +131,11 @@ function activate(context) {
                 var docs = HoverData[c]
                 //debug.appendLine("Docs: "+docs)
                 if (Array.isArray(docs)) {
-                    debug.appendLine("array trigger")
                     docs = docs.join("\n\n\n")
-                    debug.appendLine("array out: "+docs)
                 }
-		docs = docs ? new MarkdownString(docs, false);
-		if (Encryption[c]) {
-			let md = new MarkdownString("$(issues) **This function cannot be used in Encryption!**", true);
-			docs.appendMarkdown(md);
-		}
-                t.documentation = docs
-                if (Ex) t.documentation = docs+"\n\n"+Exs.join("\n\n")
+		        if (Encryption.includes(c)) docs = docs + "\n\n\**This function cannot be used in encryption.*";
+                t.documentation = new vscode.MarkdownString(docs, true);
+                if (Ex) t.documentation = new vscode.MarkdownString(docs+"\n\n"+Exs.join("\n\n"), true);
                 out.push(t);
             }
             return new vscode.CompletionList(out,true);

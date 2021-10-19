@@ -2,7 +2,7 @@
     
     "host_computer": "computer",
     "start_terminal": "shell",
-    "build": ["number", "string"]
+    "build": ["number", "string"],
     "connect_service": ["shell", "string"],
     "launch": ["number", "string"],
     "ping": ["number", "string"],
@@ -156,7 +156,7 @@
     
     "push": [],
     "pop": [],
-    "shuffle": (],
+    "shuffle": [],
     "sum": "number",
     
     "sort": [],
