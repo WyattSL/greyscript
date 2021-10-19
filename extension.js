@@ -153,14 +153,15 @@ function activate(context) {
 	    if (m) {
 		    let match;
 		    for (match of m) {
-			    console.log("Match m "+m);
+			    console.log("Match m "+match);
 			    let s = source.indexOf(match[2]);
 			    let e = source.indexOf(match[2])+match[2].length;
 			    let li = source.slice(0, s).split("/n").length;
 			    let eli = source.slice(e, source.length).split("/n").length;
-			    let max = source.slice(0, s)
-			    let sch = max.slice(max.lastIndexOf("\\n"), max.indexOf(match[2])).length;
-			    let ech = max.slice(max.lastIndexOf("\\n"), max.indexOf(match[2])+match[2].length).length;
+			    let max = source.slice(0, s);
+                let max2 = source.slice(0, e);
+			    let sch = max.slice(max.lastIndexOf("/n"), max.indexOf(match[2])).length;
+			    let ech = max2.slice(max2.lastIndexOf("/n"), max2.indexOf(match[2])+match[2].length).length;
 			    let r = new vscode.Range(li, sch, eli, ech)
 			    let ms = "Cannot use "+match[2]+" in "+ (match[1] == "Encode" ? "encryption." : "decryption.");
 			    let d = new vscode.Diagnostic(r, ms, vscode.DiagnosticSeverity.Error);
