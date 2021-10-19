@@ -153,6 +153,7 @@ function activate(context) {
 	    if (m) {
 		    let match;
 		    for (match of m) {
+			    console.log("Match m "+m);
 			    let s = source.indexOf(match[2]);
 			    let e = source.indexOf(match[2])+match[2].length;
 			    let li = source.slice(0, s).split("/n").length;
