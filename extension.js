@@ -156,9 +156,10 @@ function activate(context) {
 			    let s = source.indexOf(match[2]);
 			    let e = source.indexOf(match[2])+match[2].length;
 			    let li = source.slice(0, s).split("/n").length;
+			    let eli = source.slice(e, source.length).split("/n").length;
 			    let ch = 1;
-			    let r = new vscode.Range(s, 1, e, 2)
-			    let ms = "Cannot use "+match[2]+" in "+ match[1] == "Encode" ? "encryption." : "decryption.";
+			    let r = new vscode.Range(li, 1, eli, 2)
+			    let ms = "Cannot use "+match[2]+" in "+ (match[1] == "Encode" ? "encryption." : "decryption.");
 			    let d = new vscode.Diagnostic(r, ms, vscode.DiagnosticSeverity.Warning);
 			    outp.push(d);
             }
