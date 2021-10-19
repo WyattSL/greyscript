@@ -178,7 +178,7 @@ let collection = vscode.languages.createDiagnosticCollection("greyscript");
 		readerror(event.document);
 	}
 	
-	ctx.subscriptions.push(collection);
+	context.subscriptions.push(collection);
 
     let gecmd = vscode.commands.registerTextEditorCommand("greyScript.gotoError", (editor, edit, context) => {
         let options = {"prompt": "Enter provided line number"}
