@@ -2,5 +2,8 @@
     "get_shell": [
         ["Shell = get_shell"],
         ["RootShell = get_shell(\"root\",\"root_password\")"]
+    ],
+    "md5": [
+        ["Ciphertext = md5(\"Password\")"]
     ]
 }
