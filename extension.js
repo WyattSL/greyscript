@@ -147,12 +147,11 @@ function activate(context) {
     function LookForErrors(source) {
         console.log("Looking for errors")
 	    let outp = [];
-	    let reg = new RegExp(`(Encode|Decode)(?:\\s)?=(?:\\s)?function\\(.+\\)(.*|\n*)*(${Encryption.join("|")})(.*|\n*)*end function`, "gs");
+	    let reg = new RegExp(`(Encode|Decode)(?:\\s)?=(?:\\s)?function\\(.+\\).*(${Encryption.join("|")}).*end function`, "s");
 	    let m = source.match(reg);
         console.log("Match "+m)
 	    if (m) {
-		    let match;
-		    for (match of m) {
+		    let match = m;
 			    console.log("Match m "+match);
 			    let s = source.indexOf(match[2]);
 			    let e = source.indexOf(match[2])+match[2].length;
@@ -162,11 +161,10 @@ function activate(context) {
                 let max2 = source.slice(0, e);
 			    let sch = max.slice(max.lastIndexOf("/n"), max.indexOf(match[2])).length;
 			    let ech = max2.slice(max2.lastIndexOf("/n"), max2.indexOf(match[2])+match[2].length).length;
-			    let r = new vscode.Range(li, sch, eli, ech)
+			    let r = new vscode.Range(li, 1, eli, 99999)
 			    let ms = "Cannot use "+match[2]+" in "+ (match[1] == "Encode" ? "encryption." : "decryption.");
 			    let d = new vscode.Diagnostic(r, ms, vscode.DiagnosticSeverity.Error);
 			    outp.push(d);
-            }
 	    }
         console.log(outp.length+" errors found")
 	    return outp;
