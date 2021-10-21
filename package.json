@@ -17,6 +17,9 @@
     "engines": {
         "vscode": "^1.51.0"
     },
+    "badges": [
+        "https://github.com/WyattSL/greyscript/actions/workflows/node.js.yml/badge.svg?branch=main&event=push)](https://github.com/WyattSL/greyscript/actions/workflows/node.js.yml"
+    ],
     "categories": [
         "Programming Languages"
     ],
