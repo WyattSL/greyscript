@@ -1,4 +1,4 @@
-## 1.5.0
+## 1.6.0
 - Introduced support for error checking, will currently check for disallowed functions inside encryption/decryption. Will be expanded in future releases.
 
 ## 1.4.2
