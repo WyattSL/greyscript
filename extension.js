@@ -143,11 +143,57 @@ function activate(context) {
     });
 
     if (vscode.workspace.getConfiguration("greyscript").get("autocomplete")) context.subscriptions.push(compD)
+	
+    function LookForErrors(source) {
+        console.log("Looking for errors")
+	    let outp = [];
+	    let reg = new RegExp(`(Encode|Decode)(?:\\s)?=(?:\\s)?function\\(.+\\).*(${Encryption.join("|")}).*end function`, "s");
+	    let m = source.match(reg);
+        console.log("Match "+m)
+	    if (m) {
+		    let match = m;
+			    console.log("Match m "+match);
+			    let s = source.indexOf(match[2]);
+			    let e = source.indexOf(match[2])+match[2].length;
+			    let li = source.slice(0, s).split("/n").length;
+			    let eli = source.slice(e, source.length).split("/n").length;
+			    let max = source.slice(0, s);
+                let max2 = source.slice(0, e);
+			    let sch = max.slice(max.lastIndexOf("/n"), max.indexOf(match[2])).length;
+			    let ech = max2.slice(max2.lastIndexOf("/n"), max2.indexOf(match[2])+match[2].length).length;
+			    let r = new vscode.Range(li, 1, eli, 99999)
+			    let ms = "Cannot use "+match[2]+" in "+ (match[1] == "Encode" ? "encryption." : "decryption.");
+			    let d = new vscode.Diagnostic(r, ms, vscode.DiagnosticSeverity.Error);
+			    outp.push(d);
+	    }
+        console.log(outp.length+" errors found")
+	    return outp;
+    }
+	
+let collection = vscode.languages.createDiagnosticCollection("greyscript");
+
+	
+    function readerror(document) {
+        console.log("Reading Errors")
+	   let uri = document.uri;
+	   //collection.clear();
+       console.log("Sniffing errors on "+uri)
+	   let e = LookForErrors(document.getText());
+       console.log("Found Errors "+e.length)
+	   collection.set(uri, e);
+    }
+	let listen1 = vscode.workspace.onDidOpenTextDocument( readerror);
+	let listen2 = vscode.workspace.onDidChangeTextDocument(function(event) {
+        console.log("Doc Changed")
+		readerror(event.document);
+	});
+	console.log("Hello Hackers!")
+	context.subscriptions.push(collection, listen1, listen2);
 
     let gecmd = vscode.commands.registerTextEditorCommand("greyScript.gotoError", (editor, edit, context) => {
         let options = {"prompt": "Enter provided line number"}
         vscode.window.showInputBox(options).then((line) => {
-            line = Number(line)
+            line = Number(line);
             //debug.appendLine("line: "+line)
             var text = editor.document.getText();
             var exp = new RegExp("else","gm")
