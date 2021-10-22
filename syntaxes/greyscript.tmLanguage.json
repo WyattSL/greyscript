@@ -28,7 +28,19 @@
 				},
 				{
 					"name": "keyword.api.shell",
-					"match": "\\.(host_computer|scp|start_terminal|build|put|connect_service|launch|apt_show|apt_search|apt_update|apt_add_repo|apt_install|apt_check_upgrade)"
+					"match": "\\.(host_computer|scp|start_terminal|build|put|connect_service|launch)"
+				},
+				{
+					"name": "keyword.api.aptclient",
+					"match": "\\.(show|search|update|add_repo|del_repo|install|check_upgrade)"
+				},
+				{
+					"name": "keyword.api.libmail",
+					"match": "\\.(login)"
+				},
+				{
+					"name": "keyword.api.metamail",
+					"match": "\\.(delete|fetch|read|send)"
 				},
 				{
 					"name": "keyword.api.ftpshell",

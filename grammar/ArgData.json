@@ -6,12 +6,20 @@
     "launch": ["string", "string"],
     "ping": ["string"],
     "scp": ["string", "string", "shell"],
-    "apt_show": ["string"],
-    "apt_search": ["string"],
-    "apt_update": [],
-    "apt_add_repo": [],
-    "apt_install": ["string"],
-    "apt_check_upgrade": ["string"],
+    
+    "show": ["string"],
+    "search": ["string"],
+    "update": [],
+    "add_repo": ["string", "?integer"],
+    "del_repo": ["string"],
+    "install": ["string", "?string"],
+    "check_upgrade": ["string"],
+
+    "login": ["string", "string"],
+
+    "fetch": [],
+    "read": ["string"],
+    "send": ["string", "string", "string"],
     
     "put": ["string", "string", "ftpshell"],
     
@@ -101,7 +109,7 @@
     "active_user": [],
     "home_dir": [],
     "get_shell": ["?string", "?string"],
-    "user_input": ["string", "?number"],
+    "user_input": ["?string", "?number", "?number"],
     "include_lib": ["string"],
     "import_code": ["string"],
     "exit": ["?string"],

@@ -20,12 +20,20 @@
     "launch": "Shell.launch(string path, string args) : Null or Int\n\nLaunches the command in the provided path.\n\nReturns null on success, or 0 on failure",
     "ping": "Shell.ping(string ip) : Int\n\nReturns true if the remote address could be reached, false otherwise. Firewalls do not block ping requests.",
     "scp": "Shell.scp(string pathOrigin, string pathDestination, shell remoteShell) : Int or String\n\nCopy a file from one computer to the other through the network.\n\nReturns 1 on success, or a string (containing an error) on failure",
-    "apt_show": "Shell.apt_show(string repositoryName) : String\n\nShows all packages available in repository\nThe repository MUST be added in the /etc/apt/sources.txt file.\n\nReturns string with all pachages on success, or a string (containing an error) on failure",
-    "apt_search": "Shell.apt_search(string packageName) : String\n\nSearch specifically for the package in any of the repositories listed in /etc/apt/sources.txt\n\nReturns either a string with information about the package, or a string (containing an error) on failure",
-    "apt_update": "Shell.apt_update() : String\n\nUpdate the list of available packages after adding a new repository in /etc/apt/sources.txt, or if the remote repository has updated its information in /server/conf/repod.conf\n\nReturns string containing all repository addresses with 'Updated' prefix on success, or a string (containing an error) on failure",
-    "apt_add_repo": "Shell.apt_add_repo(string repositoryAddress, opt int port) : String\n\nAdd the repository address in the /etc/apt/sources.txt file\n\nReturns empty string on success, or a string (containing an error) on failure",
-    "apt_install": "Shell.apt_install(string packageName) : Int or String\n\nInstall the program or library from a remote repository listed in /etc/apt/sources.txt\n\nReturns 1 on success, or a string (containing an error) on failure",
-    "apt_check_upgrade": "Shell.apt_check_upgrade(string packageName) : Int or String\n\nCheck if there is a newer version of the package in the repository.\n\nReturns 1 if there is a newer version, or 0 if there is not a newer version, or a string (containing an error) on failure",
+    
+    "show": "AptClient.show(string repositoryName) : String\n\nShows all packages available in repository\nThe repository MUST be added in the /etc/apt/sources.txt file.\n\nReturns string with all pachages on success, or a string (containing an error) on failure",
+    "search": "AptClient.search(string packageName) : String\n\nSearch specifically for the package in any of the repositories listed in /etc/apt/sources.txt\n\nReturns either a string with information about the package, or a string (containing an error) on failure",
+    "update": "AptClient.update() : String\n\nUpdate the list of available packages after adding a new repository in /etc/apt/sources.txt, or if the remote repository has updated its information in /server/conf/repod.conf\n\nReturns string containing all repository addresses with 'Updated' prefix on success, or a string (containing an error) on failure",
+    "add_repo": "AptClient.add_repo(string repositoryAddress, opt int port) : String\n\nAdd the repository address in the /etc/apt/sources.txt file\n\nReturns empty string on success, or a string (containing an error) on failure",
+    "del_repo": "AptClient.del_repo(string repositoryAddress) : String\n\nRemove the repository address in the /etc/apt/sources.txt file.\n\nReturns empty string on success, or a string (containing an error) on failure",
+    "install": "AptClient.install(string package_name, string opt_install_path) : String\n\nInstall the program or library from a remote repository listed in /etc/apt/sources.txt.\nUnless a path is specified, the program installs in /lib if it is a library or in /bin otherwise\n\nReturns a string (containing an error) on failure or empty on success.",
+    "check_upgrade": "AptClient.check_upgrade(string file_path) : String\n\nCheck if there is a newer version of the file in the repository.\n\nReturns a string (containing an error) on failure or is empty when succesful",
+
+    "login": "LibMail.login(string user, string password) : MetaMail or String\n\nAccess the email account\n\nReturns a MetaMail type object if the login has been correct. In case of error, it returns a string",
+
+    "fetch": "MetaMail.fetch() : List[string] or String\n\nGet all mails\n\nReturns a string type list of the received emails, with a content preview. In case of error, it returns a string",
+    "read": "MetaMail.read(string mail_ID) : String\n\nRead the full mail. The mail_ID argument can be obtained with fetch method.\n\nReturns either the content as a string or an error message.",
+    "send": "MetaMail.send(string address, string subject, string message) : Int or String\n\nSend a new mail to the indicated recipient.\n\nReturns 1 if the mail has been sent correctly, otherwise returns a string with the error.",
     
     "put": "FtpShell.put(string pathOrigin, string pathDestination, shell remoteShell) : Int or String\n\nCopy a file from one computer to the other through the network.\n\nReturns 1 on success, or a string (containing an error) on failure",
     
@@ -83,7 +91,10 @@
     "is_folder": "File.is_folder : Int\n\nReturns true if the file is folder, false otherwise.",
     "is_binary": "File.is_binary : Int\n\nReturns true if the file is binary, false otherwise.",
     "has_permission": "File.has_permission(string permission) : Int\n\nReturns true if the user who launches the script has the necessary permissions.\nThe type_perm parameter is used for reading ('r'), writing ('w') and execution ('x')",
-    "delete": "File.delete : String\n\nDelete the file\n\nReturns a string (empty on success, or with an error on failure)",
+    "delete": [
+        "File.delete : String\n\nDelete the file\n\nReturns a string (empty on success, or with an error on failure)",
+        "MetaMail.delete(string mail_ID) : Int or String\n\nDelete the mail that corresponds with mail_ID.\n\nReturns 1 if it was removed successfully or a string with the error message."
+    ],
     "get_folders": "File.get_folders : List[file]\n\nReturns an array of the folders contained in this object. This function is only available if this object is a folder, so it is advisable to first use the is_folder function before calling this method.",
     "get_files": "File.get_files : List[file]\n\nReturns an array of files (excluded folders) contained in this object. This function is only available if this object is a folder, so it is advisable to first use the is_folder function before calling this method.",
     "permissions": "File.permissions : String\n\nReturns a string with the current file permissions.",
@@ -122,7 +133,7 @@
     "active_user": "active_user : String\n\nReturns a string with the name of the user who is executing the script.",
     "home_dir": "home_dir : String\n\nReturns a string with home folder path of the user who is executing the script.",
     "get_shell": "get_shell(opt string username, opt string password) : Shell\n\nReturns the shell that is executing the script if it is called without parameters. \nPassing a username and password, it returns a shell with those credentials if are correct.",
-    "user_input": "user_input(opt string prompt, opt int isPassword) : String\n\nIt puts the program on hold to receive the user input, which will be processed as a string. If the password mode is activated, the input text will be hidden with asterisks.",
+    "user_input": "user_input(opt string prompt, opt int isPassword, opt int anyKey) : String\n\nIt puts the program on hold to receive the user input, which will be processed as a string. If the password mode is activated, the input text will be hidden with asterisks. If the anyKey argument is true, the entered character will be captured without pressing enter.",
     "include_lib": "include_lib(string path) : any\n\nIncludes an external library to be used in scripting. If the library has been included correctly, it will return an object of corresponding type with the library, null otherwise",
     "import_code": "import_code(string absolutePath) : any\n\nIncludes external code into the current code. Can be used to split code in multiple files.\nNote: The code will be added to the current code upon compiling.",
     "exit": "exit(opt string message) : Null\n\nStops the execution of the script at the time this method is executed. Optionally you can pass a string as a message that will be printed in the terminal when the program ends.",
