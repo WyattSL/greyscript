@@ -1,5 +1,4 @@
 {
-    
     "host_computer": "shell",
     "start_terminal": "shell",
     "build": "shell",
@@ -7,12 +6,14 @@
     "launch": "shell",
     "ping": "shell",
     "scp": "shell",
-    "apt_show": "shell",
-    "apt_search": "shell",
-    "apt_update": "shell",
-    "apt_add_repo": "shell",
-    "apt_install": "shell",
-    "apt_check_upgrade": "shell",
+
+    "show": "aptclient",
+    "search": "aptclient",
+    "update": "aptclient",
+    "add_repo": "aptclient",
+    "del_repo": "aptclient",
+    "install": "aptclient",
+    "check_upgrade": "aptclient",
     
     "put": "ftpshell",
     
@@ -22,6 +23,12 @@
     "decipher": "crypto",
     "smtp_user_list": "crypto",
     
+    "login": "libmail",
+
+    "fetch": "metamail",
+    "read": "metamail",
+    "send": "metamail",
+
     "lib_name": "metalib",
     "version": "metalib",
     "overflow": "metalib",

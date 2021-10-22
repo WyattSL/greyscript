@@ -6,12 +6,20 @@
     "launch",
     "ping",
     "scp",
-    "apt_show",
-    "apt_search",
-    "apt_update",
-    "apt_add_repo",
-    "apt_install",
-    "apt_check_upgrade",
+    
+    "show",
+    "search",
+    "update",
+    "add_repo",
+    "del_repo",
+    "install",
+    "check_upgrade",
+
+    "login",
+    
+    "fetch",
+    "read",
+    "send",
     
     "put",
     

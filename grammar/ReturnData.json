@@ -7,13 +7,22 @@
     "launch": ["number", "string"],
     "ping": ["number", "string"],
     "scp": [],
-    "apt_show": [],
-    "apt_search": [],
-    "apt_update": [],
-    "apt_add_repo": [],
-    "apt_install": [],
-    "apt_check_upgrade": [],
+
+    "show": ["string"],
+    "search": ["string"],
+    "update": ["string"],
+    "add_repo": ["string"],
+    "del_repo": ["string"],
+    "install": ["string"],
+    "check_upgrade": ["string"],
     
+    "login": ["string", "metamail"],
+
+    "delete": ["integer", "string"],
+    "fetch": ["list", "string"],
+    "read": ["string"],
+    "send": ["integer", "string"],
+
     "put": [],
     
     "aircrack": [],
