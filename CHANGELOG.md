@@ -1,3 +1,6 @@
+## 1.6.1
+- Support for the new nightly functions.
+
 ## 1.6.0
 - Introduced support for error checking, will currently check for disallowed functions inside encryption/decryption. Will be expanded in future releases.
 
