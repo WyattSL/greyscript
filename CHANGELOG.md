@@ -1,5 +1,8 @@
+## 1.6.2
+- Hotfix for HoverDocs
+
 ## 1.6.1
-- Nightly functions are now highlighted.
+- Support for the new nightly functions.
 
 ## 1.6.0
 - Introduced support for error checking, will currently check for disallowed functions inside encryption/decryption. Will be expanded in future releases.
