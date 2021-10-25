@@ -1,3 +1,6 @@
+## 1.6.2
+- Hotfix for HoverDocs
+
 ## 1.6.1
 - Support for the new nightly functions.
 
