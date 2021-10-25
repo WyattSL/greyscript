@@ -19,11 +19,11 @@ function activate(context) {
             if (Array.isArray(docs)) {
                 docs = docs.join("\n\n\n")
             }
-	        if (Encryption.includes(word)) docs = docs + "\n\n\**This function cannot be used in encryption.*";
+	    if (Encryption.includes(word)) docs = docs + "\n\n\This function cannot be used in encryption.";
             if (docs) {
                 return new vscode.Hover({
                     language: "greyscript",
-                    value: new vscode.MarkdownString(docs, true)
+                    value: docs
                 });
             }
         }
