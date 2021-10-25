@@ -68,7 +68,12 @@
                 "greyscript.hoverdocs": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Enable GreyScript's hover-for-documentation"
+                    "description": "Enable GreyScript's hover-for-documentation."
+                },
+                "greyscript.colorpicker": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable GreyScript's color picker."
                 }
             }
         }
