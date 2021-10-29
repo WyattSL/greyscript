@@ -147,6 +147,9 @@ function activate(context) {
     }
 
     let ColorPicker = vscode.languages.registerColorProvider('greyscript', {
+        provideColorPresentations(color, ctx) {
+            return []
+        },
         provideDocumentColors(document, token) {
             let txt = document.getText();
             let reg = /(?:(?:<color=)?(#[0-9a-f]{6,8})|<color=\"?(black|blue|green|orange|purple|red|white|yellow)\"?)>/gi
@@ -155,12 +158,31 @@ function activate(context) {
             for (var m of mchs) {
                 let ps = txt.slice(0,m.index);
                 let pl = txt.split("\n").length;
-                let pc = txt.lastIndexOf("\n")+m.index
+                let pc = m.index-txt.slice(0, txt.lastIndexOf("\n")).length
+                if (pc < 0) pc = 0;
                 let range = new vscode.Range(pl, pc, pl, pc+m[0].length);
                 let color;
-                if (m[1].includes("#")) {
+                if (m[1] && m[1].includes("#")) {
                     let d = hexToRgb(m[1])
-                    color = new vscode.Color(d.r,d.g,d.b,d.a ? d.a : 16);
+                    color = new vscode.Color(d.r,d.g,d.b);
+                }
+                if (m[2]) {
+                    switch (m[2]) {
+                        case "red":
+                            color = "#1f0f0f"
+                            break;
+                        case "green":
+                            color = "#0f1f0f"
+                            break;
+                        case "blue":
+                            color = "#0f0f1f";
+                            break;
+                        case "white":
+                            color = "#1f1f1f"
+                            break;
+                    }
+                    let d = hexToRgb(color);
+                    color = new vscode.Color(d.r,d.g,d.b)
                 }
                 let c = new vscode.ColorInformation(range, color)
                 out.push(c);
