@@ -1,3 +1,6 @@
+## 1.6.3
+- Hotfix for potential bug in encryption detection.
+
 ## 1.6.2
 - Hotfix for HoverDocs
 
