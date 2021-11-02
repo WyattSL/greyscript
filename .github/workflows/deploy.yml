@@ -21,6 +21,8 @@ jobs:
       # Install NodeJS
       - name: Install NodeJS
         uses: actions/setup-node@v2.4.1
+        with:
+          node-version: '16'
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
@@ -32,9 +34,9 @@ jobs:
         
       - name: Find Version
         id: find-version
-        run: echo "::set-output name=ver::$(npm pkg get version)"
+        run: "ver=$(npm pkg get version)"
       
       - name: Publish GitHub Release
         run: |
           echo ${{ github.token }} | gh auth login --with-token
-          gh release create ${{fromJSON(steps.find-version.outputs.ver)}} extension.vsix -F CHANGELOG.md
+          gh release create $ver extension.vsix -F CHANGELOG.md
