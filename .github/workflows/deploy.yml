@@ -34,9 +34,11 @@ jobs:
         
       - name: Find Version
         id: find-version
-        run: "ver=$(npm pkg get version)"
+        run: |
+          ver=$(npm pkg get version)
+          ver=${ver//\"/}
       
       - name: Publish GitHub Release
         run: |
           echo ${{ github.token }} | gh auth login --with-token
-          gh release create $ver extension.vsix -F CHANGELOG.md
+          gh release create $ver extension.vsix -F CHANGELOG.md -t $ver
