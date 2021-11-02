@@ -30,7 +30,9 @@ jobs:
         
       - name: Find Version
         id: find-version
-        run: echo ::set-output name=ver::$(npm version)
+        run: echo "::set-output name=ver::$(npm version)"
       
       - name: Publish GitHub Release
-        run: gh release create ${{fromJSON(steps.find-version.outputs.ver)}} extension.vsix -F CHANGELOG.md
+        run: |
+          echo ${{ SECRETS.RELEASE_TOKEN }} | gh auth login --with-token
+          gh release create ${{fromJSON(steps.find-version.outputs.ver)}} extension.vsix -F CHANGELOG.md
