@@ -32,7 +32,7 @@ jobs:
         
       - name: Find Version
         id: find-version
-        run: echo "::set-output name=ver::$(npm version)"
+        run: echo "::set-output name=ver::$(npm pkg get version)"
       
       - name: Publish GitHub Release
         run: |
