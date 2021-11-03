@@ -22,9 +22,6 @@
         "Programming Languages"
     ],
     "main": "./extension.js",
-    "scripts": {
-        "test": "code --extensionDevelopmentPath=./ --extensionTestsPath=./tests/index.js "
-    },
     "qna": "false",
     "bugs": {
         "url": "https://github.com/WyattSL/greyscript/issues",
