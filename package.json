@@ -9,10 +9,6 @@
         "url": "https://github.com/WyattSL"
     },
     "icon": "icon.png",
-    "bugs": {
-	"url": "https://github.com/WyattSL/greyscript/issues",
-	"email": "wyattlipscomb20@gmail.com"
-    },
     "version": "1.6.4",
     "repository": {
         "type": "git",
@@ -26,6 +22,9 @@
         "Programming Languages"
     ],
     "main": "./extension.js",
+    "scripts": {
+        "test": "code --extensionDevelopmentPath=./ --extensionTestsPath=./tests/index.js "
+    },
     "qna": "false",
     "bugs": {
         "url": "https://github.com/WyattSL/greyscript/issues",
