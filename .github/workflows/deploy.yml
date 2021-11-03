@@ -38,7 +38,13 @@ jobs:
           ver=$(npm pkg get version)
           ver=${ver//\"/}
       
+      - name: Publish to DevOps
+        run: vsce publish
+        env:
+          VSCE_PAT: ${{ SECRETS.DEPLOYTOKEN }}
+      
       - name: Publish GitHub Release
         run: |
           echo ${{ github.token }} | gh auth login --with-token
           gh release create $ver extension.vsix -F CHANGELOG.md -t $ver
+      
