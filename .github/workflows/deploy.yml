@@ -46,5 +46,5 @@ jobs:
       - name: Publish GitHub Release
         run: |
           echo ${{ github.token }} | gh auth login --with-token
-          gh release create $ver extension.vsix -F CHANGELOG.md -t $ver
+          gh release create $ver extension.vsix -F CHANGELOG.md
       
