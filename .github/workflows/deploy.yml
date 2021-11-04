@@ -28,12 +28,12 @@ jobs:
 
       - name: Install VSCE
         run: npm install -g vsce
+        
+      - name: Install Webpack Dependencies
+        run: npm install -g esbuild webpack webpack-cli
 
       - name: Package Extension
         run: vsce package -o extension.vsix
-      
-      - name: Bundle Webpack
-        run: npm run package
         
       - name: Find Version
         id: find-version
