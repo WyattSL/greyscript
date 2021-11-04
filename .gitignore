@@ -2,3 +2,4 @@
 *.vsix
 .vscodeignore
 npm-debug.log
+out/*

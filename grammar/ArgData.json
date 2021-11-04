@@ -1,172 +1,1107 @@
 {
-    "host_computer": [],
-    "start_terminal": [],
-    "build": ["string", "string"],
-    "connect_service": ["string", "integer", "string", "string"],
-    "launch": ["string", "string"],
-    "ping": ["string"],
-    "scp": ["string", "string", "shell"],
-    
-    "show": ["string"],
-    "search": ["string"],
-    "update": [],
-    "add_repo": ["string", "?integer"],
-    "del_repo": ["string"],
-    "install": ["string", "?string"],
-    "check_upgrade": ["string"],
-
-    "login": ["string", "string"],
-
-    "fetch": [],
-    "read": ["string"],
-    "send": ["string", "string", "string"],
-    
-    "put": ["string", "string", "ftpshell"],
-    
-    "aircrack": ["string"],
-    "airmon": ["string"],
-    "aireplay": ["string", "string", "number"],
-    "decipher": ["string", "string"],
-    "smtp_user_list": ["string", "number"],
-    
-    "lib_name": [],
-    "version": [],
-    "overflow": ["string", "string", "?string"],
-    
-    "load": ["string"],
-    "net_use": ["string", "number"],
-    "rshell_client": ["string", "number", "string"],
-    "rshell_server": [],
-    "scan_address": ["string"],
-    "scan": ["string"],
-    "sniffer": ["number"],
-    
-    "port_number": [],
-    "is_closed": [],
-    "get_lan_ip": [],
-    
-    "bssid_name": [],
-    "device_ports": [],
-    "devices_lan_ip": [],
-    "essid_name": [],
-    "firewall_rules": [],
-    "kernel_version": [],
-    "local_ip": [],
-    "ping_port": ["number"],
-    "port_info": ["number"],
-    "public_ip": [],
-    "used_ports": [],
-    
-    "dump_lib": [],
-    
-    "chmod": ["string", "string"],
-    "copy": ["string", "string"],
-    "move": ["string", "string"],
-    "rename": ["string"],
-    "path": [],
-    "parent": [],
-    "name": [],
-    "get_content": [],
-    "set_content": ["string"],
-    "is_binary": [],
-    "has_permission": ["string"],
-    "delete": [],
-    "get_folders": [],
-    "get_files": [],
-    "permissions": [],
-    "owner": [],
-    "set_owner": ["string"],
-    "group": [],
-    "set_group": ["string"],
-    "size": [],
-    
-    "get_ports": [],
-    "File": ["string"],
-    "create_folder": ["string", "string"],
-    "is_network_active": [],
-    "touch": ["string", "string"],
-    "show_procs": [],
-    "network_devices": [],
-    "change_password": ["string", "string"],
-    "create_user": ["string", "string"],
-    "delete_user": ["string", "?number"],
-    "create_group": ["string", "string"],
-    "delete_group": ["string", "string"],
-    "groups": ["string"],
-    "close_program": ["number"],
-    "wifi_networks": [],
-    "connect_wifi": ["string", "string", "string", "string"],
-    "connect_ethernet": [],
-    "network_gateway": [],
-    "active_net_card": [],
-    
-    "typeof": ["any"],
-    "get_router": ["?string"],
-    "get_switch": ["string"],
-    "nslookup": ["string"],
-    "print": ["any"],
-    "clear_screen": [],
-    "active_user": [],
-    "home_dir": [],
-    "get_shell": ["?string", "?string"],
-    "user_input": ["?string", "?number", "?number"],
-    "include_lib": ["string"],
-    "import_code": ["string"],
-    "exit": ["?string"],
-    "user_mail_address": [],
-    "user_bank_number": [],
-    "whois": ["string"],
-    "wait": ["number"],
-    "command_info": ["string"],
-    "program_path": [],
-    "current_path": [],
-    "format_columns": ["string"],
-    "current_date": [],
-    "is_lan_ip": ["string"],
-    "is_valid_ip": ["string"],
-    "bitwise": ["string", "number", "number"],
-    
-    "abs": ["number"],
-    "acos": ["number"],
-    "asin": ["number"],
-    "atan": ["number"],
-    "tan": ["number"],
-    "cos": ["number"],
-    "sin": ["number"],
-    "char": ["number"],
-    "floor": ["number"],
-    "range": ["number", "number", "number"],
-    "round": ["number", "number"],
-    "rnd": ["?number"],
-    "sign": ["number"],
-    "sqrt": ["number"],
-    "str": ["number"],
-    "ceil": ["number"],
-    "pi": [],
-    
-    "remove": [["number", "string"]],
-    "hasIndex": [["number", "string"]],
-    "indexOf": ["string", "number"],
-    "lastIndexOf": ["string"],
-    "slice": ["string", "nunber", "number"],
-    "split": ["string"],
-    "replace": ["string", "string"],
-    "trim": [],
-    "indexes": [],
-    "code": [],
-    "len": [],
-    "lower": [],
-    "upper": [],
-    "val": [],
-    "values": [],
-    "to_int": [],
-    
-    "push": ["any"],
-    "pop": ["any"],
-    "shuffle": [],
-    "sum": [],
-    
-    "sort": [],
-    "join": ["string"],
-    "reverse": []
+    "Shell": {
+        "host_computer": [],
+        "start_terminal": [],
+        "build": [
+            {
+                "type": "String",
+                "name": "pathSource",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "pathBinary",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "allowImport",
+                "optional": true
+            }
+        ],
+        "connect_service": [
+            {
+                "type": "String",
+                "name": "ipAddress",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "port",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "user",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "password",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "service",
+                "optional": true
+            }
+        ],
+        "launch": [
+            {
+                "type": "String",
+                "name": "path",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "args",
+                "optional": false
+            }
+        ],
+        "ping": [
+            {
+                "type": "String",
+                "name": "ipAddress",
+                "optional": false
+            }
+        ],
+        "scp": [
+            {
+                "type": "String",
+                "name": "pathOrig",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "pathDest",
+                "optional": false
+            },
+            {
+                "type": "Shell",
+                "name": "remoteShell",
+                "optional": false
+            }
+        ]
+    },
+    "AptClient": {
+        "show": [
+            {
+                "type": "String",
+                "name": "repository_name",
+                "optional": false
+            }
+        ],
+        "search": [
+            {
+                "type": "String",
+                "name": "package_name",
+                "optional": false
+            }
+        ],
+        "update": [],
+        "add_repo": [
+            {
+                "type": "String",
+                "name": "repository_address",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "port",
+                "optional": true
+            }
+        ],
+        "del_repo": [
+            {
+                "type": "String",
+                "name": "repository_address",
+                "optional": false
+            }
+        ],
+        "install": [
+            {
+                "type": "String",
+                "name": "package_name",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "install_path",
+                "optional": true
+            }
+        ],
+        "check_upgrade": [
+            {
+                "type": "String",
+                "name": "file_path",
+                "optional": false
+            }
+        ]
+    },
+    "LibMail": {
+        "login": [
+            {
+                "type": "String",
+                "name": "user",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "password",
+                "optional": false
+            }
+        ]
+    },
+    "MetaMail": {
+        "delete": [
+            {
+                "type": "String",
+                "name": "mail_id",
+                "optional": false
+            }
+        ],
+        "fetch": [],
+        "read": [
+            {
+                "type": "String",
+                "name": "mail_id",
+                "optional": false
+            }
+        ],
+        "send": [
+            {
+                "type": "String",
+                "name": "address",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "subject",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "message",
+                "optional": false
+            }
+        ]
+    },
+    "FtpShell": {
+        "host_computer": [],
+        "start_terminal": [],
+        "put": [
+            {
+                "type": "String",
+                "name": "pathOrig",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "pathDest",
+                "optional": false
+            },
+            {
+                "type": "Shell",
+                "name": "remoteShell",
+                "optional": false
+            }
+        ]
+    },
+    "Crypto": {
+        "aircrack": [
+            {
+                "type": "String",
+                "name": "pathFile",
+                "optional": false
+            }
+        ],
+        "airmon": [
+            {
+                "type": "String",
+                "name": "option",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "device",
+                "optional": false
+            }
+        ],
+        "aireplay": [
+            {
+                "type": "String",
+                "name": "bssid",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "essid",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "maxAcks",
+                "optional": true
+            }
+        ],
+        "decipher": [
+            {
+                "type": "String",
+                "name": "encryptedPass",
+                "optional": false
+            }
+        ],
+        "smtp_user_list": [
+            {
+                "type": "String",
+                "name": "ipAddress",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "port",
+                "optional": false
+            }
+        ]
+    },
+    "MetaLib": {
+        "lib_name": [],
+        "version": [],
+        "overflow": [
+            {
+                "type": "String",
+                "name": "memAddress",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "unsecValue",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "optArgs",
+                "optional": true
+            }
+        ]
+    },
+    "Metaxploit": {
+        "load": [
+            {
+                "type": "String",
+                "name": "path",
+                "optional": false
+            }
+        ],
+        "net_use": [
+            {
+                "type": "String",
+                "name": "ipAddress",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "port",
+                "optional": false
+            }
+        ],
+        "rshell_client": [
+            {
+                "type": "String",
+                "name": "address",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "port",
+                "optional": true
+            },
+            {
+                "type": "String",
+                "name": "procName",
+                "optional": true
+            }
+        ],
+        "rshell_server": [],
+        "scan_address": [
+            {
+                "type": "MetaLib",
+                "name": "metaLib",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "memAddress",
+                "optional": false
+            }
+        ],
+        "scan": [
+            {
+                "type": "MetaLib",
+                "name": "metaLib",
+                "optional": false
+            }
+        ],
+        "sniffer": [
+            {
+                "type": "Number",
+                "name": "saveEncSource",
+                "optional": false
+            }
+        ]
+    },
+    "Port": {
+        "port_number": [],
+        "is_closed": [],
+        "get_lan_ip": []
+    },
+    "Router": {
+        "bssid_name": [],
+        "device_ports": [
+            {
+                "type": "String",
+                "name": "ipAddress",
+                "optional": false
+            }
+        ],
+        "devices_lan_ip": [],
+        "essid_name": [],
+        "firewall_rules": [],
+        "kernel_version": [],
+        "local_ip": [],
+        "ping_port": [
+            {
+                "type": "Number",
+                "name": "port",
+                "optional": false
+            }
+        ],
+        "port_info": [
+            {
+                "type": "Port",
+                "name": "portObject",
+                "optional": false
+            }
+        ],
+        "public_ip": [],
+        "used_ports": []
+    },
+    "NetSession": {
+        "dump_lib": []
+    },
+    "File": {
+        "chmod": [
+            {
+                "type": "String",
+                "name": "permission",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "isRecursive",
+                "optional": true
+            }
+        ],
+        "copy": [
+            {
+                "type": "String",
+                "name": "path",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "newName",
+                "optional": false
+            }
+        ],
+        "move": [
+            {
+                "type": "String",
+                "name": "path",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "newName",
+                "optional": false
+            }
+        ],
+        "rename": [
+            {
+                "type": "String",
+                "name": "newName",
+                "optional": false
+            }
+        ],
+        "path": [],
+        "parent": [],
+        "name": [],
+        "get_content": [],
+        "set_content": [
+            {
+                "type": "String",
+                "name": "content",
+                "optional": false
+            }
+        ],
+        "is_binary": [],
+        "has_permission": [
+            {
+                "type": "String",
+                "name": "permission",
+                "optional": false
+            }
+        ],
+        "delete": [],
+        "get_folders": [],
+        "get_files": [],
+        "permissions": [],
+        "owner": [],
+        "set_owner": [
+            {
+                "type": "String",
+                "name": "ownerName",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "isRecursive",
+                "optional": true
+            }
+        ],
+        "group": [],
+        "set_group": [
+            {
+                "type": "String",
+                "name": "groupName",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "isRecursive",
+                "optional": true
+            }
+        ],
+        "size": []
+    },
+    "Computer": {
+        "get_ports": [],
+        "File": [
+            {
+                "type": "String",
+                "name": "path",
+                "optional": false
+            }
+        ],
+        "create_folder": [
+            {
+                "type": "String",
+                "name": "path",
+                "optional": false
+            },
+            "folderName"
+        ],
+        "is_network_active": [],
+        "touch": [
+            {
+                "type": "String",
+                "name": "path",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "fileName",
+                "optional": false
+            }
+        ],
+        "show_procs": [],
+        "network_devices": [],
+        "change_password": [
+            {
+                "type": "String",
+                "name": "user",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "password",
+                "optional": false
+            }
+        ],
+        "create_user": [
+            {
+                "type": "String",
+                "name": "user",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "password",
+                "optional": false
+            }
+        ],
+        "delete_user": [
+            {
+                "type": "String",
+                "name": "user",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "removeHome",
+                "optional": true
+            }
+        ],
+        "create_group": [
+            {
+                "type": "String",
+                "name": "user",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "groupName",
+                "optional": false
+            }
+        ],
+        "delete_group": [
+            {
+                "type": "String",
+                "name": "user",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "groupName",
+                "optional": false
+            }
+        ],
+        "groups": [
+            {
+                "type": "String",
+                "name": "user",
+                "optional": false
+            }
+        ],
+        "close_program": [
+            {
+                "type": "Number",
+                "name": "PID",
+                "optional": false
+            }
+        ],
+        "wifi_networks": [
+            {
+                "type": "String",
+                "name": "netDevice",
+                "optional": false
+            }
+        ],
+        "connect_wifi": [
+            {
+                "type": "String",
+                "name": "netDevice",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "bssid",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "essid",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "password",
+                "optional": false
+            }
+        ],
+        "connect_ethernet": [
+            {
+                "type": "String",
+                "name": "netDevice",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "localIp",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "gateway",
+                "optional": false
+            }
+        ],
+        "network_gateway": [],
+        "active_net_card": []
+    },
+    "General": {
+        "typeof": [
+            {
+                "type": "Any",
+                "name": "anyObject",
+                "optional": false
+            }
+        ],
+        "get_router": [
+            {
+                "type": "String",
+                "name": "ipAddress",
+                "optional": true
+            }
+        ],
+        "get_switch": [
+            {
+                "type": "String",
+                "name": "ipAddress",
+                "optional": false
+            }
+        ],
+        "nslookup": [
+            {
+                "type": "String",
+                "name": "hostname",
+                "optional": false
+            }
+        ],
+        "print": [
+            {
+                "type": "String",
+                "name": "value",
+                "optional": false
+            }
+        ],
+        "clear_screen": [],
+        "active_user": [],
+        "home_dir": [],
+        "get_shell": [
+            {
+                "type": "String",
+                "name": "username",
+                "optional": true
+            },
+            {
+                "type": "String",
+                "name": "password",
+                "optional": true
+            }
+        ],
+        "user_input": [
+            {
+                "type": "String",
+                "name": "message",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "isPassword",
+                "optional": true
+            },
+            {
+                "type": "Number",
+                "name": "anyKey",
+                "optional": true
+            }
+        ],
+        "include_lib": [
+            {
+                "type": "String",
+                "name": "libPath",
+                "optional": false
+            }
+        ],
+        "import_code": [
+            {
+                "type": "String",
+                "name": "absolutePath",
+                "optional": false
+            }
+        ],
+        "exit": [
+            {
+                "type": "String",
+                "name": "message",
+                "optional": true
+            }
+        ],
+        "user_mail_address": [],
+        "user_bank_number": [],
+        "whois": [
+            {
+                "type": "String",
+                "name": "ipAddress",
+                "optional": false
+            }
+        ],
+        "wait": [
+            {
+                "type": "Number",
+                "name": "seconds",
+                "optional": false
+            }
+        ],
+        "command_info": [
+            {
+                "type": "String",
+                "name": "idCommand",
+                "optional": false
+            }
+        ],
+        "program_path": [],
+        "current_path": [],
+        "format_columns": [
+            {
+                "type": "String",
+                "name": "columns",
+                "optional": false
+            }
+        ],
+        "current_date": [],
+        "is_lan_ip": [
+            {
+                "type": "String",
+                "name": "ipAddress",
+                "optional": false
+            }
+        ],
+        "is_valid_ip": [
+            {
+                "type": "String",
+                "name": "ipAddress",
+                "optional": false
+            }
+        ],
+        "bitwise": [
+            {
+                "type": "String",
+                "name": "operator",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "num1",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "num2",
+                "optional": false
+            }
+        ],
+        "abs": [
+            {
+                "type": "Number",
+                "name": "num",
+                "optional": false
+            }
+        ],
+        "acos": [
+            {
+                "type": "Number",
+                "name": "num",
+                "optional": false
+            }
+        ],
+        "asin": [
+            {
+                "type": "Number",
+                "name": "num",
+                "optional": false
+            }
+        ],
+        "atan": [
+            {
+                "type": "Number",
+                "name": "num",
+                "optional": false
+            }
+        ],
+        "tan": [
+            {
+                "type": "Number",
+                "name": "num",
+                "optional": false
+            }
+        ],
+        "cos": [
+            {
+                "type": "Number",
+                "name": "num",
+                "optional": false
+            }
+        ],
+        "sin": [
+            {
+                "type": "Number",
+                "name": "num",
+                "optional": false
+            }
+        ],
+        "char": [
+            {
+                "type": "Number",
+                "name": "num",
+                "optional": false
+            }
+        ],
+        "floor": [
+            {
+                "type": "Number",
+                "name": "num",
+                "optional": false
+            }
+        ],
+        "range": [
+            {
+                "type": "Number",
+                "name": "start",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "end",
+                "optional": true
+            },
+            {
+                "type": "Number",
+                "name": "increment",
+                "optional": true
+            }
+        ],
+        "round": [
+            {
+                "type": "Number",
+                "name": "num",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "decimals",
+                "optional": true
+            }
+        ],
+        "rnd": [
+            {
+                "type": "Number",
+                "name": "seed",
+                "optional": true
+            }
+        ],
+        "sign": [
+            {
+                "type": "Number",
+                "name": "num",
+                "optional": false
+            }
+        ],
+        "sqrt": [
+            {
+                "type": "Number",
+                "name": "num",
+                "optional": false
+            }
+        ],
+        "str": [
+            {
+                "type": "Number",
+                "name": "num",
+                "optional": false
+            }
+        ],
+        "ceil": [
+            {
+                "type": "Number",
+                "name": "num",
+                "optional": false
+            }
+        ],
+        "pi": [],
+        "hash": [
+            {
+                "type": "String",
+                "name": "obj",
+                "optional": false
+            }
+        ],
+        "launch_path": [],
+        "slice": [
+            {
+                "type": "Any",
+                "name": "sequence",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "from",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "to",
+                "optional": true
+            }
+        ],
+        "md5": [
+            {
+                "type": "String",
+                "name": "value",
+                "optional": false
+            }
+        ]
+    },
+    "String": {
+        "remove": [
+            {
+                "type": "String",
+                "name": "subString",
+                "optional": false
+            }
+        ],
+        "hasIndex": [
+            {
+                "type": "Number",
+                "name": "index",
+                "optional": false
+            }
+        ],
+        "indexOf": [
+            {
+                "type": "String",
+                "name": "subString",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "startIndex",
+                "optional": true
+            }
+        ],
+        "lastIndexOf": [
+            {
+                "type": "String",
+                "name": "subString",
+                "optional": false
+            }
+        ],
+        "split": [
+            {
+                "type": "String",
+                "name": "delimiter",
+                "optional": false
+            }
+        ],
+        "replace": [
+            {
+                "type": "String",
+                "name": "old",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "new",
+                "optional": false
+            }
+        ],
+        "trim": [],
+        "indexes": [],
+        "code": [],
+        "len": [],
+        "lower": [],
+        "upper": [],
+        "val": [],
+        "values": [],
+        "to_int": []
+    },
+    "List": {
+        "push": [
+            {
+                "type": "Any",
+                "name": "value",
+                "optional": false
+            }
+        ],
+        "pop": [],
+        "shuffle": [],
+        "sum": [],
+        "hasIndex": [
+            {
+                "type": "Number",
+                "name": "index",
+                "optional": false
+            }
+        ],
+        "indexOf": [
+            {
+                "type": "Any",
+                "name": "value",
+                "optional": false
+            }
+        ],
+        "join": [
+            {
+                "type": "String",
+                "name": "delimiter",
+                "optional": false
+            }
+        ],
+        "sort": [
+            {
+                "type": "String",
+                "name": "key",
+                "optional": true
+            }
+        ],
+        "pull": [],
+        "reverse": [],
+        "remove": [
+            {
+                "type": "Number",
+                "name": "index",
+                "optional": false
+            }
+        ],
+        "indexes": [],
+        "len": [],
+        "values": []
+    },
+    "Map": {
+        "hasIndex": [
+            {
+                "type": "Any",
+                "name": "key",
+                "optional": false
+            }
+        ],
+        "indexOf": [
+            {
+                "type": "Any",
+                "name": "value",
+                "optional": false
+            }
+        ],
+        "push": [
+            {
+                "type": "Any",
+                "name": "key",
+                "optional": false
+            }
+        ],
+        "pop": [],
+        "shuffle": [],
+        "remove": [
+            {
+                "type": "Any",
+                "name": "key",
+                "optional": false
+            }
+        ],
+        "indexes": [],
+        "len": [],
+        "values": [],
+        "sum": []
+    }
 }
