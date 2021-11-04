@@ -138,23 +138,20 @@ function activate(context) {
         if (Encryption.includes(c)) docs.description += "\n\n\**This function cannot be used in encryption.*";
 
         // Add examples
-        let Ex = Examples[c];
-        let Exs = [];
-
+        let Ex = Examples[type] ? Examples[type][cmd] : null;
+        let codeExamples = [];
+        
         if (Ex) {
-            let i;
-            for (i=0;i<Ex.length;i++) {
-                Exs[i] = Ex[i].join("\n");
-            }
-            docs.description += "\n\n" + Exs.join("\n\n");
+            codeExamples = Ex;
         }
         
         // Return normal text
-        if(!asMarkdown) return docs.title + "\n\n\n" + docs.description.replace(/<[^>]*>?/gm, '');;
+        if(!asMarkdown) return docs.title + "\n\n\n" + docs.description.replace(/<[^>]*>?/gm, '') + "\n\n" + codeExamples.join("\n\n\n");
 
         // Append markdown string areas
         str.appendCodeblock(docs.title);
-        str.appendMarkdown("---\n" + docs.description);
+        str.appendMarkdown("---\n" + docs.description + "\n---");
+        str.appendCodeblock(codeExamples.join("\n\n"));
 
         // Return markdown string
         return str;
