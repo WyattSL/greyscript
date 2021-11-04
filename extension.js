@@ -135,6 +135,41 @@ function activate(context) {
     });
 
     if (vscode.workspace.getConfiguration("greyscript").get("autocomplete")) context.subscriptions.push(compD)
+
+    function hexToRgb(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16),
+            a: parseInt(result[4], 16)
+        } : null;
+    }
+
+    let ColorPicker = vscode.languages.registerColorProvider('greyscript', {
+        provideDocumentColors(document, token) {
+            let txt = document.getText();
+            let reg = /(?:(?:<color=)?(#[0-9a-f]{6,8})|<color=\"?(black|blue|green|orange|purple|red|white|yellow)\"?)>/gi
+            let mchs = txt.matchAll(reg);
+            let out = [];
+            for (var m of mchs) {
+                let ps = txt.slice(0,m.index);
+                let pl = txt.split("\n").length;
+                let pc = txt.lastIndexOf("\n")+m.index
+                let range = new vscode.Range(pl, pc, pl, pc+m[0].length);
+                let color;
+                if (m[1].includes("#")) {
+                    let d = hexToRgb(m[1])
+                    color = new vscode.Color(d.r,d.g,d.b,d.a ? d.a : 16);
+                }
+                let c = new vscode.ColorInformation(range, color)
+                out.push(c);
+            }
+            return out;
+        }
+    });
+
+    if (vscode.workspace.getConfiguration("greyscript").get("colorpicker")) context.subscriptions.push(ColorPicker)
 	
     function LookForErrors(source) {
 	    let outp = [];
