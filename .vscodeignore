@@ -8,3 +8,5 @@ webpack.config.js
 ecomp.js
 expcompile.js
 expver.js
+grammar/*
+SECURITY.md
