@@ -1,6 +1,6 @@
 .vscode
 node_modules
-extension/
+extension.js
 webpack.config.js
 .gitignore
 .git/

@@ -33,6 +33,7 @@
         "Programming Languages"
     ],
     "main": "./out/main.js",
+    "browser": "./out/main.js",
     "qna": "false",
     "bugs": {
         "url": "https://github.com/WyattSL/greyscript/issues",
