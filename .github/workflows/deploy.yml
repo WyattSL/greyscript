@@ -31,6 +31,9 @@ jobs:
 
       - name: Package Extension
         run: vsce package -o extension.vsix
+      
+      - name: Bundle Webpack
+        run: npm run package
         
       - name: Find Version
         id: find-version
