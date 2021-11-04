@@ -150,8 +150,8 @@ function activate(context) {
 
         // Append markdown string areas
         str.appendCodeblock(docs.title);
-        str.appendMarkdown("---\n" + docs.description + "\n---");
-        str.appendCodeblock(codeExamples.join("\n\n"));
+        str.appendMarkdown("---\n" + docs.description + codeExamples.length > 0 ? "\n---" : "");
+        if(codeExamples.length > 0) str.appendCodeblock(codeExamples.join("\n\n"));
 
         // Return markdown string
         return str;
