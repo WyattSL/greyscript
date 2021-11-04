@@ -1,9 +1,11 @@
 {
-    "get_shell": [
-        ["Shell = get_shell"],
-        ["RootShell = get_shell(\"root\",\"root_password\")"]
-    ],
-    "md5": [
-        ["Ciphertext = md5(\"Password\")"]
-    ]
+    "General": {
+        "get_shell": [
+            "shell = get_shell",
+            "rootShell = get_shell(\"root\",\"myTotallySecurePassword\")"
+        ],
+        "md5": [
+            ["ciphertext = md5(\"Password\")"]
+        ]
+    }
 }
