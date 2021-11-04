@@ -64,7 +64,7 @@
 				},
 				{
 					"name": "keyword.api.crypto",
-					"match": "\\.(aircrack|airmon|decipher|smtp_user_list)"
+					"match": "\\.(aircrack|airmon|decipher|smtp_user_list|aireplay)"
 				},
 				{
 					"name": "keyword.api.port",

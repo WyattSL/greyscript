@@ -173,7 +173,7 @@ function activate(context) {
 	
     function LookForErrors(source) {
 	    let outp = [];
-	    let reg = new RegExp(`(Encode|Decode)(?:\\s)?=(?:\\s)?function\\(.+\\).*(${Encryption.join("|")}).*end function`, "s");
+	    let reg = new RegExp(`$(Encode|Decode)(?:\\s)?=(?:\\s)?function\\(.+\\).*(${Encryption.join("|")}).*end function`, "s");
 	    let m = source.match(reg);
 	    if (m) {
 		    let match = m;
