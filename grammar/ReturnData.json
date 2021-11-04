@@ -1,174 +1,933 @@
 {
-    
-    "host_computer": "computer",
-    "start_terminal": "shell",
-    "build": ["number", "string"],
-    "connect_service": ["shell", "string"],
-    "launch": ["number", "string"],
-    "ping": ["number", "string"],
-    "scp": [],
-
-    "show": ["string"],
-    "search": ["string"],
-    "update": ["string"],
-    "add_repo": ["string"],
-    "del_repo": ["string"],
-    "install": ["string"],
-    "check_upgrade": ["string"],
-    
-    "login": ["string", "metamail"],
-
-    "delete": ["integer", "string"],
-    "fetch": ["list", "string"],
-    "read": ["string"],
-    "send": ["integer", "string"],
-
-    "put": [],
-    
-    "aircrack": [],
-    "airmon": [],
-    "aireplay": [],
-    "decipher": [],
-    "smtp_user_list": [],
-    
-    "lib_name": "string",
-    "version": "string",
-    "overflow": ["string", "number", "shell", "computer", "file"],
-    
-    "load": ["metalib", "null"],
-    "net_use": ["metalib", "null"],
-    "rshell_client": ["number"],
-    "rshell_server": ["list"],
-    "scan_address": ["string"],
-    "scan": ["list"],
-    "sniffer": ["string"],
-    
-    "port_number": "number",
-    "is_closed": "number",
-    "get_lan_ip": "string",
-    
-    "bssid_name": "string",
-    "device_ports": "list",
-    "devices_lan_ip": "list",
-    "essid_name": "string",
-    "firewall_rules": "string",
-    "kernel_version": "string",
-    "local_ip": "string",
-    "ping_port": "string",
-    "port_info": "port",
-    "public_ip": "string",
-    "used_ports": "list",
-    
-    "dump_lib": "metalib",
-    
-    "chmod": [],
-    "copy": [],
-    "move": [],
-    "rename": [],
-    "path": "string",
-    "parent": "file",
-    "name": "string",
-    "get_content": "string",
-    "set_content": "string",
-    "is_binary": "number",
-    "has_permission": "number",
-    "delete": "number",
-    "get_folders": "list",
-    "get_files": "list",
-    "permissions": "string",
-    "owner": "string",
-    "set_owner": "number",
-    "group": "string",
-    "set_group": "number",
-    "size": "number",
-    
-    "get_ports": "list",
-    "File": ["file", "null"],
-    "create_folder": "number",
-    "is_network_active": "number",
-    "touch": ["number", "string"],
-    "show_procs": "list",
-    "network_devices": "list",
-    "change_password": "number",
-    "create_user": "number",
-    "delete_user": "number",
-    "create_group": "number",
-    "delete_group": "number",
-    "groups": "string",
-    "close_program": "number",
-    "wifi_networks": "list",
-    "connect_wifi": "number",
-    "connect_ethernet": "number",
-    "network_gateway": "string",
-    "active_net_card": "string",
-    
-    "typeof": "string",
-    "get_router": ["router", "null"],
-    "get_switch": ["router", "null"],
-    "nslookup": "string",
-    "print": "number",
-    "clear_screen": "null",
-    "active_user": "string",
-    "home_dir": "string",
-    "get_shell": ["shell", "null"],
-    "user_input": "string",
-    "include_lib": ["crypto", "metaxploit"],
-    "import_code": "null",
-    "exit": "null",
-    "user_mail_address": "string",
-    "user_bank_number": "number",
-    "whois": "string",
-    "wait": "null",
-    "command_info": "string",
-    "program_path": "string",
-    "current_path": "string",
-    "format_columns": "string",
-    "current_date": "string",
-    "is_lan_ip": "number",
-    "is_valid_ip": "number",
-    "bitwise": "number",
-    
-    "abs": "number",
-    "acos": "number",
-    "asin": "number",
-    "atan": "number",
-    "tan": "number",
-    "cos": "number",
-    "sin": "number",
-    "char": "string",
-    "floor": "number",
-    "range": "list",
-    "round": "number",
-    "rnd": "number",
-    "sign": "number",
-    "sqrt": "number",
-    "str": "number",
-    "ceil": "number",
-    "pi": "number",
-    
-    "remove": ["string", "list"],
-    "hasIndex": "number",
-    "indexOf": "number",
-    "lastIndexOf": "number",
-    "slice": ["string", "list"],
-    "split": "list",
-    "replace": "string",
-    "trim": "string",
-    "indexes": "list",
-    "code": "number",
-    "len": "number",
-    "lower": "string",
-    "upper": "string",
-    "val": "number",
-    "values": "list",
-    "to_int": "number",
-    
-    "push": [],
-    "pop": [],
-    "shuffle": [],
-    "sum": "number",
-    
-    "sort": [],
-    "join": "string",
-    "reverse": "list"
+    "Shell": {
+        "host_computer": [
+            {
+                "type": "Computer"
+            }
+        ],
+        "start_terminal": [],
+        "build": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "String"
+            }
+        ],
+        "connect_service": [
+            {
+                "type": "Shell"
+            },
+            {
+                "type": "FtpShell"
+            },
+            {
+                "type": "String"
+            }
+        ],
+        "launch": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "String"
+            }
+        ],
+        "ping": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "String"
+            }
+        ],
+        "scp": []
+    },
+    "AptClient": {
+        "show": [
+            {
+                "type": "String"
+            }
+        ],
+        "search": [
+            {
+                "type": "String"
+            }
+        ],
+        "update": [
+            {
+                "type": "String"
+            }
+        ],
+        "add_repo": [
+            {
+                "type": "String"
+            }
+        ],
+        "del_repo": [
+            {
+                "type": "String"
+            }
+        ],
+        "install": [
+            {
+                "type": "String"
+            }
+        ],
+        "check_upgrade": [
+            {
+                "type": "String"
+            }
+        ]
+    },
+    "LibMail": {
+        "login": [
+            {
+                "type": "String"
+            },
+            {
+                "type": "MetaMail"
+            }
+        ]
+    },
+    "MetaMail": {
+        "delete": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "String"
+            }
+        ],
+        "fetch": [
+            {
+                "type": "List",
+                "subType": "String"
+            },
+            {
+                "type": "String"
+            }
+        ],
+        "read": [
+            {
+                "type": "String"
+            }
+        ],
+        "send": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "String"
+            }
+        ]
+    },
+    "FtpShell": {
+        "host_computer": [
+            {
+                "type": "Computer"
+            }
+        ],
+        "start_terminal": [],
+        "put": []
+    },
+    "Crypto": {
+        "aircrack": [],
+        "airmon": [],
+        "aireplay": [],
+        "decipher": [],
+        "smtp_user_List": []
+    },
+    "MetaLib": {
+        "lib_name": [
+            {
+                "type": "String"
+            }
+        ],
+        "version": [
+            {
+                "type": "String"
+            }
+        ],
+        "overflow": [
+            {
+                "type": "String"
+            },
+            {
+                "type": "Number"
+            },
+            {
+                "type": "Shell"
+            },
+            {
+                "type": "Computer"
+            },
+            {
+                "type": "File"
+            }
+        ]
+    },
+    "Metaxploit": {
+        "load": [
+            {
+                "type": "MetaLib"
+            },
+            {
+                "type": "null"
+            }
+        ],
+        "net_use": [
+            {
+                "type": "NetSession"
+            },
+            {
+                "type": "null"
+            }
+        ],
+        "rshell_client": [
+            {
+                "type": "Number"
+            }
+        ],
+        "rshell_server": [
+            {
+                "type": "List",
+                "subType": "Shell"
+            }
+        ],
+        "scan_address": [
+            {
+                "type": "String"
+            }
+        ],
+        "scan": [
+            {
+                "type": "List",
+                "subType": "String"
+            }
+        ],
+        "sniffer": [
+            {
+                "type": "String"
+            }
+        ]
+    },
+    "Port": {
+        "port_number": [
+            {
+                "type": "Number"
+            }
+        ],
+        "is_closed": [
+            {
+                "type": "Number"
+            }
+        ],
+        "get_lan_ip": [
+            {
+                "type": "String"
+            }
+        ]
+    },
+    "Router": {
+        "bssid_name": [
+            {
+                "type": "String"
+            }
+        ],
+        "device_ports": [
+            {
+                "type": "List",
+                "subType": "Port"
+            }
+        ],
+        "devices_lan_ip": [
+            {
+                "type": "List",
+                "subType": "String"
+            }
+        ],
+        "essid_name": [
+            {
+                "type": "String"
+            }
+        ],
+        "firewall_rules": [
+            {
+                "type": "String"
+            }
+        ],
+        "kernel_version": [
+            {
+                "type": "String"
+            }
+        ],
+        "local_ip": [
+            {
+                "type": "String"
+            }
+        ],
+        "ping_port": [
+            {
+                "type": "String"
+            }
+        ],
+        "port_info": [
+            {
+                "type": "String"
+            }
+        ],
+        "public_ip": [
+            {
+                "type": "String"
+            }
+        ],
+        "used_ports": [
+            {
+                "type": "List",
+                "subType": "Port"
+            }
+        ]
+    },
+    "NetSession": {
+        "dump_lib": [
+            {
+                "type": "MetaLib"
+            }
+        ]
+    },
+    "File": {
+        "chmod": [],
+        "copy": [],
+        "move": [],
+        "rename": [],
+        "path": [
+            {
+                "type": "String"
+            }
+        ],
+        "parent": [
+            {
+                "type": "List",
+                "subType": "File"
+            }
+        ],
+        "name": [
+            {
+                "type": "String"
+            }
+        ],
+        "get_content": [
+            {
+                "type": "String"
+            }
+        ],
+        "set_content": [
+            {
+                "type": "String"
+            }
+        ],
+        "is_binary": [
+            {
+                "type": "Number"
+            }
+        ],
+        "has_permission": [
+            {
+                "type": "Number"
+            }
+        ],
+        "delete": [
+            {
+                "type": "Number"
+            }
+        ],
+        "get_folders": [
+            {
+                "type": "List",
+                "subType": "File"
+            }
+        ],
+        "get_files": [
+            {
+                "type": "List",
+                "subType": "File"
+            }
+        ],
+        "permissions": [
+            {
+                "type": "String"
+            }
+        ],
+        "owner": [
+            {
+                "type": "String"
+            }
+        ],
+        "set_owner": [
+            {
+                "type": "Number"
+            }
+        ],
+        "group": [
+            {
+                "type": "String"
+            }
+        ],
+        "set_group": [
+            {
+                "type": "Number"
+            }
+        ],
+        "size": [
+            {
+                "type": "Number"
+            }
+        ]
+    },
+    "Computer": {
+        "get_ports": [
+            {
+                "type": "List",
+                "subType": "Port"
+            }
+        ],
+        "File": [
+            {
+                "type": "File"
+            },
+            {
+                "type": "null"
+            }
+        ],
+        "create_folder": [
+            {
+                "type": "Number"
+            }
+        ],
+        "is_network_active": [
+            {
+                "type": "Number"
+            }
+        ],
+        "touch": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "String"
+            }
+        ],
+        "show_procs": [
+            {
+                "type": "List",
+                "subType": "String"
+            }
+        ],
+        "network_devices": [
+            {
+                "type": "List",
+                "subType": "String"
+            }
+        ],
+        "change_password": [
+            {
+                "type": "Number"
+            }
+        ],
+        "create_user": [
+            {
+                "type": "Number"
+            }
+        ],
+        "delete_user": [
+            {
+                "type": "Number"
+            }
+        ],
+        "create_group": [
+            {
+                "type": "Number"
+            }
+        ],
+        "delete_group": [
+            {
+                "type": "Number"
+            }
+        ],
+        "groups": [
+            {
+                "type": "String"
+            }
+        ],
+        "close_program": [
+            {
+                "type": "Number"
+            }
+        ],
+        "wifi_networks": [
+            {
+                "type": "List",
+                "subType": "String"
+            }
+        ],
+        "connect_wifi": [
+            {
+                "type": "Number"
+            }
+        ],
+        "connect_ethernet": [
+            {
+                "type": "Number"
+            }
+        ],
+        "network_gateway": [
+            {
+                "type": "String"
+            }
+        ],
+        "active_net_card": [
+            {
+                "type": "String"
+            }
+        ]
+    },
+    "General": {
+        "typeof": [
+            {
+                "type": "String"
+            }
+        ],
+        "get_router": [
+            {
+                "type": "Router"
+            },
+            {
+                "type": "null"
+            }
+        ],
+        "get_switch": [
+            {
+                "type": "Router"
+            },
+            {
+                "type": "null"
+            }
+        ],
+        "nslookup": [
+            {
+                "type": "String"
+            }
+        ],
+        "print": [
+            {
+                "type": "Number"
+            }
+        ],
+        "clear_screen": [
+            {
+                "type": "null"
+            }
+        ],
+        "active_user": [
+            {
+                "type": "String"
+            }
+        ],
+        "home_dir": [
+            {
+                "type": "String"
+            }
+        ],
+        "get_shell": [
+            {
+                "type": "Shell"
+            },
+            {
+                "type": "null"
+            }
+        ],
+        "user_input": [
+            {
+                "type": "String"
+            }
+        ],
+        "include_lib": [
+            {
+                "type": "Crypto"
+            },
+            {
+                "type": "Metaxploit"
+            },
+            {
+                "type": "AptClient"
+            },
+            {
+                "type": "LibMail"
+            }
+        ],
+        "import_code": [
+            {
+                "type": "null"
+            }
+        ],
+        "exit": [
+            {
+                "type": "null"
+            }
+        ],
+        "user_mail_address": [
+            {
+                "type": "String"
+            }
+        ],
+        "user_bank_number": [
+            {
+                "type": "Number"
+            }
+        ],
+        "whois": [
+            {
+                "type": "String"
+            }
+        ],
+        "wait": [
+            {
+                "type": "null"
+            }
+        ],
+        "command_info": [
+            {
+                "type": "String"
+            }
+        ],
+        "program_path": [
+            {
+                "type": "String"
+            }
+        ],
+        "current_path": [
+            {
+                "type": "String"
+            }
+        ],
+        "format_columns": [
+            {
+                "type": "String"
+            }
+        ],
+        "current_date": [
+            {
+                "type": "String"
+            }
+        ],
+        "is_lan_ip": [
+            {
+                "type": "Number"
+            }
+        ],
+        "is_valid_ip": [
+            {
+                "type": "Number"
+            }
+        ],
+        "bitwise": [
+            {
+                "type": "Number"
+            }
+        ],
+        "hash": [
+            {
+                "type": "Number"
+            }
+        ],
+        "launch_path": [
+            {
+                "type": "String"
+            }
+        ],
+        "abs": [
+            {
+                "type": "Number"
+            }
+        ],
+        "acos": [
+            {
+                "type": "Number"
+            }
+        ],
+        "asin": [
+            {
+                "type": "Number"
+            }
+        ],
+        "atan": [
+            {
+                "type": "Number"
+            }
+        ],
+        "tan": [
+            {
+                "type": "Number"
+            }
+        ],
+        "cos": [
+            {
+                "type": "Number"
+            }
+        ],
+        "sin": [
+            {
+                "type": "Number"
+            }
+        ],
+        "char": [
+            {
+                "type": "String"
+            }
+        ],
+        "floor": [
+            {
+                "type": "Number"
+            }
+        ],
+        "range": [
+            {
+                "type": "List",
+                "subType": "Number"
+            }
+        ],
+        "round": [
+            {
+                "type": "Number"
+            }
+        ],
+        "rnd": [
+            {
+                "type": "Number"
+            }
+        ],
+        "sign": [
+            {
+                "type": "Number"
+            }
+        ],
+        "sqrt": [
+            {
+                "type": "Number"
+            }
+        ],
+        "str": [
+            {
+                "type": "Number"
+            }
+        ],
+        "ceil": [
+            {
+                "type": "Number"
+            }
+        ],
+        "pi": [
+            {
+                "type": "Number"
+            }
+        ],
+        "slice": [
+            {
+                "type": "String"
+            },
+            {
+                "type": "List",
+                "subType": "Any"
+            }
+        ]
+    },
+    "String": {
+        "remove": [
+            {
+                "type": "String"
+            }
+        ],
+        "hasIndex": [
+            {
+                "type": "Number"
+            }
+        ],
+        "indexOf": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "null"
+            }
+        ],
+        "lastIndexOf": [
+            {
+                "type": "Number"
+            }
+        ],
+        "split": [
+            {
+                "type": "List",
+                "subType": "String"
+            }
+        ],
+        "replace": [
+            {
+                "type": "String"
+            }
+        ],
+        "trim": [
+            {
+                "type": "String"
+            }
+        ],
+        "indexes": [
+            {
+                "type": "List",
+                "subType": "Number"
+            }
+        ],
+        "code": [
+            {
+                "type": "Number"
+            }
+        ],
+        "len": [
+            {
+                "type": "Number"
+            }
+        ],
+        "lower": [
+            {
+                "type": "String"
+            }
+        ],
+        "upper": [
+            {
+                "type": "String"
+            }
+        ],
+        "val": [
+            {
+                "type": "Number"
+            }
+        ],
+        "values": [
+            {
+                "type": "List",
+                "subType": "String"
+            }
+        ],
+        "to_int": [
+            {
+                "type": "Number"
+            }
+        ]
+    },
+    "List": {
+        "hasIndex": [
+            {
+                "type": "Number"
+            }
+        ],
+        "indexOf": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "null"
+            }
+        ],
+        "join": [],
+        "push": [],
+        "pop": [
+            {
+                "type": "Any"
+            }
+        ],
+        "pull": [
+            {
+                "type": "Any"
+            }
+        ],
+        "shuffle": [],
+        "reverse": [],
+        "sort": [],
+        "remove": [
+            {
+                "type": "List",
+                "subType": "Any"
+            }
+        ],
+        "indexes": [
+            {
+                "type": "List",
+                "subType": "Number"
+            }
+        ],
+        "len": [
+            {
+                "type": "Number"
+            }
+        ],
+        "values": [
+            {
+                "type": "List",
+                "subType": "Any"
+            }
+        ],
+        "sum": [
+            {
+                "type": "Number"
+            }
+        ]
+    },
+    "Map": {
+        "hasIndex": [
+            {
+                "type": "Number"
+            }
+        ],
+        "indexOf": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "null"
+            }
+        ],
+        "push": [],
+        "pop": [
+            {
+                "type": "Any"
+            }
+        ],
+        "shuffle": [],
+        "remove": [
+            {
+                "type": "List",
+                "subType": "Any"
+            }
+        ],
+        "indexes": [
+            {
+                "type": "List",
+                "subType": "Any"
+            }
+        ],
+        "len": [
+            {
+                "type": "Number"
+            }
+        ],
+        "values": [
+            "List"
+        ],
+        "sum": [
+            {
+                "type": "Number"
+            }
+        ]
+    }
 }
