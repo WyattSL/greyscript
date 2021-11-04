@@ -1,3 +1,7 @@
+## 1.7.1
+- Webpack support
+- Better autocomplete/prediction.
+
 ## 1.6.4
 - Patch minor coloring issues.
 
