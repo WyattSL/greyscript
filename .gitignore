@@ -2,3 +2,5 @@
 *.vsix
 npm-debug.log
 out/*
+node_modules/
+tests/*
