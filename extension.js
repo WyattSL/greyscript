@@ -9,23 +9,43 @@ var CompTypes = require("./grammar/CompletionTypes.json") // Constant 20 Functio
 var HoverData = require("./grammar/HoverData.json");
 var Encryption = require("./grammar/Encryption.json");
 
+var enumCompTypeText = {
+    1: "method",
+    2: "function",
+    5: "variable",
+    7: "interface",
+    9: "property",
+    20: "constant",
+}
+
 function activate(context) {
     let hoverD = vscode.languages.registerHoverProvider('greyscript', {
         provideHover(document,position,token) {
             if (!vscode.workspace.getConfiguration("greyscript").get("hoverdocs")) return;
+
             let range = document.getWordRangeAtPosition(position)
             let word = document.getText(range)
-            let docs = HoverData[word];
-            if (Array.isArray(docs)) {
-                docs = docs.join("\n\n\n")
+
+            let options = {"General": CompData["General"]};
+
+            // If there is a . in front of the text check what the previous item accesses
+            if(range && range.start.character - 2 >= 0 && document.getText(new vscode.Range(new vscode.Position(range.start.line, range.start.character - 1), new vscode.Position(range.start.line, range.start.character))) == "."){
+                let res = getOptionsBasedOfPriorCommand(document, range);
+                if(res) options = res;
             }
-	    if (Encryption.includes(word)) docs = docs + "\n\n\This function cannot be used in encryption.";
-            if (docs) {
-                return new vscode.Hover({
-                    language: "greyscript",
-                    value: docs
-                });
+
+            let output = {"key": null, "cmd": null}
+            for(key in options){
+                output.cmd = options[key].find(cmd => cmd == word);
+                if(output.cmd){
+                    output.key = key;
+                    break;  
+                } 
             }
+
+            if(output.key) {
+                return new vscode.Hover(getHoverData(output.key, output.cmd));
+            }           
         }
     })
 
@@ -88,48 +108,222 @@ function activate(context) {
     context.subscriptions.push(foldD);
     */
 
+    let getHoverData = (type, cmd, asMarkdown = true) => {
+        // Create markdownString
+        let str = new vscode.MarkdownString("", true);
+        
+        // Get type of cmd
+        let cmdType = CompTypes[cmd] || CompTypes["default"];
+
+        // Get type text, example: Shell.
+        typeText = "";
+        if (type != "General") typeText = type + ".";
+
+        // Combine base data together
+        let docs = {"title": enumCompTypeText[cmdType] + " " + typeText + cmd, "description": ""};
+        
+        // Add arguments if its a function/method
+        if(cmdType == 2 || cmdType == 1){
+            docs.title += "(" + ArgData[type][cmd].map(d => d.name + (d.optional ? "?" : "") + ": " + d.type + (d.type == "Map" || d.type == "List" ? `[${d.subType}]` : "")).join(", ") + ")";
+        }
+
+        // Add result if set
+        let resultTypes = ReturnData[type][cmd];
+        if (resultTypes) docs.title += ": " + resultTypes.map(d => d.type + (d.type == "Map" || d.type == "List" ? `[${d.subType}]` : "")).join(" or ");
+
+        // Add info/hover text
+        docs.description = HoverData[type][cmd] || "";
+
+        // Apply encryption text to hover text if available
+        if (Encryption.includes(c)) docs.description += "\n\n\**This function cannot be used in encryption.*";
+
+        // Add examples
+        let Ex = Examples[type] ? Examples[type][cmd] : null;
+        let codeExamples = [];
+        
+        if (Ex) {
+            codeExamples = Ex;
+        }
+        
+        // Return normal text
+        if(!asMarkdown) return docs.title + "\n\n\n" + docs.description.replace(/<[^>]*>?/gm, '') + "\n\n" + codeExamples.join("\n\n\n");
+
+        // Append markdown string areas
+        str.appendCodeblock(docs.title);
+        str.appendMarkdown("---\n" + docs.description + codeExamples.length > 0 ? "\n---" : "");
+        if(codeExamples.length > 0) str.appendCodeblock(codeExamples.join("\n\n"));
+
+        // Return markdown string
+        return str;
+    }
+
+    let getOptionsBasedOfPriorCommand = (document, range) => {
+        console.log("Checking item before .");
+
+        // Get Target if there was a delimiter before starting character
+        let targetRange = document.getWordRangeAtPosition(new vscode.Position(range.start.line, range.start.character - 2));
+        let targetWord = document.getText(targetRange);
+
+        // Find type of target
+        // Check if target is command
+        let prevCmd = null;
+        for (type in CompData) {
+            for(cmd of CompData[type]) {
+                if(cmd == targetWord){
+                    prevCmd = {"type": type, "cmd": cmd};
+                    break;
+                }
+            }
+            if(prevCmd) break;
+        }
+
+        // Get return data from command
+        if(prevCmd){
+            let returnValues = ReturnData[prevCmd.type][prevCmd.cmd];
+            let options = {};
+
+            // Get options based of return value
+            for(returnValue of returnValues){
+                if(!CompData[returnValue.type]) continue;
+                options[returnValue.type] = CompData[returnValue.type];
+            }
+
+            return Object.keys(options).length > 0 ? options : undefined;
+        }
+        else {
+            // Check variable assignment if its not a command
+            let text = document.getText()
+            lines = [];
+            let re = new RegExp("\\b"+targetWord+"(\\s|)=")
+            i = 0;
+            
+            // Get all lines that interact with the variable prior to the line
+            for(line of text.split("\n")){
+                if(i > targetRange.start.line) break;
+                if(line.match(re)) lines.push(line);
+                i++;
+            }
+
+            // Get the assigned value
+            let assignment = lines[lines.length - 1];
+            let matches = assignment.match(re);
+            if(!matches) return undefined;
+            let match = matches[0];
+            assignment = assignment.substring(assignment.indexOf(match) + match.length).trim().replace(";", "");
+            
+            if(assignment.includes(".")) {
+                assignment = assignment.split(".");
+                assignment = assignment[assignment.length - 1];
+            }
+
+            if(assignment.includes("+")) {
+                assignment = assignment.split("+");
+                assignment = assignment[assignment.length - 1];
+            }
+            
+            assignment = assignment.trim();
+
+            // If its a string type return the string options
+            if(assignment.startsWith("\"")) return {"String": CompData["String"]};
+
+            // If its a list type return the string options
+            if(assignment.startsWith("[")) return {"List": CompData["List"]};
+
+            // If its a map type return the string options
+            if(assignment.startsWith("{")) return {"Map": CompData["Map"]};
+
+            // Check if value is command
+            for (type in CompData) {
+                for(cmd of CompData[type]) {
+                    if(cmd == assignment){
+                        prevCmd = {"type": type, "cmd": cmd};
+                        break;
+                    }
+                }
+                if(prevCmd) break;
+            }
+
+            // Set options based off command
+            if(prevCmd){
+                let returnValues = ReturnData[prevCmd.type][prevCmd.cmd];
+                options = {};
+
+                // Get options based of return value
+                for(returnValue of returnValues){
+                    if(!CompData[returnValue.type]) continue;
+                    options[returnValue.type] = CompData[returnValue.type];
+                }
+
+                return Object.keys(options).length > 0 ? options : undefined;
+            }
+            else{
+                console.log("Greyscript: Target is unknown returning all CompData as completion items")
+                return CompData;
+            }
+        }
+        return undefined;
+    }
+
     let compD = vscode.languages.registerCompletionItemProvider('greyscript', {
         provideCompletionItems(document,position,token,ccontext) {
             if (!vscode.workspace.getConfiguration("greyscript").get("autocomplete")) return;
+            
+            // Get typed word
             let range = document.getWordRangeAtPosition(position);
             let word = document.getText(range);
-            let output = []
-            let match = function(c) {
-                let w = word;
-                return c.includes(w)
+            //console.log(word);
+            
+            // Set default options (THIS IS ALSO THE FALLBACK)
+            let options = {"General": CompData["General"]};
+
+            // If there is a . in front of the text check what the previous item accesses
+            if(range && range.start.character - 2 >= 0 && document.getText(new vscode.Range(new vscode.Position(range.start.line, range.start.character - 1), new vscode.Position(range.start.line, range.start.character))) == "."){
+                let res = getOptionsBasedOfPriorCommand(document, range);
+                if(res) options = res;
             }
-            output = CompData.filter(match)
-            var outputS = [];
-            var i;
-            for (i=0;i<output.length;i++) {
-                outputS.push(i+""+output.shift)
+           
+            let output = {};
+
+            // Get autocompletion of type and filter
+            for(key in options){
+               let keyOutput = options[key].filter(cmd => cmd.includes(word));
+               if(keyOutput.length > 0) output[key] = keyOutput;
             }
-            let c;
+            //console.log(output);
+
+            // Instantiate result array
             let out = [];
-            var a = -1;
-            for (c of output) {
-                a++
-                let type = CompTypes[c] || CompTypes["default"];
-                let s = outputS[a]
-                let t = new vscode.CompletionItem(c,type)
-                t.sortText = s;
-                let Ex = Examples[c];
-                let Exs = [];
-                if (Ex) {
-                    let i;
-                    for (i=0;i<Ex.length;i++) {
-                        Exs[i] = Ex[i].join("\n");
-                    }
+
+            // Instantiate sort text index
+            var a = 0;
+
+            // Go through filtered results
+            for (key in output) {
+                for(c of output[key]){
+                    //console.log("Processing result: " + c);
+
+                    // Get type of completion item
+                    let type = CompTypes[c] || CompTypes["default"];
+                    
+                    // Create completion item
+                    let t = new vscode.CompletionItem(c,type)
+
+                    // Add hover data to completion item
+                    t.documentation = getHoverData(key, c);
+                    t.commitCharacters = [".", ";"]
+
+                    // Push completion item to result array
+                    out.push(t);
+
+                    // Increment sort text index
+                    a++
                 }
-                var docs = HoverData[c]
-                if (Array.isArray(docs)) {
-                    docs = docs.join("\n\n\n")
-                }
-		        if (Encryption.includes(c)) docs = docs + "\n\n\**This function cannot be used in encryption.*";
-                t.documentation = new vscode.MarkdownString(docs, true);
-                if (Ex) t.documentation = new vscode.MarkdownString(docs+"\n\n"+Exs.join("\n\n"), true);
-                out.push(t);
             }
+
+            //console.log("AutoCompletion result:");
+            //console.log(out);
+
+            // Return completion items
             return new vscode.CompletionList(out,true);
         }
     });
@@ -195,7 +389,7 @@ function activate(context) {
 	
     function LookForErrors(source) {
 	    let outp = [];
-	    let reg = new RegExp(`(Encode|Decode)(?:\\s)?=(?:\\s)?function\\(.+\\).*(${Encryption.join("|")}).*end function`, "s");
+	    let reg = new RegExp(`$(Encode|Decode)(?:\\s)?=(?:\\s)?function\\(.+\\).*(${Encryption.join("|")}).*end function`, "s");
 	    let m = source.match(reg);
 	    if (m) {
 		    let match = m;

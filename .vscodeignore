@@ -1,0 +1,12 @@
+.vscode
+node_modules
+extension.js
+webpack.config.js
+.gitignore
+.git/
+.github/
+ecomp.js
+expcompile.js
+expver.js
+grammar/*
+SECURITY.md

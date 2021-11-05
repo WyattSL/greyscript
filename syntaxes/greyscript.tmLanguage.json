@@ -28,7 +28,7 @@
 				},
 				{
 					"name": "keyword.api.shell",
-					"match": "\\.(host_computer|scp|start_terminal|build|put|connect_service|launch)"
+					"match": "\\.(host_computer|scp|start_terminal|build|connect_service|launch|ping)"
 				},
 				{
 					"name": "keyword.api.aptclient",
@@ -48,14 +48,14 @@
 				},
 				{
 					"name": "keyword.api.computer",
-					"match": "\\.(File|public_ip|local_ip|get_router|touch|create_user|delete_user|create_group|delete_group|active_net_card|change_password|close_program|connect_ethernet|connect_wifi|current_path|get_ports|groups|is_network_active|network_devices|network_gateway|show_procs|wifi_networks|create_folder)"
+					"match": "\\.(File|public_ip|local_ip|touch|create_user|delete_user|create_group|delete_group|active_net_card|change_password|close_program|connect_ethernet|connect_wifi|get_ports|groups|is_network_active|network_devices|network_gateway|show_procs|wifi_networks|create_folder)"
 				},
 				{
 					"name": "keyword.api.file",
 					"match": "\\.(path|delete|set_content|get_content|set_group|group|set_owner|owner|parent|get_files|get_folders|is_binary|is_folder|has_permission|permissions|size|name|chmod|rename|move|copy)"
 				},
 				{
-					"name": "keyword.api.metalib",
+					"name": "keyword.api.metaxploit",
 					"match": "\\.(load|net_use|scan_address|scan|sniffer|rshell_server|rshell_client)"
 				},
 				{
@@ -64,7 +64,7 @@
 				},
 				{
 					"name": "keyword.api.crypto",
-					"match": "\\.(aircrack|airmon|decipher|smtp_user_list)"
+					"match": "\\.(aircrack|airmon|decipher|smtp_user_list|aireplay)"
 				},
 				{
 					"name": "keyword.api.port",
@@ -76,15 +76,15 @@
 				},
 				{
 					"name": "keyword.api.router",
-					"match": "\\.(public_ip|local_ip|device_ports|devices_lan_ip|ping_port|port_info|used_ports|bssid_name|essid_name|firewall_rules)"
+					"match": "\\.(public_ip|local_ip|device_ports|devices_lan_ip|ping_port|port_info|used_ports|bssid_name|essid_name|firewall_rules|kernel_version)"
 				},
 				{
 					"name": "keyword.api.general",
-					"match": "\\b(clear_screen|print|time|typeof|md5|get_router|get_shell|nslookup|whois|is_valid_ip|is_lan_ip|command_info|current_date|parent_path|home_dir|program_path|active_user|user_mail_address|user_bank_address|format_columns|user_input|include_lib|import_code|exit|bitwise|masterkey|yield|wait|hash|launch_path)"
+					"match": "\\b(clear_screen|print|time|typeof|md5|get_switch|get_router|get_shell|nslookup|whois|is_valid_ip|is_lan_ip|command_info|current_date|parent_path|home_dir|program_path|active_user|user_mail_address|user_bank_number|format_columns|user_input|include_lib|import_code|current_path|exit|bitwise|wait|hash|launch_path)"
 				},
 				{
 					"name": "support.function",
-					"match": "((\\b(slice|abs|acos|asin|atan|tan|cos|sin|char|floor|round|range|rnd|sign|sqrt|str|ceil)\\(|\\.(split|indexOf|hasIndex|lower\b|upper\b|remove|lastIndexOf|replace|trim|indexes\b|code\b|len\b|val\b|values\b|to_int\b|char|join|push|pop|pull|shuffle|reverse|sort|sum\b|key\b|value\b))|\bpi\b)"
+					"match": "((\\b(slice|abs|acos|asin|atan|tan|cos|sin|char|floor|round|range|rnd|sign|sqrt|str|ceil)\\(|\\.(split|indexOf|hasIndex|lower\b|upper\b|remove|lastIndexOf|replace|trim|indexes\b|code\b|len\b|val\b|values\b|to_int\b|join|push|pop|pull|shuffle|reverse|sort|sum\b))|\bpi\b)"
 				},
 				{
 					"name": "support.type",

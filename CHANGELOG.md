@@ -1,3 +1,13 @@
+## 1.7.1
+- Webpack support
+- Better autocomplete/prediction.
+
+## 1.6.4
+- Patch minor coloring issues.
+
+## 1.6.3
+- Hotfix for potential bug in encryption detection.
+
 ## 1.6.2
 - Hotfix for HoverDocs
 
