@@ -390,6 +390,12 @@ let collection = vscode.languages.createDiagnosticCollection("greyscript");
 	});
 	console.log("Hello Hackers!")
 	context.subscriptions.push(collection, listen1, listen2);
+    
+	function minify(editor, edit, context) {
+		let text = editor.document,getText();
+	}
+	
+	context.subscriptions.push(vscode.commands.registerTextEditorCommand("greyscript.minify", minify));
 
     let gecmd = vscode.commands.registerTextEditorCommand("greyScript.gotoError", (editor, edit, context) => {
         let options = {"prompt": "Enter provided line number"}
