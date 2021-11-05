@@ -208,8 +208,18 @@ function activate(context) {
             let assignment = lines[lines.length - 1];
             let match = assignment.match(re)[0];
             assignment = assignment.substring(assignment.indexOf(match) + match.length).trim().replace(";", "");
-            assignment = assignment.split(".")
-            assignment = assignment[assignment.length - 1];
+            
+            if(assignment.includes(".")) {
+                assignment = assignment.split(".");
+                assignment = assignment[assignment.length - 1];
+            }
+
+            if(assignment.includes("+")) {
+                assignment = assignment.split("+");
+                assignment = assignment[assignment.length - 1];
+            }
+            
+            assignment = assignment.trim();
 
             // If its a string type return the string options
             if(assignment.startsWith("\"")) return {"String": CompData["String"]};
@@ -267,7 +277,6 @@ function activate(context) {
             // If there is a . in front of the text check what the previous item accesses
             if(range && range.start.character - 2 >= 0 && document.getText(new vscode.Range(new vscode.Position(range.start.line, range.start.character - 1), new vscode.Position(range.start.line, range.start.character))) == "."){
                 let res = getOptionsBasedOfPriorCommand(document, range);
-                console.log(res);
                 if(res) options = res;
             }
            
