@@ -206,7 +206,9 @@ function activate(context) {
 
             // Get the assigned value
             let assignment = lines[lines.length - 1];
-            let match = assignment.match(re)[0];
+            let matches = assignment.match(re);
+            if(!matches) return undefined;
+            let match = matches[0];
             assignment = assignment.substring(assignment.indexOf(match) + match.length).trim().replace(";", "");
             
             if(assignment.includes(".")) {
@@ -308,6 +310,7 @@ function activate(context) {
 
                     // Add hover data to completion item
                     t.documentation = getHoverData(key, c);
+                    t.commitCharacters = [".", ";"]
 
                     // Push completion item to result array
                     out.push(t);
