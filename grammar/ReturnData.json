@@ -41,7 +41,11 @@
                 "type": "String"
             }
         ],
-        "scp": []
+        "scp": [
+            {
+                "type": "String"
+            }
+        ]
     },
     "AptClient": {
         "show": [
