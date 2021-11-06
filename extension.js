@@ -401,18 +401,28 @@ let collection = vscode.languages.createDiagnosticCollection("greyscript");
             lastLine.range.end.line,
             lastLine.range.end.character);
                 
-        let lines = text.split("\r\n")
-        console.log(lines);
+        let lines = text.split("\r\n");
         let cleanedLines = [];
+        let inListOrMap = false;
+
         for(i in lines){
             if(lines[i].length == 0) continue;
 
             if(lines[i].includes("if") && lines[i].includes("then")){
                 let expression = lines[i].substring(lines[i].indexOf("then") + 4).trim();
-                if(expression.length == 0) continue;
-                lines[i] += " end if;";
+                if(expression.length != 0) lines[i] += " end if";
             }
-            else if(lines[i].substring(lines[i].length - 1) != ";") {
+            
+            if(lines[i].includes("{")){
+                inListOrMap = true;
+            }
+            
+            if(lines[i].includes("}")){
+                inListOrMap = false;
+                lines[i] += ";";
+            }
+
+            if(lines[i].substring(lines[i].length - 1) != ";" && !inListOrMap) {
                 lines[i] += ";";
             }
 
