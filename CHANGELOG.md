@@ -1,3 +1,6 @@
+## 1.7.2
+- Minifier is now included, to access use CTRL+SHIFT+P to bring up the console, and use the command "Greyscript: Minify".
+
 ## 1.7.1
 - Webpack support
 - Better autocomplete/prediction.
