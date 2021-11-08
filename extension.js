@@ -404,8 +404,8 @@ let collection = vscode.languages.createDiagnosticCollection("greyscript");
         let lines = text.split("\r\n");
         let cleanedLines = [];
         let inListOrMap = false;
-
         for(i in lines){
+            lines[i] = lines[i].trim();
             if(lines[i].length == 0) continue;
 
             if(lines[i].includes("if") && lines[i].includes("then")){
@@ -413,11 +413,11 @@ let collection = vscode.languages.createDiagnosticCollection("greyscript");
                 if(expression.length != 0) lines[i] += " end if";
             }
             
-            if(lines[i].includes("{")){
+            if(lines[i].match(/{(?=(?:[^"]*"[^"]*")*[^"]*$)/g)){
                 inListOrMap = true;
             }
             
-            if(lines[i].includes("}")){
+            if(lines[i].match(/}(?=(?:[^"]*"[^"]*")*[^"]*$)/g)){
                 inListOrMap = false;
                 lines[i] += ";";
             }
