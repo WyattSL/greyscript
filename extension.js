@@ -390,6 +390,51 @@ let collection = vscode.languages.createDiagnosticCollection("greyscript");
 	});
 	console.log("Hello Hackers!")
 	context.subscriptions.push(collection, listen1, listen2);
+    
+	function minify(editor, edit, context) {
+        let text = editor.document.getText().replace(/\/\/.*/g, "");
+
+        var firstLine = editor.document.lineAt(0);
+        var lastLine = editor.document.lineAt(editor.document.lineCount - 1);
+        var textRange = new vscode.Range(firstLine.range.start.line,
+            firstLine.range.start.character,
+            lastLine.range.end.line,
+            lastLine.range.end.character);
+                
+        let lines = text.split("\r\n");
+        let cleanedLines = [];
+        let inListOrMap = false;
+
+        for(i in lines){
+            if(lines[i].length == 0) continue;
+
+            if(lines[i].includes("if") && lines[i].includes("then")){
+                let expression = lines[i].substring(lines[i].indexOf("then") + 4).trim();
+                if(expression.length != 0) lines[i] += " end if";
+            }
+            
+            if(lines[i].includes("{")){
+                inListOrMap = true;
+            }
+            
+            if(lines[i].includes("}")){
+                inListOrMap = false;
+                lines[i] += ";";
+            }
+
+            if(lines[i].substring(lines[i].length - 1) != ";" && !inListOrMap) {
+                lines[i] += ";";
+            }
+
+            cleanedLines.push(lines[i]);
+        }
+
+        text = cleanedLines.join(" ");
+
+        edit.replace(textRange, text.replace(/\s+(?=(?:[^"]*"[^"]*")*[^"]*$)/g, " "));//.replace(/\r/g, "").replace(/\n/g, " "));
+	}
+	
+	context.subscriptions.push(vscode.commands.registerTextEditorCommand("greyscript.minify", minify));
 
     let gecmd = vscode.commands.registerTextEditorCommand("greyScript.gotoError", (editor, edit, context) => {
         let options = {"prompt": "Enter provided line number"}

@@ -67,6 +67,10 @@
             {
                 "command": "greyScript.gotoError",
                 "title": "GreyScript: Goto Error"
+            },
+            {
+                "command": "greyscript.minify",
+                "title": "GreyScript: Minify"
             }
         ],
         "configuration": {
