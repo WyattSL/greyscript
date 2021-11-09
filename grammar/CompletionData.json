@@ -173,7 +173,10 @@
         "break",
         "continue",
         "if",
-        "else"
+        "else",
+        "function",
+        "then",
+        "end"
     ],
     "String": [
         "remove",

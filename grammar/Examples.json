@@ -5,7 +5,11 @@
             "rootShell = get_shell(\"root\",\"myTotallySecurePassword\")"
         ],
         "md5": [
-            ["ciphertext = md5(\"Password\")"]
+            "ciphertext = md5(\"Password\")"
+        ],
+        "function": [
+            "myFunc = function()\n    print(\"Hello World\")\nend function",
+            "myFunc = function(data)\n    print(data)\nend function"
         ]
     }
 }

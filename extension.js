@@ -45,7 +45,56 @@ function activate(context) {
 
             if(output.key) {
                 return new vscode.Hover(getHoverData(output.key, output.cmd));
-            }           
+            }
+            else{
+                hoverText = new vscode.MarkdownString("", true);
+
+                // Variable hover
+                let text = document.getText()
+                lines = [];
+                let re = new RegExp("\\b"+word+"(\\s|)=")
+                i = 0;
+                
+                // Get all lines that interact with the variable prior to the line
+                for(line of text.split("\n")){
+                    if(i > range.start.line) break;
+                    if(line && line.match(re)) lines.push(line);
+                    i++;
+                }
+
+                // Get the assigned value
+                let assignment = lines[lines.length - 1];
+                if(!assignment || !assignment.match(re)) return;
+
+                let match = assignment.match(re)[0];
+                assignment = assignment.substring(assignment.indexOf(match) + match.length).trim().replace(";", "");
+                assignment = assignment.split(".")
+                assignment = assignment[assignment.length - 1];
+
+                // If its a string type return the string hover
+                if(assignment.startsWith("\"")) {
+                    hoverText.appendCodeblock("(variable) " + word + ": String")
+                    return new vscode.Hover(hoverText);
+                }
+
+                // If its a list type return the list hover
+                if(assignment.startsWith("[")) {
+                    hoverText.appendCodeblock("(variable) " + word + ": List")
+                    return new vscode.Hover(hoverText);
+                }
+
+                // If its a map type return the map hover
+                if(assignment.startsWith("{")) {
+                    hoverText.appendCodeblock("(variable) " + word + ": Map")
+                    return new vscode.Hover(hoverText);
+                }
+
+                // If its a function type return the function hover
+                if(assignment.startsWith("function")) {
+                    hoverText.appendCodeblock("(function) " + word + "(" +assignment.match(/(?<=\()(.*?)(?=\))/)[0] + ")")
+                    return new vscode.Hover(hoverText);
+                }
+            }
         }
     })
 
@@ -120,7 +169,7 @@ function activate(context) {
         if (type != "General") typeText = type + ".";
 
         // Combine base data together
-        let docs = {"title": enumCompTypeText[cmdType] + " " + typeText + cmd, "description": ""};
+        let docs = {"title": "(" + enumCompTypeText[cmdType] + ") " + typeText + cmd, "description": ""};
         
         // Add arguments if its a function/method
         if(cmdType == 2 || cmdType == 1){
@@ -150,8 +199,11 @@ function activate(context) {
 
         // Append markdown string areas
         str.appendCodeblock(docs.title);
-        str.appendMarkdown("---\n" + docs.description + codeExamples.length > 0 ? "\n---" : "");
-        if(codeExamples.length > 0) str.appendCodeblock(codeExamples.join("\n\n"));
+        str.appendMarkdown("---\n"+docs.description);
+        if(codeExamples.length > 0) {
+            str.appendMarkdown("\n### Examples\n---");
+            str.appendCodeblock(codeExamples.join("\n\n"));
+        }
 
         // Return markdown string
         return str;
@@ -214,10 +266,10 @@ function activate(context) {
             // If its a string type return the string options
             if(assignment.startsWith("\"")) return {"String": CompData["String"]};
 
-            // If its a list type return the string options
+            // If its a list type return the list options
             if(assignment.startsWith("[")) return {"List": CompData["List"]};
 
-            // If its a map type return the string options
+            // If its a map type return the list options
             if(assignment.startsWith("{")) return {"Map": CompData["Map"]};
 
             // Check if value is command
@@ -251,6 +303,8 @@ function activate(context) {
         }
         return undefined;
     }
+
+
 
     let compD = vscode.languages.registerCompletionItemProvider('greyscript', {
         provideCompletionItems(document,position,token,ccontext) {
