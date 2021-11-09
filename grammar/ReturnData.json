@@ -3,9 +3,19 @@
         "host_computer": [
             {
                 "type": "Computer"
+            },
+            {
+                "type": "null"
             }
         ],
-        "start_terminal": [],
+        "start_terminal": [
+            {
+                "type": "String"
+            },
+            {
+                "type": "null"
+            }
+        ],
         "build": [
             {
                 "type": "Number"
@@ -39,9 +49,22 @@
             },
             {
                 "type": "String"
+            },
+            {
+                "type": "null"
             }
         ],
-        "scp": []
+        "scp": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "String"
+            },
+            {
+                "type": "null"
+            }
+        ]
     },
     "AptClient": {
         "show": [
@@ -126,17 +149,76 @@
         "host_computer": [
             {
                 "type": "Computer"
+            },
+            {
+                "type": "null"
             }
         ],
-        "start_terminal": [],
-        "put": []
+        "start_terminal": [
+            {
+                "type": "String"
+            },
+            {
+                "type": "null"
+            }
+        ],
+        "put": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "String"
+            },
+            {
+                "type": "null"
+            }
+        ]
     },
     "Crypto": {
-        "aircrack": [],
-        "airmon": [],
-        "aireplay": [],
-        "decipher": [],
-        "smtp_user_List": []
+        "aircrack": [
+            {
+                "type": "String"
+            },
+            {
+                "type": "null"
+            }
+        ],
+        "airmon": [
+            {
+                "type": "String"
+            },
+            {
+                "type": "Number"
+            }
+        ],
+        "aireplay": [
+            {
+                "type": "String"
+            },
+            {
+                "type": "null"
+            }
+        ],
+        "decipher": [
+            {
+                "type": "String"
+            },
+            {
+                "type": "null"
+            }
+        ],
+        "smtp_user_List": [
+            {
+                "type": "String"
+            },
+            {
+                "type": "List",
+                "subType": "String"
+            },
+            {
+                "type": "null"
+            }
+        ]
     },
     "MetaLib": {
         "lib_name": [
@@ -298,9 +380,39 @@
     },
     "File": {
         "chmod": [],
-        "copy": [],
-        "move": [],
-        "rename": [],
+        "copy": [
+            {
+                "type": "String"
+            },
+            {
+                "type": "Number"
+            },
+            {
+                "type": "null"
+            }
+        ],
+        "move": [
+            {
+                "type": "String"
+            },
+            {
+                "type": "Number"
+            },
+            {
+                "type": "null"
+            }
+        ],
+        "rename": [
+            {
+                "type": "String"
+            },
+            {
+                "type": "Number"
+            },
+            {
+                "type": "null"
+            }
+        ],
         "path": [
             {
                 "type": "String"

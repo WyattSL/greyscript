@@ -262,10 +262,22 @@ function activate(context) {
 
             // Get the assigned value
             let assignment = lines[lines.length - 1];
-            let match = assignment.match(re)[0];
+            let matches = assignment.match(re);
+            if(!matches) return undefined;
+            let match = matches[0];
             assignment = assignment.substring(assignment.indexOf(match) + match.length).trim().replace(";", "");
-            assignment = assignment.split(".")
-            assignment = assignment[assignment.length - 1];
+            
+            if(assignment.includes(".")) {
+                assignment = assignment.split(".");
+                assignment = assignment[assignment.length - 1];
+            }
+
+            if(assignment.includes("+")) {
+                assignment = assignment.split("+");
+                assignment = assignment[assignment.length - 1];
+            }
+            
+            assignment = assignment.trim();
 
             // If its a string type return the string options
             if(assignment.startsWith("\"")) return {"String": CompData["String"]};
@@ -325,7 +337,6 @@ function activate(context) {
             // If there is a . in front of the text check what the previous item accesses
             if(range && range.start.character - 2 >= 0 && document.getText(new vscode.Range(new vscode.Position(range.start.line, range.start.character - 1), new vscode.Position(range.start.line, range.start.character))) == "."){
                 let res = getOptionsBasedOfPriorCommand(document, range);
-                console.log(res);
                 if(res) options = res;
             }
            
@@ -357,6 +368,7 @@ function activate(context) {
 
                     // Add hover data to completion item
                     t.documentation = getHoverData(key, c);
+                    t.commitCharacters = [".", ";"]
 
                     // Push completion item to result array
                     out.push(t);
@@ -401,6 +413,9 @@ function activate(context) {
       }
 
     let ColorPicker = vscode.languages.registerColorProvider('greyscript', {
+        provideColorPresentations(color, ctx) {
+            return []
+        },
         provideDocumentColors(document, token) {
             let txt = document.getText();
             let reg = /(?:(?:<color=)?(#[0-9a-f]{6})|<color=\"?(black|blue|green|orange|purple|red|white|yellow)\"?)>/gi
@@ -409,7 +424,6 @@ function activate(context) {
             for (var m of mchs) {
                 // All text till occurence
                 let ps = txt.slice(0,m.index);
-
                 // Get line number
                 let pl = ps.split("\n").length - 1;
 
