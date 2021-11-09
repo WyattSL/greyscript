@@ -9,7 +9,7 @@
         "url": "https://github.com/WyattSL"
     },
     "icon": "icon.png",
-    "version": "1.7.1",
+    "version": "1.7.4",
     "repository": {
         "type": "git",
         "url": "https://github.com/WyattSL/greyscript.git"
@@ -20,6 +20,7 @@
         "webpack-cli": "^4.9.1"
     },
     "scripts": {
+        "vscode:prepublish-nonminified": "npm run esbuild-base -- ",
         "vscode:prepublish": "npm run esbuild-base -- --minify",
         "esbuild-base": "esbuild ./extension.js --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
         "esbuild": "npm run esbuild-base -- --sourcemap",
@@ -67,6 +68,10 @@
             {
                 "command": "greyScript.gotoError",
                 "title": "GreyScript: Goto Error"
+            },
+            {
+                "command": "greyscript.minify",
+                "title": "GreyScript: Minify"
             }
         ],
         "configuration": {

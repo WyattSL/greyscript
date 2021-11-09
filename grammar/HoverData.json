@@ -168,9 +168,12 @@
         "while": "Use a while block to loop as long as a condition is true.",
         "break": "The break statement jumps out of a while or for loop",
         "continue": "The continue statement jumps to the top of the loop, skipping the rest of the current iteration.",
-        "if": "Use if blocks to do different things depending on some condition. \nInclude zero or more else if blocks and one optional else block.",
-        "else": "Use if blocks to do different things depending on some condition. \nInclude zero or more else if blocks and one optional else block.",
-        "slice":"Returns the provided string or list from index start to index end."
+        "if": "Use if blocks to do different things depending on some condition.\nYou can include an else or an else if to create conditions for all your needs.",
+        "else": "Use else blocks to do things if the previous if condition was false.\nAn else block can be chained with an if creating a conditional else block.",
+        "slice":"Returns the provided string or list from index start to index end.",
+        "function": "Create a user defined function block where you can run your own snippets of code.",
+        "then": "Ends the conditioning of an if statement.",
+        "end": "Ends the provided code block."
     },
     "String": {
         "remove": "Returns the string without the first occurrence of the provided substring.",

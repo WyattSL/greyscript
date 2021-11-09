@@ -40,5 +40,8 @@
     "break": 20,
     "continue": 20,
     "if": 20,
-    "else": 20
+    "else": 20,
+    "end": 20,
+    "then": 20,
+    "function": 20
 }

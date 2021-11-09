@@ -1,3 +1,15 @@
+## 1.7.4
+- Fix color picking not working.
+- Add hover text for variables and own defined functions
+- The constants 'end', 'then' and 'function' are now included in predictions
+- Fix 'else' description being the same as the 'if' description
+
+## 1.7.3
+- Fix minifier adding unnecessary semi-colons. 
+
+## 1.7.2
+- Minifier is now included, to access use CTRL+SHIFT+P to bring up the console, and use the command "Greyscript: Minify".
+
 ## 1.7.1
 - Webpack support
 - Better autocomplete/prediction.

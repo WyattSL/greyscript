@@ -24,6 +24,7 @@ function activate(context) {
             if (!vscode.workspace.getConfiguration("greyscript").get("hoverdocs")) return;
 
             let range = document.getWordRangeAtPosition(position)
+            if(!range) return;
             let word = document.getText(range)
 
             let options = {"General": CompData["General"]};
@@ -45,28 +46,80 @@ function activate(context) {
 
             if(output.key) {
                 return new vscode.Hover(getHoverData(output.key, output.cmd));
-            }           
+            }
+            else{
+                hoverText = new vscode.MarkdownString("", true);
+
+                // Variable hover
+                let text = document.getText()
+                lines = [];
+                let re = new RegExp("\\b"+word+"(\\s|)=")
+                i = 0;
+                
+                // Get all lines that interact with the variable prior to the line
+                for(line of text.split("\n")){
+                    if(i > range.start.line) break;
+                    if(line && line.match(re)) lines.push(line);
+                    i++;
+                }
+
+                // Get the assigned value
+                let assignment = lines[lines.length - 1];
+                if(!assignment || !assignment.match(re)) return;
+
+                let match = assignment.match(re)[0];
+                assignment = assignment.substring(assignment.indexOf(match) + match.length).trim().replace(";", "");
+                assignment = assignment.split(".")
+                assignment = assignment[assignment.length - 1];
+
+                // If its a string type return the string hover
+                if(assignment.startsWith("\"")) {
+                    hoverText.appendCodeblock("(variable) " + word + ": String")
+                    return new vscode.Hover(hoverText);
+                }
+
+                // If its a list type return the list hover
+                if(assignment.startsWith("[")) {
+                    hoverText.appendCodeblock("(variable) " + word + ": List")
+                    return new vscode.Hover(hoverText);
+                }
+
+                // If its a map type return the map hover
+                if(assignment.startsWith("{")) {
+                    hoverText.appendCodeblock("(variable) " + word + ": Map")
+                    return new vscode.Hover(hoverText);
+                }
+
+                // If its a function type return the function hover
+                if(assignment.startsWith("function")) {
+                    hoverText.appendCodeblock("(function) " + word + "(" +assignment.match(/(?<=\()(.*?)(?=\))/)[0] + ")")
+                    return new vscode.Hover(hoverText);
+                }
+            }
         }
     })
 
     if (vscode.workspace.getConfiguration("greyscript").get("hoverdocs")) context.subscriptions.push(hoverD)
 
-    let decD = vscode.languages.registerDeclarationProvider('greyscript', {
+    context.subscriptions.push(vscode.languages.registerDeclarationProvider('greyscript', {
         provideDeclaration(document, position, token) {
+
             let range = document.getWordRangeAtPosition(position);
             let word = document.getText(range);
-            let Exp = new RegExp(`(${word} = |${word}=)`);
             let Text = document.getText();
-            let Match = Text.match(Exp);
+
+            let re = RegExp("\\b"+word+"(\\s|)=");
+            let Match = Text.match(re);
+
             let index = Match.index;
             let nt = Text.slice(0, index);
+
             let lines = nt.split(new RegExp("\n","g")).length;
             let Pos = new vscode.Position(lines-1, word.length);
+
             return new vscode.Location(document.uri, Pos);
         }
-    });
-
-    context.subscriptions.push(decD);
+    }));
 
     /*
 
@@ -120,7 +173,7 @@ function activate(context) {
         if (type != "General") typeText = type + ".";
 
         // Combine base data together
-        let docs = {"title": enumCompTypeText[cmdType] + " " + typeText + cmd, "description": ""};
+        let docs = {"title": "(" + enumCompTypeText[cmdType] + ") " + typeText + cmd, "description": ""};
         
         // Add arguments if its a function/method
         if(cmdType == 2 || cmdType == 1){
@@ -150,8 +203,11 @@ function activate(context) {
 
         // Append markdown string areas
         str.appendCodeblock(docs.title);
-        str.appendMarkdown("---\n" + docs.description + codeExamples.length > 0 ? "\n---" : "");
-        if(codeExamples.length > 0) str.appendCodeblock(codeExamples.join("\n\n"));
+        str.appendMarkdown("---\n"+docs.description);
+        if(codeExamples.length > 0) {
+            str.appendMarkdown("\n### Examples\n---");
+            str.appendCodeblock(codeExamples.join("\n\n"));
+        }
 
         // Return markdown string
         return str;
@@ -226,10 +282,10 @@ function activate(context) {
             // If its a string type return the string options
             if(assignment.startsWith("\"")) return {"String": CompData["String"]};
 
-            // If its a list type return the string options
+            // If its a list type return the list options
             if(assignment.startsWith("[")) return {"List": CompData["List"]};
 
-            // If its a map type return the string options
+            // If its a map type return the list options
             if(assignment.startsWith("{")) return {"Map": CompData["Map"]};
 
             // Check if value is command
@@ -263,6 +319,8 @@ function activate(context) {
         }
         return undefined;
     }
+
+
 
     let compD = vscode.languages.registerCompletionItemProvider('greyscript', {
         provideCompletionItems(document,position,token,ccontext) {
@@ -331,14 +389,28 @@ function activate(context) {
     if (vscode.workspace.getConfiguration("greyscript").get("autocomplete")) context.subscriptions.push(compD)
 
     function hexToRgb(hex) {
-        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
         return result ? {
             r: parseInt(result[1], 16),
             g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16),
-            a: parseInt(result[4], 16)
+            b: parseInt(result[3], 16)
         } : null;
     }
+    
+    function RGBToHex(r,g,b) {
+        r = (r*255).toString(16);
+        g = (g*255).toString(16);
+        b = (b*255).toString(16);
+      
+        if (r.length == 1)
+          r = "0" + r;
+        if (g.length == 1)
+          g = "0" + g;
+        if (b.length == 1)
+          b = "0" + b;
+      
+        return "#" + r + g + b;
+      }
 
     let ColorPicker = vscode.languages.registerColorProvider('greyscript', {
         provideColorPresentations(color, ctx) {
@@ -346,42 +418,77 @@ function activate(context) {
         },
         provideDocumentColors(document, token) {
             let txt = document.getText();
-            let reg = /(?:(?:<color=)?(#[0-9a-f]{6,8})|<color=\"?(black|blue|green|orange|purple|red|white|yellow)\"?)>/gi
+            let reg = /(?:(?:<color=)?(#[0-9a-f]{6})|<color=\"?(black|blue|green|orange|purple|red|white|yellow)\"?)>/gi
             let mchs = txt.matchAll(reg);
             let out = [];
             for (var m of mchs) {
+                // All text till occurence
                 let ps = txt.slice(0,m.index);
-                let pl = txt.split("\n").length;
-                let pc = m.index-txt.slice(0, txt.lastIndexOf("\n")).length
-                if (pc < 0) pc = 0;
-                let range = new vscode.Range(pl, pc, pl, pc+m[0].length);
+                // Get line number
+                let pl = ps.split("\n").length - 1;
+
+                // Get line text
+                let line = document.lineAt(pl);
+                
+                // Get color tag range
+                let range = new vscode.Range(pl, line.text.indexOf(m[0]), pl, line.text.indexOf(m[0]) + m[0].length);
+
+                // Parse color
+                console.log(m);
                 let color;
-                if (m[1] && m[1].includes("#")) {
+                if (m[1]) {
+                    range = new vscode.Range(pl, line.text.indexOf(m[1]), pl, line.text.indexOf(m[1]) + m[1].length);
                     let d = hexToRgb(m[1])
-                    color = new vscode.Color(d.r,d.g,d.b);
+                    color = new vscode.Color(d.r,d.g,d.b,16);
                 }
-                if (m[2]) {
-                    switch (m[2]) {
-                        case "red":
-                            color = "#1f0f0f"
+                else {
+                    range = new vscode.Range(pl, line.text.indexOf(m[2]), pl, line.text.indexOf(m[2]) + m[2].length);
+                    switch(m[2]){
+                        case "black":
+                            color = new vscode.Color(0,0,0,16);
                             break;
-                        case "green":
-                            color = "#0f1f0f"
-                            break;
-                        case "blue":
-                            color = "#0f0f1f";
-                            break;
+
                         case "white":
-                            color = "#1f1f1f"
+                            color = new vscode.Color(16,16,16,16);
+                            break;
+
+                        case "red":
+                            color = new vscode.Color(16,0,0,16);
+                            break;
+
+                        case "green":
+                            color = new vscode.Color(0,16,0,16);
+                            break;
+
+                        case "blue":
+                            color = new vscode.Color(0,0,16,16);
+                            break;
+                        
+                        case "orange":
+                            let c = hexToRgb("#FFA500")
+                            color = new vscode.Color(c.r, c.g, c.b, 16);
+                            break;
+
+                        case "purple":
+                            let c = hexToRgb("#800080")
+                            color = new vscode.Color(c.r, c.g, c.b, 16);
+                            break;
+
+                        case "yellow":
+                            let c = hexToRgb("#ffff00")
+                            color = new vscode.Color(c.r, c.g, c.b, 16);
                             break;
                     }
-                    let d = hexToRgb(color);
-                    color = new vscode.Color(d.r,d.g,d.b)
                 }
                 let c = new vscode.ColorInformation(range, color)
                 out.push(c);
             }
             return out;
+        },
+        provideColorPresentations(color, ctx, token){
+            let hex = RGBToHex(color.red, color.green, color.blue);
+            ctx.range = new vscode.Range(ctx.range.start, new vscode.Position(ctx.range.end.line, ctx.range.start.character + hex.length))
+            return [vscode.ColorPresentation(hex)]
         }
     });
 
@@ -424,6 +531,51 @@ let collection = vscode.languages.createDiagnosticCollection("greyscript");
 	});
 	console.log("Hello Hackers!")
 	context.subscriptions.push(collection, listen1, listen2);
+    
+	function minify(editor, edit, context) {
+        let text = editor.document.getText().replace(/\/\/.*/g, "");
+
+        var firstLine = editor.document.lineAt(0);
+        var lastLine = editor.document.lineAt(editor.document.lineCount - 1);
+        var textRange = new vscode.Range(firstLine.range.start.line,
+            firstLine.range.start.character,
+            lastLine.range.end.line,
+            lastLine.range.end.character);
+                
+        let lines = text.split("\r\n");
+        let cleanedLines = [];
+        let inListOrMap = false;
+        for(i in lines){
+            lines[i] = lines[i].trim();
+            if(lines[i].length == 0) continue;
+
+            if(lines[i].includes("if") && lines[i].includes("then")){
+                let expression = lines[i].substring(lines[i].indexOf("then") + 4).trim();
+                if(expression.length != 0) lines[i] += " end if";
+            }
+            
+            if(lines[i].match(/{(?=(?:[^"]*"[^"]*")*[^"]*$)/g)){
+                inListOrMap = true;
+            }
+            
+            if(lines[i].match(/}(?=(?:[^"]*"[^"]*")*[^"]*$)/g)){
+                inListOrMap = false;
+                lines[i] += ";";
+            }
+
+            if(lines[i].substring(lines[i].length - 1) != ";" && !inListOrMap) {
+                lines[i] += ";";
+            }
+
+            cleanedLines.push(lines[i]);
+        }
+
+        text = cleanedLines.join(" ");
+
+        edit.replace(textRange, text.replace(/\s+(?=(?:[^"]*"[^"]*")*[^"]*$)/g, " "));//.replace(/\r/g, "").replace(/\n/g, " "));
+	}
+	
+	context.subscriptions.push(vscode.commands.registerTextEditorCommand("greyscript.minify", minify));
 
     let gecmd = vscode.commands.registerTextEditorCommand("greyScript.gotoError", (editor, edit, context) => {
         let options = {"prompt": "Enter provided line number"}
