@@ -1,6 +1,6 @@
 .vscode/*
 *.vsix
-.vscodeignore
 npm-debug.log
 out/*
-node_modules/*
+node_modules/
+tests/*
