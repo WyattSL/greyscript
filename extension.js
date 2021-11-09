@@ -24,6 +24,7 @@ function activate(context) {
             if (!vscode.workspace.getConfiguration("greyscript").get("hoverdocs")) return;
 
             let range = document.getWordRangeAtPosition(position)
+            if(!range) return;
             let word = document.getText(range)
 
             let options = {"General": CompData["General"]};
@@ -100,22 +101,25 @@ function activate(context) {
 
     if (vscode.workspace.getConfiguration("greyscript").get("hoverdocs")) context.subscriptions.push(hoverD)
 
-    let decD = vscode.languages.registerDeclarationProvider('greyscript', {
+    context.subscriptions.push(vscode.languages.registerDeclarationProvider('greyscript', {
         provideDeclaration(document, position, token) {
+
             let range = document.getWordRangeAtPosition(position);
             let word = document.getText(range);
-            let Exp = new RegExp(`(${word} = |${word}=)`);
             let Text = document.getText();
-            let Match = Text.match(Exp);
+
+            let re = RegExp("\\b"+word+"(\\s|)=");
+            let Match = Text.match(re);
+
             let index = Match.index;
             let nt = Text.slice(0, index);
+
             let lines = nt.split(new RegExp("\n","g")).length;
             let Pos = new vscode.Position(lines-1, word.length);
+
             return new vscode.Location(document.uri, Pos);
         }
-    });
-
-    context.subscriptions.push(decD);
+    }));
 
     /*
 
@@ -373,35 +377,104 @@ function activate(context) {
     if (vscode.workspace.getConfiguration("greyscript").get("autocomplete")) context.subscriptions.push(compD)
 
     function hexToRgb(hex) {
-        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
         return result ? {
             r: parseInt(result[1], 16),
             g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16),
-            a: parseInt(result[4], 16)
+            b: parseInt(result[3], 16)
         } : null;
     }
+    
+    function RGBToHex(r,g,b) {
+        r = (r*255).toString(16);
+        g = (g*255).toString(16);
+        b = (b*255).toString(16);
+      
+        if (r.length == 1)
+          r = "0" + r;
+        if (g.length == 1)
+          g = "0" + g;
+        if (b.length == 1)
+          b = "0" + b;
+      
+        return "#" + r + g + b;
+      }
 
     let ColorPicker = vscode.languages.registerColorProvider('greyscript', {
         provideDocumentColors(document, token) {
             let txt = document.getText();
-            let reg = /(?:(?:<color=)?(#[0-9a-f]{6,8})|<color=\"?(black|blue|green|orange|purple|red|white|yellow)\"?)>/gi
+            let reg = /(?:(?:<color=)?(#[0-9a-f]{6})|<color=\"?(black|blue|green|orange|purple|red|white|yellow)\"?)>/gi
             let mchs = txt.matchAll(reg);
             let out = [];
             for (var m of mchs) {
+                // All text till occurence
                 let ps = txt.slice(0,m.index);
-                let pl = txt.split("\n").length;
-                let pc = txt.lastIndexOf("\n")+m.index
-                let range = new vscode.Range(pl, pc, pl, pc+m[0].length);
+
+                // Get line number
+                let pl = ps.split("\n").length - 1;
+
+                // Get line text
+                let line = document.lineAt(pl);
+                
+                // Get color tag range
+                let range = new vscode.Range(pl, line.text.indexOf(m[0]), pl, line.text.indexOf(m[0]) + m[0].length);
+
+                // Parse color
+                console.log(m);
                 let color;
-                if (m[1].includes("#")) {
+                if (m[1]) {
+                    range = new vscode.Range(pl, line.text.indexOf(m[1]), pl, line.text.indexOf(m[1]) + m[1].length);
                     let d = hexToRgb(m[1])
-                    color = new vscode.Color(d.r,d.g,d.b,d.a ? d.a : 16);
+                    color = new vscode.Color(d.r,d.g,d.b,16);
+                }
+                else {
+                    range = new vscode.Range(pl, line.text.indexOf(m[2]), pl, line.text.indexOf(m[2]) + m[2].length);
+                    switch(m[2]){
+                        case "black":
+                            color = new vscode.Color(0,0,0,16);
+                            break;
+
+                        case "white":
+                            color = new vscode.Color(16,16,16,16);
+                            break;
+
+                        case "red":
+                            color = new vscode.Color(16,0,0,16);
+                            break;
+
+                        case "green":
+                            color = new vscode.Color(0,16,0,16);
+                            break;
+
+                        case "blue":
+                            color = new vscode.Color(0,0,16,16);
+                            break;
+                        
+                        case "orange":
+                            let c = hexToRgb("#FFA500")
+                            color = new vscode.Color(c.r, c.g, c.b, 16);
+                            break;
+
+                        case "purple":
+                            let c = hexToRgb("#800080")
+                            color = new vscode.Color(c.r, c.g, c.b, 16);
+                            break;
+
+                        case "yellow":
+                            let c = hexToRgb("#ffff00")
+                            color = new vscode.Color(c.r, c.g, c.b, 16);
+                            break;
+                    }
                 }
                 let c = new vscode.ColorInformation(range, color)
                 out.push(c);
             }
             return out;
+        },
+        provideColorPresentations(color, ctx, token){
+            let hex = RGBToHex(color.red, color.green, color.blue);
+            ctx.range = new vscode.Range(ctx.range.start, new vscode.Position(ctx.range.end.line, ctx.range.start.character + hex.length))
+            return [vscode.ColorPresentation(hex)]
         }
     });
 
