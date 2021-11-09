@@ -3,6 +3,7 @@
 - Add hover text for variables and own defined functions
 - The constants 'end', 'then' and 'function' are now included in predictions
 - Fix 'else' description being the same as the 'if' description
+- *maybe* Webpack support
 
 ## 1.7.3
 - Fix minifier adding unnecessary semi-colons. 
