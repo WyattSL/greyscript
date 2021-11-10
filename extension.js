@@ -440,6 +440,7 @@ function activate(context) {
                 }
                 else {
                     range = new vscode.Range(pl, line.text.indexOf(m[2]), pl, line.text.indexOf(m[2]) + m[2].length);
+                    let c = undefined;
                     switch(m[2]){
                         case "black":
                             color = new vscode.Color(0,0,0,16);
@@ -462,17 +463,17 @@ function activate(context) {
                             break;
                         
                         case "orange":
-                            let c = hexToRgb("#FFA500")
+                            c = hexToRgb("#FFA500")
                             color = new vscode.Color(c.r, c.g, c.b, 16);
                             break;
 
                         case "purple":
-                            let c = hexToRgb("#800080")
+                            c = hexToRgb("#800080")
                             color = new vscode.Color(c.r, c.g, c.b, 16);
                             break;
 
                         case "yellow":
-                            let c = hexToRgb("#ffff00")
+                            c = hexToRgb("#ffff00")
                             color = new vscode.Color(c.r, c.g, c.b, 16);
                             break;
                     }
