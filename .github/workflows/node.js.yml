@@ -25,7 +25,12 @@ jobs:
               npm install
               npm install -g vsce
       - name: Package Extension
-        run: vsce package
+        run: vsce package -o extension.vsix
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: Extension
+          path: extension.vsix
   test:
     name: Test
     strategy:
