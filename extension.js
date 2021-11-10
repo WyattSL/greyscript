@@ -333,11 +333,30 @@ function activate(context) {
             
             // Set default options (THIS IS ALSO THE FALLBACK)
             let options = {"General": CompData["General"]};
+            let variableOptions = [];
 
             // If there is a . in front of the text check what the previous item accesses
             if(range && range.start.character - 2 >= 0 && document.getText(new vscode.Range(new vscode.Position(range.start.line, range.start.character - 1), new vscode.Position(range.start.line, range.start.character))) == "."){
                 let res = getOptionsBasedOfPriorCommand(document, range);
                 if(res) options = res;
+            }
+            else {
+                // Get All user defined variables
+                let linesTillLine = document.getText().split("\n").splice(0, range.start.line)
+                
+                for(line of linesTillLine.reverse()){
+                    matches = line.match(/\w+(\s|)=/g);
+                    if(matches){
+                        for(match of matches){
+                            variableName = match.replace(/(\s|)=/, "");
+                            if(!variableOptions.some(m => m.name === variableName)) {
+                                let assignment = line.substring(match.index)
+                                assignment = assignment.substring(assignment.indexOf("=") + 1).trim();
+                                variableOptions.push({"name": variableName, "type": (assignment.startsWith("function") ? 2 : 5)});
+                            }
+                        }
+                    }
+                }
             }
            
             let output = {};
@@ -347,6 +366,13 @@ function activate(context) {
                let keyOutput = options[key].filter(cmd => cmd.includes(word));
                if(keyOutput.length > 0) output[key] = keyOutput;
             }
+
+            let variablesOutput = [];
+            // Get autocompletion of variableNames
+            for(variable of variableOptions){
+                if(variable.name.includes(word)) variablesOutput.push(variable);
+            }
+
             //console.log(output);
 
             // Instantiate result array
@@ -378,6 +404,11 @@ function activate(context) {
                 }
             }
 
+            // Go through filtered variables
+            for(variable of variablesOutput){
+                out.push(new vscode.CompletionItem(variable.name, variable.type));
+            }
+
             //console.log("AutoCompletion result:");
             //console.log(out);
 
@@ -386,7 +417,15 @@ function activate(context) {
         }
     });
 
-    if (vscode.workspace.getConfiguration("greyscript").get("autocomplete")) context.subscriptions.push(compD)
+    if (vscode.workspace.getConfiguration("greyscript").get("autocomplete")) {
+        context.subscriptions.push(compD)
+        context.subscriptions.push(vscode.languages.registerSignatureHelpProvider("greyscript", {
+            provideSignatureHelp(document, position, token, ctx) {
+                let word = document.getText(document.getWordRangeAtPosition(position));
+                //console.log(word);
+            }
+        }, [",", "("]))
+    }
 
     function hexToRgb(hex) {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
