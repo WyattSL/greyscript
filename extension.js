@@ -413,9 +413,6 @@ function activate(context) {
       }
 
     let ColorPicker = vscode.languages.registerColorProvider('greyscript', {
-        provideColorPresentations(color, ctx) {
-            return []
-        },
         provideDocumentColors(document, token) {
             let txt = document.getText();
             let reg = /(?:(?:<color=)?(#[0-9a-f]{6})|<color=\"?(black|blue|green|orange|purple|red|white|yellow)\"?)>/gi
