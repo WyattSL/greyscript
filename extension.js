@@ -446,13 +446,14 @@ function activate(context) {
         optionalParam = p.match(/\w+(\s|)=(\s|)/);
         if(optionalParam){
             let value = p.substring(optionalParam[0].length);
+            let name = optionalParam[0].replace(/(\s|)=(\s|)/, "");
 
-            if(value == "true" || value == "false") return p.split(" ")[0] + ": Bool";
-            else if(!isNaN(value)) return p.split(" ")[0] + ": Number";
-            else if(value.startsWith("\"")) return p.split(" ")[0] + ": String";
-            else if(value.startsWith("[")) return p.split(" ")[0] + ": List";
-            else if(value.startsWith("{")) return p.split(" ")[0] + ": Map";
-            else return p.split(" ")[0] + ": any";
+            if(value == "true" || value == "false") return name + ": Bool";
+            else if(!isNaN(value)) return name + ": Number";
+            else if(value.startsWith("\"")) return name + ": String";
+            else if(value.startsWith("[")) return name + ": List";
+            else if(value.startsWith("{")) return name + ": Map";
+            else return name + ": any";
         }
         else return p.trim() + ": any"
     }
