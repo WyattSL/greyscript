@@ -1,3 +1,6 @@
+## 1.7.6
+- Fix color picker when same tags occur twice.
+
 ## 1.7.5
 - Add variables in completion items.
 - Add function parameter signatures.
