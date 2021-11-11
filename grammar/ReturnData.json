@@ -103,16 +103,6 @@
             }
         ]
     },
-    "LibMail": {
-        "login": [
-            {
-                "type": "String"
-            },
-            {
-                "type": "MetaMail"
-            }
-        ]
-    },
     "MetaMail": {
         "delete": [
             {
@@ -605,6 +595,14 @@
         ]
     },
     "General": {
+        "mail_login": [
+            {
+                "type": "String"
+            },
+            {
+                "type": "MetaMail"
+            }
+        ],
         "typeof": [
             {
                 "type": "String"
@@ -673,9 +671,6 @@
             },
             {
                 "type": "AptClient"
-            },
-            {
-                "type": "LibMail"
             }
         ],
         "import_code": [

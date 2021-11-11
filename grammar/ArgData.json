@@ -138,20 +138,6 @@
             }
         ]
     },
-    "LibMail": {
-        "login": [
-            {
-                "type": "String",
-                "name": "user",
-                "optional": false
-            },
-            {
-                "type": "String",
-                "name": "password",
-                "optional": false
-            }
-        ]
-    },
     "MetaMail": {
         "delete": [
             {
@@ -640,6 +626,18 @@
         "active_net_card": []
     },
     "General": {
+        "mail_login": [
+            {
+                "type": "String",
+                "name": "user",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "password",
+                "optional": false
+            }
+        ],
         "typeof": [
             {
                 "type": "Any",

@@ -17,9 +17,6 @@
         "install": "Install the program or library from a remote repository listed in /etc/apt/sources.txt.\nUnless a path is specified, the program installs in /lib if it is a library or in /bin otherwise\n\nReturns a string (containing an error) on failure or empty on success.",
         "check_upgrade": "Check if there is a newer version of the file in the repository.\n\nReturns a string (containing an error) on failure or is empty when succesful."
     },
-    "LibMail": {
-        "login": "Access the email account\n\nReturns a MetaMail type object if the login has been correct. In case of error, it returns a string"
-    },
     "MetaMail": {
         "delete": "Delete the mail that corresponds with mail_ID.\n\nReturns 1 if it was removed successfully or a string with the error message.",
         "fetch": "Get all mails\n\nReturns a string type list of the received emails, with a content preview. In case of error, it returns a string.",
@@ -120,6 +117,7 @@
         "active_net_card": "Returns a string with the keyword WIFI if the current device is connected to a router by WiFi, if it is connected by cable a string with the keyword ETHERNET is returned."
     },
     "General": {
+        "mail_login": "Access the email account\n\nReturns a MetaMail type object if the login has been correct. In case of error, it returns a string",
         "typeof": "Returns a string with the type of the object passed as a parameter.",
         "get_router": "Returns the router whose public IP matches, otherwise returns null.\nIf the ip_address parameter is not specified, returns the router to which the computer executing this command is connected.",
         "get_switch": "Returns the switch on the local network whose IP matches, otherwise it returns null.",
