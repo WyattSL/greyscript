@@ -623,7 +623,7 @@ function activate(context) {
                     }
                 }
                 let c = new vscode.ColorInformation(range, color)
-                startPos += range.end.character;
+                startPos = range.end.character;
                 out.push(c);
             }
             return out;
