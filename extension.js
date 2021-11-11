@@ -311,7 +311,6 @@ function activate(context) {
                 return CompData;
             }
         }
-        return undefined;
     }
 
     let compD = vscode.languages.registerCompletionItemProvider('greyscript', {
