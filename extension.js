@@ -325,14 +325,39 @@ function activate(context) {
     let compD = vscode.languages.registerCompletionItemProvider('greyscript', {
         provideCompletionItems(document,position,token,ccontext) {
             if (!vscode.workspace.getConfiguration("greyscript").get("autocomplete")) return;
-            
-            // Get typed word
-            let range = document.getWordRangeAtPosition(position);
-            let word = document.getText(range);
-            //console.log(word);
-            
+            let out = [];
+
             // Set default options (THIS IS ALSO THE FALLBACK)
             let options = {"General": CompData["General"]};
+
+            // Get typed word
+            let range = document.getWordRangeAtPosition(position);
+            if(!range) {
+                for (key in options) {
+                    for(c of options[key]){
+                        //console.log("Processing result: " + c);
+    
+                        // Get type of completion item
+                        let type = CompTypes[c] || CompTypes["default"];
+                        
+                        // Create completion item
+                        let t = new vscode.CompletionItem(c,type)
+    
+                        // Add hover data to completion item
+                        t.documentation = getHoverData(key, c);
+                        t.commitCharacters = [".", ";"]
+    
+                        // Push completion item to result array
+                        out.push(t);
+                    }
+                }
+                return new vscode.CompletionList(out,true);
+            }
+            
+            let word = document.getText(range);
+            if(!word) return;
+            //console.log(word);
+            
             let variableOptions = [];
 
             // If there is a . in front of the text check what the previous item accesses
@@ -376,10 +401,9 @@ function activate(context) {
             //console.log(output);
 
             // Instantiate result array
-            let out = [];
 
             // Instantiate sort text index
-            var a = 0;
+            //var a = 0;
 
             // Go through filtered results
             for (key in output) {
@@ -400,7 +424,7 @@ function activate(context) {
                     out.push(t);
 
                     // Increment sort text index
-                    a++
+                    //a++
                 }
             }
 
@@ -417,12 +441,97 @@ function activate(context) {
         }
     });
 
+    function processFunctionParameter(p) {
+        // Parse the user defined function parameters
+        optionalParam = p.match(/\w+(\s|)=(\s|)/);
+        if(optionalParam){
+            let value = p.substring(optionalParam[0].length);
+
+            if(value == "true" || value == "false") return p.split(" ")[0] + ": Bool";
+            else if(!isNaN(value)) return p.split(" ")[0] + ": Number";
+            else if(value.startsWith("\"")) return p.split(" ")[0] + ": String";
+            else if(value.startsWith("[")) return p.split(" ")[0] + ": List";
+            else if(value.startsWith("{")) return p.split(" ")[0] + ": Map";
+            else return p.split(" ")[0] + ": any";
+        }
+        else return p.trim() + ": any"
+    }
+
     if (vscode.workspace.getConfiguration("greyscript").get("autocomplete")) {
         context.subscriptions.push(compD)
         context.subscriptions.push(vscode.languages.registerSignatureHelpProvider("greyscript", {
             provideSignatureHelp(document, position, token, ctx) {
-                let word = document.getText(document.getWordRangeAtPosition(position));
-                //console.log(word);
+                // Check if current line is not a function creation
+                let re = RegExp("(\\s|)=(\\s|)function");
+                let curLine = document.lineAt(position.line);
+                if(ctx.triggerCharacter == "(" && curLine.text.match(re)) return;
+
+                // Get the function being called 
+                let range = document.getWordRangeAtPosition(new vscode.Position(position.line, curLine.text.lastIndexOf("(") - 1));
+                let word = document.getText(range);
+
+                // Create default signature help
+                let t = new vscode.SignatureHelp();
+                if(curLine.text.match(/(?<=\()(.*?)(?=\))/)) t.activeParameter = curLine.text.match(/(?<=\()(.*?)(?=\))/)[0].split(",").length - 1;
+                t.signatures = [];
+                t.activeSignature = 0;
+
+                // Get all the possible signatures from comp data
+                for(key in CompData){
+                    if(CompData[key].includes(word)) {
+                        let cmdType = CompTypes[word] || CompTypes["default"];
+                        if(cmdType != 2 && cmdType != 1) continue;
+
+                        args = (ArgData[key][word] || []).map(d => d.name + (d.optional ? "?" : "") + ": " + d.type + (d.type == "Map" || d.type == "List" ? `[${d.subType}]` : "")).join(", ")
+                        results = ": " + (ReturnData[key][word] || []).map(d => d.type + (d.type == "Map" || d.type == "List" ? `[${d.subType}]` : "")).join(" or ")
+
+                        let info = new vscode.SignatureInformation(key + "." + word + "(" + args + ")" + results);
+                        info.parameters = [];
+
+                        for(param of args.split(",")){
+                            let p = new vscode.ParameterInformation(param.trim(), "");
+                            if(param.trim().length > 0) info.parameters.push(p);
+                        }
+
+                        t.signatures.push(info);
+                    }
+                }
+               
+                // Get all lines till this line
+                let linesTillLine = document.getText().split("\n").splice(0, range.start.line)
+                re = RegExp(word + "(\\s|)=(\\s|)function");
+                
+                // Get last defined user function using this word
+                let func = null;
+                for(line of linesTillLine.reverse()){
+                    matches = line.match(re);
+                    if(matches){
+                        func = line;
+                        break;
+                    }
+                }
+
+                // If no user defined function is found return the current signatures
+                if(!func) return t;
+                
+                // Parse the signature information
+                let params = func.match(/(?<=\()(.*?)(?=\))/)[0];
+                let info = new vscode.SignatureInformation(word + "(" + params.split(",").map(p => processFunctionParameter(p)).join(", ") + "): any");
+                info.parameters = []; 
+
+                // Go through all parameters and register them
+                for(param of params.split(",")){
+                    let p = param.trim();
+                    let processed = processFunctionParameter(p)
+                    let pInfo = new vscode.ParameterInformation(processed);
+                    if(p.length > 0) info.parameters.push(pInfo);
+                }
+                
+                // Push the user defined function as a signature
+                t.signatures.push(info);
+
+                // Return all found signatures
+                return t;
             }
         }, [",", "("]))
     }
@@ -436,7 +545,7 @@ function activate(context) {
         } : null;
     }
     
-    function RGBToHex(r,g,b) {
+    function rgbToHex(r,g,b) {
         r = (r*255).toString(16);
         g = (g*255).toString(16);
         b = (b*255).toString(16);
@@ -523,7 +632,7 @@ function activate(context) {
             return out;
         },
         provideColorPresentations(color, ctx, token){
-            let hex = RGBToHex(color.red, color.green, color.blue);
+            let hex = rgbToHex(color.red, color.green, color.blue);
             ctx.range = new vscode.Range(ctx.range.start, new vscode.Position(ctx.range.end.line, ctx.range.start.character + hex.length))
             return [vscode.ColorPresentation(hex)]
         }
