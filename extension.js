@@ -314,8 +314,6 @@ function activate(context) {
         return undefined;
     }
 
-
-
     let compD = vscode.languages.registerCompletionItemProvider('greyscript', {
         provideCompletionItems(document,position,token,ccontext) {
             if (!vscode.workspace.getConfiguration("greyscript").get("autocomplete")) return;
@@ -436,6 +434,8 @@ function activate(context) {
     });
 
     function processFunctionParameter(p) {
+        if(p.length == 0) return "";
+
         // Parse the user defined function parameters
         optionalParam = p.match(/\w+(\s|)=(\s|)/);
         if(optionalParam){
