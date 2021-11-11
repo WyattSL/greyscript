@@ -560,9 +560,11 @@ function activate(context) {
             let reg = /(?:(?:<color=)?(#[0-9a-f]{6})|<color=\"?(black|blue|green|orange|purple|red|white|yellow)\"?)>/gi
             let mchs = txt.matchAll(reg);
             let out = [];
+            let startPos = 0;
             for (var m of mchs) {
                 // All text till occurence
                 let ps = txt.slice(0,m.index);
+
                 // Get line number
                 let pl = ps.split("\n").length - 1;
 
@@ -570,18 +572,18 @@ function activate(context) {
                 let line = document.lineAt(pl);
                 
                 // Get color tag range
-                let range = new vscode.Range(pl, line.text.indexOf(m[0]), pl, line.text.indexOf(m[0]) + m[0].length);
+                let range = new vscode.Range(pl, line.text.indexOf(m[0], startPos), pl, line.text.indexOf(m[0], startPos) + m[0].length);
 
                 // Parse color
                 console.log(m);
                 let color;
                 if (m[1]) {
-                    range = new vscode.Range(pl, line.text.indexOf(m[1]), pl, line.text.indexOf(m[1]) + m[1].length);
+                    range = new vscode.Range(pl, line.text.indexOf(m[1], startPos), pl, line.text.indexOf(m[1], startPos) + m[1].length);
                     let d = hexToRgb(m[1])
                     color = new vscode.Color(d.r,d.g,d.b,16);
                 }
                 else {
-                    range = new vscode.Range(pl, line.text.indexOf(m[2]), pl, line.text.indexOf(m[2]) + m[2].length);
+                    range = new vscode.Range(pl, line.text.indexOf(m[2], startPos), pl, line.text.indexOf(m[2], startPos) + m[2].length);
                     let c = undefined;
                     switch(m[2]){
                         case "black":
@@ -621,6 +623,7 @@ function activate(context) {
                     }
                 }
                 let c = new vscode.ColorInformation(range, color)
+                startPos += range.end.character;
                 out.push(c);
             }
             return out;
