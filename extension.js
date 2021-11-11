@@ -459,7 +459,7 @@ function activate(context) {
                 // Check if current line is not a function creation
                 let re = RegExp("(\\s|)=(\\s|)function");
                 let curLine = document.lineAt(position.line);
-                if(ctx.triggerCharacter == "(" && curLine.text.match(re)) return;
+                if((ctx.triggerCharacter == "(" && curLine.text.match(re)) || curLine.text.lastIndexOf("(") < 1) return;
 
                 // Get the function being called 
                 let range = document.getWordRangeAtPosition(new vscode.Position(position.line, curLine.text.lastIndexOf("(") - 1));
