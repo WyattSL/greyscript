@@ -177,12 +177,11 @@ function activate(context) {
         
         // Add arguments if its a function/method
         if(cmdType == 2 || cmdType == 1){
-            docs.title += "(" + ArgData[type][cmd].map(d => d.name + (d.optional ? "?" : "") + ": " + d.type + (d.type == "Map" || d.type == "List" ? `[${d.subType}]` : "")).join(", ") + ")";
+            docs.title += "(" + (ArgData[type][cmd] || []).map(d => d.name + (d.optional ? "?" : "") + ": " + d.type + (d.type == "Map" || d.type == "List" ? `[${d.subType}]` : "")).join(", ") + ")";
         }
 
-        // Add result if set
-        let resultTypes = ReturnData[type][cmd];
-        if (resultTypes) docs.title += ": " + resultTypes.map(d => d.type + (d.type == "Map" || d.type == "List" ? `[${d.subType}]` : "")).join(" or ");
+        // Add result
+        docs.title += ": " + (ReturnData[type][cmd] || []).map(d => d.type + (d.type == "Map" || d.type == "List" ? `[${d.subType}]` : "")).join(" or ");
 
         // Add info/hover text
         docs.description = HoverData[type][cmd] || "";
@@ -191,12 +190,7 @@ function activate(context) {
         if (Encryption.includes(c)) docs.description += "\n\n\**This function cannot be used in encryption.*";
 
         // Add examples
-        let Ex = Examples[type] ? Examples[type][cmd] : null;
-        let codeExamples = [];
-        
-        if (Ex) {
-            codeExamples = Ex;
-        }
+        let codeExamples = Examples[type][cmd] || [];
         
         // Return normal text
         if(!asMarkdown) return docs.title + "\n\n\n" + docs.description.replace(/<[^>]*>?/gm, '') + "\n\n" + codeExamples.join("\n\n\n");
