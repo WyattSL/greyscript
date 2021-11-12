@@ -48,10 +48,36 @@ function activate(context) {
                 return new vscode.Hover(getHoverData(output.key, output.cmd));
             }
             else{
+                // Variable hover
                 hoverText = new vscode.MarkdownString("", true);
 
-                // Variable hover
+                // Get Text
                 let text = document.getText()
+                let linesTillCurLine = document.getText().split("\n").splice(0, range.start.line);
+                
+                // Check if in function and maybe variable is parameter
+                for(line of linesTillCurLine.reverse()){
+                    if(line.includes("end function")) break;
+
+                    if(line.match(/\w+(\s|)=(\s|)function/) && linesTillCurLine.reverse().slice(linesTillCurLine.indexOf(line)).every(l => !l.includes("end function"))){
+                        params = line.match(/(?<=\()(.*?)(?=\))/)[0].split(",").map(p => p.trim());
+                        for(p of params){
+                            optionalParam = p.match(/\w+(\s|)=(\s|)/);
+                            if(optionalParam){
+                                let name = optionalParam[0].replace(/(\s|)=(\s|)/, "");
+                                if(name == word){
+                                    hoverText.appendCodeblock("(parameter) " + processFunctionParameter(p));
+                                    return new vscode.Hover(hoverText);
+                                }
+                            }
+                            else if(p == word) {
+                                hoverText.appendCodeblock("(parameter) " + processFunctionParameter(p));
+                                return new vscode.Hover(hoverText);
+                            }
+                        }
+                    }
+                }
+
                 lines = [];
                 let re = new RegExp("\\b"+word+"(\\s|)=")
                 i = 0;
@@ -368,6 +394,19 @@ function activate(context) {
                             if(!variableOptions.some(m => m.name === variableName)) {
                                 let assignment = line.substring(match.index)
                                 assignment = assignment.substring(assignment.indexOf("=") + 1).trim();
+
+                                if(assignment.startsWith("function") && linesTillLine.reverse().slice(linesTillLine.indexOf(line)).every(l => !l.includes("end function"))){
+                                    params = assignment.match(/(?<=\()(.*?)(?=\))/)[0].split(",").map(p => p.trim());
+                                    for(p of params){
+                                        optionalParam = p.match(/\w+(\s|)=(\s|)/);
+                                        if(optionalParam){
+                                            let name = optionalParam[0].replace(/(\s|)=(\s|)/, "");
+                                            variableOptions.push({"name": name, "type": 5});
+                                        }
+                                        else variableOptions.push({"name": p, "type": 5});
+                                    }
+                                }
+
                                 variableOptions.push({"name": variableName, "type": (assignment.startsWith("function") ? 2 : 5)});
                             }
                         }
