@@ -1,3 +1,6 @@
+## 1.7.7
+- Hotfix color picker not resetting startPos
+
 ## 1.7.6
 - Fix color picker when same tags occur twice.
 - Add parameter autocomplete and hover text.
