@@ -1,5 +1,6 @@
 ## 1.7.6
 - Fix color picker when same tags occur twice.
+- Add parameter autocomplete and hover text.
 
 ## 1.7.5
 - Add variables in completion items.
