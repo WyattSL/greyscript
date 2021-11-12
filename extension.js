@@ -600,6 +600,7 @@ function activate(context) {
             let mchs = txt.matchAll(reg);
             let out = [];
             let startPos = 0;
+            let prevLine = 0;
             for (var m of mchs) {
                 // All text till occurence
                 let ps = txt.slice(0,m.index);
@@ -609,6 +610,10 @@ function activate(context) {
 
                 // Get line text
                 let line = document.lineAt(pl);
+
+                if(prevLine < pl) startPos = 0;
+
+                if(line.text.indexOf(m[0], startPos) == -1) continue;
                 
                 // Get color tag range
                 let range = new vscode.Range(pl, line.text.indexOf(m[0], startPos), pl, line.text.indexOf(m[0], startPos) + m[0].length);
@@ -663,6 +668,7 @@ function activate(context) {
                 }
                 let c = new vscode.ColorInformation(range, color)
                 startPos = range.end.character;
+                prevLine = pl;
                 out.push(c);
             }
             return out;
