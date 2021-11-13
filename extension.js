@@ -213,10 +213,10 @@ function activate(context) {
         docs.description = HoverData[type][cmd] || "";
 
         // Apply encryption text to hover text if available
-        if (Encryption.includes(c)) docs.description += "\n\n\**This function cannot be used in encryption.*";
+        if (Encryption.includes(cmd)) docs.description += "\n\n\**This function cannot be used in encryption.*";
 
         // Add examples
-        let codeExamples = Examples[type][cmd] || [];
+        let codeExamples = Examples[type] ? Examples[type][cmd] || [] : [];
         
         // Return normal text
         if(!asMarkdown) return docs.title + "\n\n\n" + docs.description.replace(/<[^>]*>?/gm, '') + "\n\n" + codeExamples.join("\n\n\n");
@@ -234,7 +234,7 @@ function activate(context) {
     }
 
     let getOptionsBasedOfPriorCommand = (document, range) => {
-        console.log("Checking item before .");
+        //console.log("Checking item before .");
 
         // Get Target if there was a delimiter before starting character
         let targetRange = document.getWordRangeAtPosition(new vscode.Position(range.start.line, range.start.character - 2));
@@ -619,7 +619,7 @@ function activate(context) {
                 let range = new vscode.Range(pl, line.text.indexOf(m[0], startPos), pl, line.text.indexOf(m[0], startPos) + m[0].length);
 
                 // Parse color
-                console.log(m);
+                //console.log(m);
                 let color;
                 if (m[1]) {
                     range = new vscode.Range(pl, line.text.indexOf(m[1], startPos), pl, line.text.indexOf(m[1], startPos) + m[1].length);
