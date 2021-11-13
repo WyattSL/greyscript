@@ -282,8 +282,11 @@ function activate(context) {
 
             // Get the assigned value
             let assignment = lines[lines.length - 1];
+            if(!assignment) return CompData;
+
             let matches = assignment.match(re);
-            if(!matches) return undefined;
+            if(!matches) return CompData;
+
             let match = matches[0];
             assignment = assignment.substring(assignment.indexOf(match) + match.length).trim().replace(";", "");
             
@@ -333,7 +336,7 @@ function activate(context) {
                 return Object.keys(options).length > 0 ? options : undefined;
             }
             else{
-                console.log("Greyscript: Target is unknown returning all CompData as completion items")
+                console.log("Greyscript: Target is unknown returning all CompData.")
                 return CompData;
             }
         }
