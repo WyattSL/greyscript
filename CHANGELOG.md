@@ -1,3 +1,6 @@
+## 1.7.9
+- Hotfix if hovered over function and prior variable is inside map.
+
 ## 1.7.8
 - Hotfix certain data being undefined in hover text get function.
 
