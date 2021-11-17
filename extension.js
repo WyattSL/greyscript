@@ -555,10 +555,12 @@ function activate(context) {
                 
                 // Get last defined user function using this word
                 let func = null;
+                let desc = null;
                 for(line of linesTillLine.reverse()){
                     matches = line.match(re);
                     if(matches){
                         func = line;
+                        if(linesTillLine[linesTillLine.indexOf(line) + 1].startsWith("//")) desc = linesTillLine[linesTillLine.indexOf(line) + 1].substring(2).trim();
                         break;
                     }
                 }
@@ -570,6 +572,7 @@ function activate(context) {
                 let params = func.match(/(?<=\()(.*?)(?=\))/)[0];
                 let info = new vscode.SignatureInformation(word + "(" + params.split(",").map(p => processFunctionParameter(p)).join(", ") + "): any");
                 info.parameters = []; 
+                if(desc) info.documentation = desc;
 
                 // Go through all parameters and register them
                 for(param of params.split(",")){
