@@ -118,7 +118,12 @@ function activate(context) {
 
                 // If its a function type return the function hover
                 if(assignment.startsWith("function")) {
+                    let description = null;
+                    if(linesTillCurLine[linesTillCurLine.indexOf(lines[lines.length - 1]) + 1].startsWith("//")){
+                        description = linesTillCurLine[linesTillCurLine.indexOf(lines[lines.length - 1]) + 1].substring(2).trim();
+                    }
                     hoverText.appendCodeblock("(function) " + word + "(" +assignment.match(/(?<=\()(.*?)(?=\))/)[0] + ")")
+                    if(description) hoverText.appendText(description);
                     return new vscode.Hover(hoverText);
                 }
             }
@@ -387,33 +392,42 @@ function activate(context) {
             }
             else {
                 // Get All user defined variables
-                let linesTillLine = document.getText().split("\n").splice(0, range.start.line)
-                
-                for(line of linesTillLine.reverse()){
-                    matches = line.match(/\w+(\s|)=/g);
-                    if(matches){
-                        for(match of matches){
-                            variableName = match.replace(/(\s|)=/, "");
-                            if(!variableOptions.some(m => m.name === variableName)) {
-                                let assignment = line.substring(match.index)
-                                assignment = assignment.substring(assignment.indexOf("=") + 1).trim();
-
-                                if(assignment.startsWith("function") && linesTillLine.reverse().slice(linesTillLine.indexOf(line)).every(l => !l.includes("end function"))){
-                                    params = assignment.match(/(?<=\()(.*?)(?=\))/)[0].split(",").map(p => p.trim());
-                                    for(p of params){
-                                        optionalParam = p.match(/\w+(\s|)=(\s|)/);
-                                        if(optionalParam){
-                                            let name = optionalParam[0].replace(/(\s|)=(\s|)/, "");
-                                            variableOptions.push({"name": name, "type": 5});
-                                        }
-                                        else variableOptions.push({"name": p, "type": 5});
-                                    }
-                                }
-
-                                variableOptions.push({"name": variableName, "type": (assignment.startsWith("function") ? 2 : 5)});
+                let linesTillLine = document.getText(new vscode.Range(new vscode.Position(0, 0), range.start))
+                matches = linesTillLine.matchAll(/\b(\w+(\s|)=|end function)/g);
+                let inFunction = false;
+                let functionVars = [];
+                if(matches){
+                    for(match of Array.from(matches).reverse()){
+                        let fullMatch = match[0];
+                        variableName = fullMatch.replace(/(\s|)=/, "");
+                        if(variableOptions.every(m => m.name !== variableName)) {
+                            if(fullMatch == "end function"){
+                                inFunction = true;
+                                functionVars = [];
+                                continue;
                             }
+                            let assignment = linesTillLine.substring(match.index, linesTillLine.indexOf("\n", match.index));
+                            assignment = assignment.substring(assignment.indexOf("=") + 1).trim();
+
+                            if(assignment.startsWith("function")){
+                                inFunction = false;
+                                params = assignment.match(/(?<=\()(.*?)(?=\))/)[0].split(",").map(p => p.trim());
+                                for(p of params){
+                                    optionalParam = p.match(/\w+(\s|)=(\s|)/);
+                                    if(optionalParam){
+                                        let name = optionalParam[0].replace(/(\s|)=(\s|)/, "");
+                                        functionVars.push({"name": name, "type": 5});
+                                    }
+                                    else functionVars.push({"name": p, "type": 5});
+                                }
+                            }
+
+                            let variable = {"name": variableName, "type": (assignment.startsWith("function") ? 2 : 5)}
+                            if(inFunction) functionVars.push(variable);
+                            else variableOptions.push(variable);
                         }
                     }
+                    variableOptions = variableOptions.concat(functionVars);
                 }
             }
            
@@ -478,7 +492,7 @@ function activate(context) {
         if(p.length == 0) return "";
 
         // Parse the user defined function parameters
-        optionalParam = p.match(/\w+(\s|)=(\s|)/);
+        optionalParam = p.match(/\b\w+(\s|)=(\s|)/);
         if(optionalParam){
             let value = p.substring(optionalParam[0].length);
             let name = optionalParam[0].replace(/(\s|)=(\s|)/, "");
@@ -500,7 +514,9 @@ function activate(context) {
                 // Check if current line is not a function creation
                 let re = RegExp("(\\s|)=(\\s|)function");
                 let curLine = document.lineAt(position.line);
-                if((ctx.triggerCharacter == "(" && curLine.text.match(re)) || curLine.text.lastIndexOf("(") < 1) return;
+                let textTillCharacter = curLine.text.slice(0, position.character);
+                if((ctx.triggerCharacter == "(" && curLine.text.match(re)) || textTillCharacter.lastIndexOf("(") < 1) return;
+                if(textTillCharacter.split("(").length === textTillCharacter.split(")").length) return;
 
                 // Get the function being called 
                 let range = document.getWordRangeAtPosition(new vscode.Position(position.line, curLine.text.lastIndexOf("(") - 1));
@@ -535,7 +551,7 @@ function activate(context) {
                
                 // Get all lines till this line
                 let linesTillLine = document.getText().split("\n").splice(0, range.start.line)
-                re = RegExp(word + "(\\s|)=(\\s|)function");
+                re = RegExp("\\b" + word + "(\\s|)=(\\s|)function");
                 
                 // Get last defined user function using this word
                 let func = null;
