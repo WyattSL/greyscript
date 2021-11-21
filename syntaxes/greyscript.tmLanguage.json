@@ -95,13 +95,7 @@
 		"strings": {
 			"name": "string.quoted.double.greyscript",
 			"begin": "\"",
-			"end": "\"",
-			"patterns": [
-				{
-					"name": "constant.character.escape.greyscript",
-					"match": "\\\\."
-				}
-			]
+			"end": "\""
 		},
 		"number": {
 			"patterns": [{
