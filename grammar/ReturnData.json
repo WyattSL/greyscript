@@ -698,6 +698,16 @@
                 "type": "String"
             }
         ],
+        "parent_path": [
+            {
+                "type": "String"
+            }
+        ],
+        "time": [
+            {
+                "type": "Number"
+            }
+        ],
         "wait": [
             {
                 "type": "null"

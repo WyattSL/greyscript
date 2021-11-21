@@ -27,60 +27,84 @@
 					"match": "\\b(Shell|FtpShell|Computer|File|Router|NetSession|Metaxploit|Metalib|Port|Crypto|int|float|string|String|Int|Float|bool|map|Map|list|List)\\b"
 				},
 				{
-					"name": "keyword.api.shell",
-					"match": "\\.(host_computer|scp|start_terminal|build|connect_service|launch|ping)"
+					"name": "support.variable.shell",
+					"match": "\\.(host_computer)"
 				},
 				{
-					"name": "keyword.api.aptclient",
+					"name": "support.function.shell",
+					"match": "\\.(scp|start_terminal|build|connect_service|launch|ping)"
+				},
+				{
+					"name": "support.function.aptclient",
 					"match": "\\.(show|search|update|add_repo|del_repo|install|check_upgrade)"
 				},
 				{
-					"name": "keyword.api.libmail",
-					"match": "\\.(login)"
-				},
-				{
-					"name": "keyword.api.metamail",
+					"name": "support.function.metamail",
 					"match": "\\.(delete|fetch|read|send)"
 				},
 				{
-					"name": "keyword.api.ftpshell",
-					"match": "\\.(host_computer|start_terminal|put)"
+					"name": "support.variable.ftpshell",
+					"match": "\\.(host_computer)"
 				},
 				{
-					"name": "keyword.api.computer",
-					"match": "\\.(File|public_ip|local_ip|touch|create_user|delete_user|create_group|delete_group|active_net_card|change_password|close_program|connect_ethernet|connect_wifi|get_ports|groups|is_network_active|network_devices|network_gateway|show_procs|wifi_networks|create_folder)"
+					"name": "support.function.ftpshell",
+					"match": "\\.(start_terminal|put)"
 				},
 				{
-					"name": "keyword.api.file",
-					"match": "\\.(path|delete|set_content|get_content|set_group|group|set_owner|owner|parent|get_files|get_folders|is_binary|is_folder|has_permission|permissions|size|name|chmod|rename|move|copy)"
+					"name": "support.variable.computer",
+					"match": "\\.(public_ip|local_ip|active_net_card|get_ports|groups|is_network_active|network_devices|network_gateway|show_procs)"
 				},
 				{
-					"name": "keyword.api.metaxploit",
+					"name": "support.function.computer",
+					"match": "\\.(File|touch|create_user|delete_user|create_group|delete_group|change_password|close_program|connect_ethernet|connect_wifi|wifi_networks|create_folder)"
+				},
+				{
+					"name": "support.variable.file",
+					"match": "\\.(is_binary|is_folder|size|name|owner|parent|group|permissions|path)"
+				},
+				{
+					"name": "support.function.file",
+					"match": "\\.(delete|set_content|get_content|set_group|set_owner|get_files|get_folders|has_permission|chmod|rename|move|copy)"
+				},
+				{
+					"name": "support.function.metaxploit",
 					"match": "\\.(load|net_use|scan_address|scan|sniffer|rshell_server|rshell_client)"
 				},
 				{
-					"name": "keyword.api.metalib",
-					"match": "\\.(overflow|lib_name|version)"
+					"name": "support.variable.metalib",
+					"match": "\\.(lib_name|version)"
 				},
 				{
-					"name": "keyword.api.crypto",
+					"name": "support.function.metalib",
+					"match": "\\.(overflow)"
+				},
+				{
+					"name": "support.function.crypto",
 					"match": "\\.(aircrack|airmon|decipher|smtp_user_list|aireplay)"
 				},
 				{
-					"name": "keyword.api.port",
+					"name": "support.variable.port",
 					"match": "\\.(get_lan_ip|is_closed|port_number)"
 				},
 				{
-					"name": "keyword.api.netsession",
+					"name": "support.function.netsession",
 					"match": "\\.(dump_lib)"
 				},
 				{
-					"name": "keyword.api.router",
-					"match": "\\.(public_ip|local_ip|device_ports|devices_lan_ip|ping_port|port_info|used_ports|bssid_name|essid_name|firewall_rules|kernel_version)"
+					"name": "support.variable.router",
+					"match": "\\.(public_ip|local_ip|device_ports|devices_lan_ip|port_info|used_ports|bssid_name|essid_name|firewall_rules|kernel_version)"
 				},
 				{
-					"name": "keyword.api.general",
-					"match": "\\b(clear_screen|print|time|typeof|md5|get_switch|get_router|get_shell|nslookup|whois|is_valid_ip|is_lan_ip|command_info|current_date|parent_path|home_dir|program_path|active_user|user_mail_address|user_bank_number|format_columns|user_input|include_lib|import_code|current_path|exit|bitwise|wait|hash|launch_path)"
+					"name": "support.function.router",
+					"match": "\\.(ping_port)"
+				},
+				{
+					"name": "support.variable.general",
+					"match": "\\b(time|current_date|parent_path|home_dir|program_path|active_user|user_mail_address|user_bank_number|current_path|launch_path)"
+				},
+				{
+					"name": "support.function.general",
+					"match": "\\b(clear_screen|print|typeof|md5|get_switch|get_router|get_shell|nslookup|whois|is_valid_ip|is_lan_ip|command_info|format_columns|user_input|include_lib|import_code|exit|bitwise|wait|hash|mail_login)"
 				},
 				{
 					"name": "support.function",
