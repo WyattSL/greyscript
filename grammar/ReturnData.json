@@ -857,6 +857,16 @@
                 "type": "List",
                 "subType": "Any"
             }
+        ],
+        "true": [
+            {
+                "type": "Number"
+            }
+        ],
+        "false": [
+            {
+                "type": "Number"
+            }
         ]
     },
     "String": {
@@ -937,16 +947,6 @@
             }
         ],
         "to_int": [
-            {
-                "type": "Number"
-            }
-        ],
-        "true": [
-            {
-                "type": "Number"
-            }
-        ],
-        "false": [
             {
                 "type": "Number"
             }
