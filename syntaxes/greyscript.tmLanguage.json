@@ -24,7 +24,7 @@
 				},
 				{
 					"name": "support.class",
-					"match": "\\b(Shell|FtpShell|Computer|File|Router|NetSession|Metaxploit|Metalib|Port|Crypto|int|float|string|String|Int|Float|bool|map|Map|list|List)\\b"
+					"match": "\\b(Shell|FtpShell|Computer|File|Router|NetSession|Metaxploit|Metalib|Port|Crypto|int|float|number|string|String|Int|Float|Number|bool|map|Map|list|List)\\b"
 				},
 				{
 					"name": "support.variable.shell",
