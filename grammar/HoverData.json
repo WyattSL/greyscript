@@ -173,7 +173,9 @@
         "then": "Ends the conditioning of an if statement.",
         "end": "Ends the provided code block.",
         "parent_path": "Returns the path to the parent directory.",
-        "time": "Returns the number of seconds since the program execution began."
+        "time": "Returns the number of seconds since the program execution began.",
+        "true": "A constant value of 1. Easy for return types or the use in an if statement.",
+        "false": "A constant value of 0. Easy for return types or the use in an if statement."
     },
     "String": {
         "remove": "Returns the string without the first occurrence of the provided substring.",

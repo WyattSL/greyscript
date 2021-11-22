@@ -52,11 +52,11 @@
 				},
 				{
 					"name": "support.variable.computer",
-					"match": "\\.(public_ip|local_ip|active_net_card|get_ports|groups|is_network_active|network_devices|network_gateway|show_procs)"
+					"match": "\\.(public_ip|local_ip|active_net_card|get_ports|groups|is_network_active|network_devices|network_gateway)"
 				},
 				{
 					"name": "support.function.computer",
-					"match": "\\.(File|touch|create_user|delete_user|create_group|delete_group|change_password|close_program|connect_ethernet|connect_wifi|wifi_networks|create_folder)"
+					"match": "\\.(File|touch|create_user|delete_user|create_group|delete_group|change_password|close_program|connect_ethernet|connect_wifi|wifi_networks|create_folder|show_procs)"
 				},
 				{
 					"name": "support.variable.file",
