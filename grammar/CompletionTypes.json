@@ -13,6 +13,8 @@
     "function": 20,
     "true": 20,
     "false": 20,
+    "not": 20,
+    "null": 20,
     
     "name": 9,
     "get_lan_ip": 9,

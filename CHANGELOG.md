@@ -1,3 +1,7 @@
+## 1.7.12
+- Hotfix mark `null` constant.
+- Hotfix mark `not` constant.
+
 ## 1.7.11
 - Fix highlighting color always showing support color.
 - Add `null` to autocomplete.
