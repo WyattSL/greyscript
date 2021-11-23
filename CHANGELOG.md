@@ -1,3 +1,8 @@
+## 1.7.11
+- Fix highlighting color always showing support color.
+- Add `null` to autocomplete.
+- Add `not` to autocomplete.
+
 ## 1.7.10
 - Fix when closing a `)` it didn't stop showing the parameters.
 - Fix autocomplete not always showing all the variable options available.
