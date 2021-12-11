@@ -60,7 +60,7 @@
 				},
 				{
 					"name": "support.variable.file",
-					"match": "\\.\\b(is_binary|is_folder|size|name|owner|parent|group|permissions|path)\\b"
+					"match": "\\.\\b(is_binary|is_folder|size|name|owner|parent|group|permissions|path|allow_import)\\b"
 				},
 				{
 					"name": "support.function.file",
