@@ -52,7 +52,7 @@
 				},
 				{
 					"name": "keyword.api.file",
-					"match": "\\.(path|delete|set_content|get_content|set_group|group|set_owner|owner|parent|get_files|get_folders|is_binary|is_folder|has_permission|permissions|size|name|chmod|rename|move|copy)"
+					"match": "\\.(path|delete|set_content|get_content|set_group|group|set_owner|owner|parent|get_files|get_folders|is_binary|is_folder|has_permission|permissions|size|name|chmod|rename|move|copy|allow_import)"
 				},
 				{
 					"name": "keyword.api.metaxploit",
