@@ -1,3 +1,22 @@
+## 1.7.12
+- Hotfix mark `null` constant.
+- Hotfix mark `not` constant.
+
+## 1.7.11
+- Fix highlighting color always showing support color.
+- Add `null` to autocomplete.
+- Add `not` to autocomplete.
+
+## 1.7.10
+- Fix when closing a `)` it didn't stop showing the parameters.
+- Fix autocomplete not always showing all the variable options available.
+- Add support for describing user defined functions by adding a comment above the defining line. Example below.
+```
+// Description of function
+random = function()
+...
+```
+
 ## 1.7.9
 - Hotfix if hovered over function and prior variable is inside map.
 

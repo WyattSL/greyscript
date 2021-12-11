@@ -174,7 +174,11 @@
         "else",
         "function",
         "then",
-        "end"
+        "end",
+        "true",
+        "false",
+        "null",
+        "not"
     ],
     "String": [
         "remove",

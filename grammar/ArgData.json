@@ -949,7 +949,9 @@
                 "name": "value",
                 "optional": false
             }
-        ]
+        ],
+        "true": [],
+        "false": []
     },
     "String": {
         "remove": [

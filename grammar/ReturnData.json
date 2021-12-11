@@ -698,6 +698,16 @@
                 "type": "String"
             }
         ],
+        "parent_path": [
+            {
+                "type": "String"
+            }
+        ],
+        "time": [
+            {
+                "type": "Number"
+            }
+        ],
         "wait": [
             {
                 "type": "null"
@@ -846,6 +856,16 @@
             {
                 "type": "List",
                 "subType": "Any"
+            }
+        ],
+        "true": [
+            {
+                "type": "Number"
+            }
+        ],
+        "false": [
+            {
+                "type": "Number"
             }
         ]
     },

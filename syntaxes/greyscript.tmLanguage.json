@@ -24,63 +24,87 @@
 				},
 				{
 					"name": "support.class",
-					"match": "\\b(Shell|FtpShell|Computer|File|Router|NetSession|Metaxploit|Metalib|Port|Crypto|int|float|string|String|Int|Float|bool|map|Map|list|List)\\b"
+					"match": "\\b(Shell|FtpShell|Computer|File|Router|NetSession|Metaxploit|MetaMail|Metalib|Port|Crypto|int|float|number|string|String|Int|Float|Number|bool|map|Map|list|List)\\b"
 				},
 				{
-					"name": "keyword.api.shell",
-					"match": "\\.(host_computer|scp|start_terminal|build|connect_service|launch|ping)"
+					"name": "support.variable.shell",
+					"match": "\\.\\b(host_computer)\\b"
 				},
 				{
-					"name": "keyword.api.aptclient",
-					"match": "\\.(show|search|update|add_repo|del_repo|install|check_upgrade)"
+					"name": "support.function.shell",
+					"match": "\\.\\b(scp|start_terminal|build|connect_service|launch|ping)\\b"
 				},
 				{
-					"name": "keyword.api.libmail",
-					"match": "\\.(login)"
+					"name": "support.function.aptclient",
+					"match": "\\.\\b(show|search|update|add_repo|del_repo|install|check_upgrade)\\b"
 				},
 				{
-					"name": "keyword.api.metamail",
-					"match": "\\.(delete|fetch|read|send)"
+					"name": "support.function.metamail",
+					"match": "\\.\\b(delete|fetch|read|send)\\b"
 				},
 				{
-					"name": "keyword.api.ftpshell",
-					"match": "\\.(host_computer|start_terminal|put)"
+					"name": "support.variable.ftpshell",
+					"match": "\\.\\b(host_computer)\\b"
 				},
 				{
-					"name": "keyword.api.computer",
-					"match": "\\.(File|public_ip|local_ip|touch|create_user|delete_user|create_group|delete_group|active_net_card|change_password|close_program|connect_ethernet|connect_wifi|get_ports|groups|is_network_active|network_devices|network_gateway|show_procs|wifi_networks|create_folder)"
+					"name": "support.function.ftpshell",
+					"match": "\\.\\b(start_terminal|put)\\b"
 				},
 				{
-					"name": "keyword.api.file",
-					"match": "\\.(path|delete|set_content|get_content|set_group|group|set_owner|owner|parent|get_files|get_folders|is_binary|is_folder|has_permission|permissions|size|name|chmod|rename|move|copy)"
+					"name": "support.variable.computer",
+					"match": "\\.\\b(public_ip|local_ip|active_net_card|get_ports|groups|is_network_active|network_devices|network_gateway)\\b"
 				},
 				{
-					"name": "keyword.api.metaxploit",
-					"match": "\\.(load|net_use|scan_address|scan|sniffer|rshell_server|rshell_client)"
+					"name": "support.function.computer",
+					"match": "\\.\\b(File|touch|create_user|delete_user|create_group|delete_group|change_password|close_program|connect_ethernet|connect_wifi|wifi_networks|create_folder|show_procs)\\b"
 				},
 				{
-					"name": "keyword.api.metalib",
-					"match": "\\.(overflow|lib_name|version)"
+					"name": "support.variable.file",
+					"match": "\\.\\b(is_binary|is_folder|size|name|owner|parent|group|permissions|path)\\b"
 				},
 				{
-					"name": "keyword.api.crypto",
-					"match": "\\.(aircrack|airmon|decipher|smtp_user_list|aireplay)"
+					"name": "support.function.file",
+					"match": "\\.\\b(delete|set_content|get_content|set_group|set_owner|get_files|get_folders|has_permission|chmod|rename|move|copy)\\b"
 				},
 				{
-					"name": "keyword.api.port",
-					"match": "\\.(get_lan_ip|is_closed|port_number)"
+					"name": "support.function.metaxploit",
+					"match": "\\.\\b(load|net_use|scan_address|scan|sniffer|rshell_server|rshell_client)\\b"
 				},
 				{
-					"name": "keyword.api.netsession",
-					"match": "\\.(dump_lib)"
+					"name": "support.variable.metalib",
+					"match": "\\.\\b(lib_name|version)\\b"
 				},
 				{
-					"name": "keyword.api.router",
-					"match": "\\.(public_ip|local_ip|device_ports|devices_lan_ip|ping_port|port_info|used_ports|bssid_name|essid_name|firewall_rules|kernel_version)"
+					"name": "support.function.metalib",
+					"match": "\\.\\b(overflow)\\b"
 				},
 				{
-					"name": "keyword.api.general",
-					"match": "\\b(clear_screen|print|time|typeof|md5|get_switch|get_router|get_shell|nslookup|whois|is_valid_ip|is_lan_ip|command_info|current_date|parent_path|home_dir|program_path|active_user|user_mail_address|user_bank_number|format_columns|user_input|include_lib|import_code|current_path|exit|bitwise|wait|hash|launch_path)"
+					"name": "support.function.crypto",
+					"match": "\\.\\b(aircrack|airmon|decipher|smtp_user_list|aireplay)\\b"
+				},
+				{
+					"name": "support.variable.port",
+					"match": "\\.\\b(get_lan_ip|is_closed|port_number)\\b"
+				},
+				{
+					"name": "support.function.netsession",
+					"match": "\\.\\b(dump_lib)\\b"
+				},
+				{
+					"name": "support.variable.router",
+					"match": "\\.\\b(public_ip|local_ip|device_ports|devices_lan_ip|port_info|used_ports|bssid_name|essid_name|firewall_rules|kernel_version)\\b"
+				},
+				{
+					"name": "support.function.router",
+					"match": "\\.\\b(ping_port)\\b"
+				},
+				{
+					"name": "support.variable.general",
+					"match": "\\b(time|current_date|parent_path|home_dir|program_path|active_user|user_mail_address|user_bank_number|current_path|launch_path)\\b"
+				},
+				{
+					"name": "support.function.general",
+					"match": "\\b(clear_screen|print|typeof|md5|get_switch|get_router|get_shell|nslookup|whois|is_valid_ip|is_lan_ip|command_info|format_columns|user_input|include_lib|import_code|exit|bitwise|wait|hash|mail_login)\\b"
 				},
 				{
 					"name": "support.function",
@@ -88,20 +112,14 @@
 				},
 				{
 					"name": "support.type",
-					"match": "\\b(params|true|false|globals|self)"
+					"match": "\\b(params|true|false|globals|self)\\b"
 				}
 			]
 		},
 		"strings": {
 			"name": "string.quoted.double.greyscript",
 			"begin": "\"",
-			"end": "\"",
-			"patterns": [
-				{
-					"name": "constant.character.escape.greyscript",
-					"match": "\\\\."
-				}
-			]
+			"end": "\""
 		},
 		"number": {
 			"patterns": [{
