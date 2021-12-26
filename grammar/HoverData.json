@@ -198,7 +198,7 @@
         "hasIndex": "Returns 1 if the index exists. Returns 0 otherise.",
         "indexOf": "Returns the index of the provided value. Optionally searches after begin. Returns Null if not found.",
         "push": "Pushes the provided input onto the end of the list. Returns the updated list, and updates the list in it's place.",
-        "pop": "Returns the key of the first element in the list, and removes that element from the list.",
+        "pop": "Returns the last element of the list, and removes that element from the list.",
         "pull": "Returns the first element of the list, and removes that element from the list.",
         "shuffle": "Randomly remaps values in a list, leaving the keys in their original order.",
         "sort": "Sorts a list alphanumerically.",
