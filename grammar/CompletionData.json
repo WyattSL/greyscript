@@ -6,7 +6,10 @@
         "build",
         "launch",
         "host_computer",
-        "ping"
+        "ping",
+        "masterkey",
+        "masterkey_direct",
+        "restore_network"
     ],
     "AptClient": [
         "show",
@@ -91,7 +94,8 @@
         "set_owner",
         "group",
         "set_group",
-        "size"
+        "size",
+        "meta_info"
     ],
     "Computer": [
         "get_ports",

@@ -64,7 +64,16 @@
             {
                 "type": "null"
             }
-        ]
+        ],
+        "masterkey": [
+            { "type": "Shell" },
+            { "type": "null" }
+        ],
+        "masterkey_direct": [
+            { "type": "Shell" },
+            { "type": "null" }
+        ],
+        "restore_network": [ {"type": "Any" }]
     },
     "AptClient": {
         "show": [
@@ -485,6 +494,9 @@
             {
                 "type": "Number"
             }
+        ],
+        "meta_info": [
+            { "type": "Any" }
         ]
     },
     "Computer": {

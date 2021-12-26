@@ -6,7 +6,10 @@
         "connect_service": "Connect to a remote service. You can specify 'ftp' in the serviceType to request a FtpShell\n\nReturns a Shell or FtpShell if the connection has been established correctly or null on failure.",
         "launch": "Launches the command in the provided path.\n\nReturns null on success, or 0 on failure.",
         "ping": "Returns true if the remote address could be reached, false otherwise. Firewalls do not block ping requests.",
-        "scp": "Copy a file from one computer to the other through the network.\n\nReturns 1 on success, or a string (containing an error) on failure."
+        "scp": "Copy a file from one computer to the other through the network.\n\nReturns 1 on success, or a string (containing an error) on failure.",
+        "masterkey": "Connect to a remote server, regardless of any security.\n\n**This requires moderator permissions on Multiplayer, and is unavailable in Singleplayer.*",
+        "masterkey_direct": "Connect to a remote server, regardless of any security. Differences unknown from normal masterkey.\n\n**This requires moderator permissions on Multiplayer, and is unavailable in Singleplayer.*",
+        "restore_network": "Restore a network to it's original state, presumedly as would be done with ConfigLan.\n\n**This requires moderator permissions on Multiplayer, and is unavailable in Singleplayer.*"
     },
     "AptClient": {
         "show": "Shows all packages available in repository\nThe repository MUST be added in the /etc/apt/sources.txt file.\n\nReturns string with all pachages on success, or a string (containing an error) on failure.",
@@ -91,7 +94,8 @@
         "set_owner": "Apply a owner to this file. By default, the owner does not apply recursively. To apply the owner recursively, the optional parameter must be 1.\n\nReturns a string (empty on success, or with an error on failure)",
         "group": "Returns a string with the name of the group to which this file belongs.",
         "set_group": "Apply a group to this file. By default, the group does not apply recursively. To apply the group recursively, the optional parameter must be 1.\n\nReturns a string (empty on success, or with an error on failure)",
-        "size": "Returns a string with the size of the file in bytes."
+        "size": "Returns a string with the size of the file in bytes.",
+        "meta_info": "Presumedly returns metadata information about a file.\n\n**This requires moderator permissions on Multiplayer, and is unavailable in Singleplayer.*"
     },
     "Computer": {
         "local_ip": "Returns a string with the computer's local ip address.",

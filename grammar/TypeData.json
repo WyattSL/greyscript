@@ -6,6 +6,9 @@
     "launch": "shell",
     "ping": "shell",
     "scp": "shell",
+    "masterkey": "shell",
+    "masterkey_direct": "shell",
+    "restore_network": "shell",
 
     "show": "aptclient",
     "search": "aptclient",
@@ -79,6 +82,7 @@
     "group": "file",
     "set_group": "file",
     "size": "file",
+    "meta_info": "file",
     
     "get_ports": "computer",
     "File": "computer",

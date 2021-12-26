@@ -81,6 +81,47 @@
                 "name": "remoteShell",
                 "optional": false
             }
+        ],
+        "masterkey": [
+            {
+                "type": "String",
+                "name": "ipAddress",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "Port",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "User",
+                "optional": false
+            }
+        ],
+        "masterkey_direct": [
+            {
+                "type": "String",
+                "name": "publicIpAddress",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "localIpAddress",
+                "optional": false
+            },
+            {
+                "type": "String",
+                "name": "User",
+                "optional": false
+            }
+        ],
+        "restore_network": [
+            {
+                "type": "String",
+                "name": "publicIpAddress",
+                "optional": false
+            }
         ]
     },
     "AptClient": {
@@ -468,7 +509,8 @@
                 "optional": true
             }
         ],
-        "size": []
+        "size": [],
+        "meta_info": []
     },
     "Computer": {
         "get_ports": [],
