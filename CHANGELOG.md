@@ -1,3 +1,9 @@
+# 1.8.1
+- Fix matching patterns for keywords.
+- Add support for `File.allow_import`
+- Fix description of `List.pop`
+- Add descriptions for `Shell.masterkey()`, `Shell.masterkey_direct()`, `Shell.restore_network()`, and `File.meta_info()`.
+
 ## 1.7.12
 - Hotfix mark `null` constant.
 - Hotfix mark `not` constant.
