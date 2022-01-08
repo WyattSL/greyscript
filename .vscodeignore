@@ -1,14 +1,10 @@
 .vscode
 node_modules
-extension.js
-webpack.config.js
+tsconig.json
 .gitignore
 .git/
 .github/
-ecomp.js
-expcompile.js
-expver.js
 grammar/
 SECURITY.md
 tests/
-miniscript/
+src/

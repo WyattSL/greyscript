@@ -1,25 +1,14 @@
-const vscode = require("vscode");
+import vscode from 'vscode';
+import CompData from '../grammar/CompData.json';
+import TypeData from '../grammar/TypeData.json';
+import ArgData from '../grammar/ArgData.json';
+import ReturnData from '../grammar/ReturnData.json';
+import CompTypes from '../grammar/CompTypes.json';
+import Encryption from '../grammar/Encryption.json';
+import getHoverData from './hover-data';
 
-var CompData = require("./grammar/CompletionData.json")
-var TypeData = require("./grammar/TypeData.json")
-var ArgData = require("./grammar/ArgData.json")
-var ReturnData = require("./grammar/ReturnData.json")
-var Examples = require("./grammar/Examples.json")
-var CompTypes = require("./grammar/CompletionTypes.json") // Constant 20 Function 2 Property 9 Method 1 Variable 5 Interface 7
-var HoverData = require("./grammar/HoverData.json");
-var Encryption = require("./grammar/Encryption.json");
-
-var enumCompTypeText = {
-    1: "method",
-    2: "function",
-    5: "variable",
-    7: "interface",
-    9: "property",
-    20: "constant",
-}
-
-function activate(context) {
-    let hoverD = vscode.languages.registerHoverProvider('greyscript', {
+export function activate(context) {
+    const hoverD = vscode.languages.registerHoverProvider('greyscript', {
         provideHover(document,position,token) {
             if (!vscode.workspace.getConfiguration("greyscript").get("hoverdocs")) return;
 
@@ -191,52 +180,6 @@ function activate(context) {
 
     context.subscriptions.push(foldD);
     */
-
-    let getHoverData = (type, cmd, asMarkdown = true) => {
-        // Create markdownString
-        let str = new vscode.MarkdownString("", true);
-        
-        // Get type of cmd
-        let cmdType = CompTypes[cmd] || CompTypes["default"];
-
-        // Get type text, example: Shell.
-        typeText = "";
-        if (type != "General") typeText = type + ".";
-
-        // Combine base data together
-        let docs = {"title": "(" + enumCompTypeText[cmdType] + ") " + typeText + cmd, "description": ""};
-        
-        // Add arguments if its a function/method
-        if(cmdType == 2 || cmdType == 1){
-            docs.title += "(" + (ArgData[type][cmd] || []).map(d => d.name + (d.optional ? "?" : "") + ": " + d.type + (d.type == "Map" || d.type == "List" ? `[${d.subType}]` : "")).join(", ") + ")";
-        }
-
-        // Add result
-        docs.title += ": " + (ReturnData[type][cmd] || []).map(d => d.type + (d.type == "Map" || d.type == "List" ? `[${d.subType}]` : "")).join(" or ");
-
-        // Add info/hover text
-        docs.description = HoverData[type][cmd] || "";
-
-        // Apply encryption text to hover text if available
-        if (Encryption.includes(cmd)) docs.description += "\n\n\**This function cannot be used in encryption.*";
-
-        // Add examples
-        let codeExamples = Examples[type] ? Examples[type][cmd] || [] : [];
-        
-        // Return normal text
-        if(!asMarkdown) return docs.title + "\n\n\n" + docs.description.replace(/<[^>]*>?/gm, '') + "\n\n" + codeExamples.join("\n\n\n");
-
-        // Append markdown string areas
-        str.appendCodeblock(docs.title);
-        str.appendMarkdown("---\n"+docs.description);
-        if(codeExamples.length > 0) {
-            str.appendMarkdown("\n### Examples\n---");
-            str.appendCodeblock(codeExamples.join("\n\n"));
-        }
-
-        // Return markdown string
-        return str;
-    }
 
     let getOptionsBasedOfPriorCommand = (document, range) => {
         //console.log("Checking item before .");
@@ -829,6 +772,6 @@ let collection = vscode.languages.createDiagnosticCollection("greyscript");
     context.subscriptions.push(gecmd)
 }
 
-function deactivate() {}
+export function deactivate() {
 
-module.exports = {activate, deactivate};
+}

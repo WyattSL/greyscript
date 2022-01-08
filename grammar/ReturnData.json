@@ -1061,7 +1061,9 @@
             }
         ],
         "values": [
-            "List"
+            {
+                "type": "List"
+            }
         ],
         "sum": [
             {
