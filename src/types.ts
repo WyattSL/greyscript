@@ -1,5 +1,6 @@
 export interface ArgDataCmd {
 	type: string;
+	subType?: string;
 	name: string;
 	optional: boolean;
 }

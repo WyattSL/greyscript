@@ -9,7 +9,7 @@
         "url": "https://github.com/WyattSL"
     },
     "icon": "icon.png",
-    "version": "1.8.1",
+    "version": "2.0.0",
     "repository": {
         "type": "git",
         "url": "https://github.com/WyattSL/greyscript.git"
@@ -73,12 +73,16 @@
         ],
         "commands": [
             {
-                "command": "greyScript.gotoError",
+                "command": "greyscript.gotoError",
                 "title": "GreyScript: Goto Error"
             },
             {
                 "command": "greyscript.minify",
                 "title": "GreyScript: Minify"
+            },
+            {
+                "command": "greyscript.run",
+                "title": "GreyScript: Run"
             }
         ],
         "configuration": {
@@ -101,5 +105,11 @@
                 }
             }
         }
+    },
+    "dependencies": {
+        "greybel-core": "^0.1.5",
+        "greybel-interpreter": "^0.2.0",
+        "greybel-intrinsics": "^0.1.1",
+        "greybel-transpiler": "^0.1.1"
     }
 }
