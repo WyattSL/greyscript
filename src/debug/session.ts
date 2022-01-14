@@ -3,21 +3,29 @@ import {
 	InitializedEvent,
 	TerminatedEvent,
 	StoppedEvent,
-	OutputEvent
+	OutputEvent,
+	Thread,
+	Breakpoint,
+	BreakpointEvent,
+	Source
 } from '@vscode/debugadapter';
 import { DebugProtocol } from '@vscode/debugprotocol';
-import { Interpreter, CustomType, Debugger, OperationContext } from 'greybel-interpreter';
+import { Interpreter, CustomType, Debugger, OperationContext, ContextType } from 'greybel-interpreter';
 import { InterpreterResourceProvider } from '../resource';
 import { init as initIntrinsics } from 'greybel-intrinsics';
 
 interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 	program: string;
+	noDebug?: boolean;
 }
 
 export class GreybelDebugSession extends LoggingDebugSession {
-	private static threadID = 1;
+	public static threadID = 1;
+	public lastContext: OperationContext | undefined;
+	public breakpoints: Map<string, DebugProtocol.Breakpoint[]> = new Map();
+
 	private _runtime: Interpreter | undefined;
-	private lastContext: OperationContext | undefined;
+	private _breakpointIncrement: number = 0;
 
 	public constructor() {
 		super("greybel-debug.txt");
@@ -48,14 +56,14 @@ export class GreybelDebugSession extends LoggingDebugSession {
 		response.body.supportsDataBreakpoints = false;
 
 		// make VS Code support completion in REPL
-		response.body.supportsCompletionsRequest = true;
+		response.body.supportsCompletionsRequest = false;
 		response.body.completionTriggerCharacters = [ ".", "[" ];
 
 		// make VS Code send cancel request
 		response.body.supportsCancelRequest = false;
 
 		// make VS Code send the breakpointLocations request
-		response.body.supportsBreakpointLocationsRequest = false;
+		response.body.supportsBreakpointLocationsRequest = true;
 
 		// make VS Code provide "Step in Target" functionality
 		response.body.supportsStepInTargetsRequest = false;
@@ -82,8 +90,6 @@ export class GreybelDebugSession extends LoggingDebugSession {
 		response.body.supportsReadMemoryRequest = false;
 		response.body.supportsWriteMemoryRequest = false;
 
-		response.body.supportsSingleThreadExecutionRequests = true;
-
 		this.sendResponse(response);
 
 		// since this debug adapter can accept configuration requests like 'setBreakpoint' at any time,
@@ -100,19 +106,12 @@ export class GreybelDebugSession extends LoggingDebugSession {
             const e: DebugProtocol.OutputEvent = new OutputEvent(`${customValue.toString()}\n`);
 			me.sendEvent(e);
         });
-
-		class GrebyelDebugger extends Debugger {
-			interact(operationContext: OperationContext) {
-				me.lastContext = operationContext;
-				me.sendEvent(new StoppedEvent('breakpoint', GreybelDebugSession.threadID));
-			}
-		}
 		
 		me._runtime = new Interpreter({
 			target: args.program,
 			api: initIntrinsics(vsAPI),
             resourceHandler: new InterpreterResourceProvider().getHandler(),
-			debugger: new GrebyelDebugger()
+			debugger: args.noDebug ? new GrebyelPseudoDebugger() : new GrebyelDebugger(me)
 		});
 
 		// start the program in the runtime
@@ -130,6 +129,16 @@ export class GreybelDebugSession extends LoggingDebugSession {
 		me.sendEvent(new TerminatedEvent());
 	}
 
+	protected threadsRequest(response: DebugProtocol.ThreadsResponse): void {
+		// runtime supports no threads so just return a default thread.
+		response.body = {
+			threads: [
+				new Thread(GreybelDebugSession.threadID, "thread 1")
+			]
+		};
+		this.sendResponse(response);
+	}
+
 	protected continueRequest(response: DebugProtocol.ContinueResponse, args: DebugProtocol.ContinueArguments): void {
 		this._runtime?.context?.debugger.setBreakpoint(false);
 		this.sendResponse(response);
@@ -138,6 +147,13 @@ export class GreybelDebugSession extends LoggingDebugSession {
 	protected nextRequest(response: DebugProtocol.NextResponse, args: DebugProtocol.NextArguments): void {
 		this._runtime?.context?.debugger.next();
 		this.sendResponse(response);
+	}
+
+	protected disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments, request?: DebugProtocol.Request): void {
+		this._runtime?.context?.debugger.setBreakpoint(false);
+		this._runtime?.exit();
+		this.sendResponse(response);
+		this.shutdown();
 	}
 
 	protected async evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): Promise<void> {
@@ -157,5 +173,98 @@ export class GreybelDebugSession extends LoggingDebugSession {
 
 		this.sendResponse(response);
 	}
+
+	protected async setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): Promise<void> {
+		const me = this;
+		const path = args.source.path as string;
+		const clientLines = args.lines || [];
+
+		const actualBreakpoints0 = clientLines.map((line: number) => {
+			const bp = new Breakpoint(
+				false,
+				line,
+				0,
+				new Source(path, path)
+			) as DebugProtocol.Breakpoint;
+			bp.id= me._breakpointIncrement++;
+			return bp;
+		});
+		const actualBreakpoints = await Promise.all<DebugProtocol.Breakpoint>(actualBreakpoints0);
+
+		me.breakpoints.set(path, actualBreakpoints);
+
+		response.body = {
+			breakpoints: actualBreakpoints
+		};
+
+		this.sendResponse(response);
+	}
+
+	protected breakpointLocationsRequest(response: DebugProtocol.BreakpointLocationsResponse, args: DebugProtocol.BreakpointLocationsArguments, request?: DebugProtocol.Request): void {
+		if (args.source.path) {
+			const breakpoints = this.breakpoints.get(args.source.path) || [];
+			const actualBreakpoint = breakpoints.find((bp: DebugProtocol.Breakpoint) => {
+				return bp.line === args.line;
+			}) as DebugProtocol.Breakpoint;
+
+			if (actualBreakpoint) {
+				response.body = {
+					breakpoints: [{
+						line: args.line
+					}]
+				};
+
+				this.sendResponse(response);
+				return;
+			}
+		}
+
+		response.body = {
+			breakpoints: []
+		};
+
+		this.sendResponse(response);
+	}
 }
 
+class GrebyelDebugger extends Debugger {
+	session: GreybelDebugSession;
+
+	constructor(session: GreybelDebugSession) {
+		super();
+		this.session = session;
+	}
+
+	getBreakpoint(operationContext: OperationContext): boolean {
+		if (operationContext.type === ContextType.INJECTION) {
+			return false;
+		}
+
+		const breakpoints = this.session.breakpoints.get(operationContext.target) || [];
+		const actualBreakpoint = breakpoints.find((bp: DebugProtocol.Breakpoint) => {
+			return bp.line === operationContext.line;
+		}) as DebugProtocol.Breakpoint;
+
+		if (actualBreakpoint) {
+			actualBreakpoint.verified = true;
+			this.session.sendEvent(new BreakpointEvent('changed', actualBreakpoint));
+			this.breakpoint = true;
+		}
+
+		return this.breakpoint;
+	}
+
+	interact(operationContext: OperationContext) {
+		this.session.lastContext = operationContext;
+		this.session.sendEvent(new StoppedEvent('breakpoint', GreybelDebugSession.threadID));
+	}
+}
+
+class GrebyelPseudoDebugger extends Debugger {
+	getBreakpoint(operationContext: OperationContext): boolean {
+		return false;
+	}
+
+	interact(operationContext: OperationContext) {
+	}
+}

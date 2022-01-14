@@ -67,6 +67,23 @@
                     "group": "navigation@2"
                 }
             ],
+            "editor/context": [
+                {
+                    "command": "greyscript.minify",
+                    "when": "resourceLangId == greyscript",
+                    "group": "navigation"
+                },
+                {
+                    "command": "greyscript.build",
+                    "when": "resourceLangId == greyscript",
+                    "group": "navigation"
+                },
+                {
+                    "command": "greyscript.gotoError",
+                    "when": "resourceLangId == greyscript",
+                    "group": "navigation"
+                }
+            ],
             "commandPalette": [
                 {
                     "command": "greyscript.debug.debugEditorContents",
@@ -74,6 +91,18 @@
                 },
                 {
                     "command": "greyscript.debug.runEditorContents",
+                    "when": "resourceLangId == greyscript"
+                },
+                {
+                    "command": "greyscript.minify",
+                    "when": "resourceLangId == greyscript"
+                },
+                {
+                    "command": "greyscript.build",
+                    "when": "resourceLangId == greyscript"
+                },
+                {
+                    "command": "greyscript.gotoError",
                     "when": "resourceLangId == greyscript"
                 }
             ]
@@ -111,10 +140,6 @@
             {
                 "command": "greyscript.minify",
                 "title": "GreyScript: Minify"
-            },
-            {
-                "command": "greyscript.run",
-                "title": "GreyScript: Run"
             },
             {
                 "command": "greyscript.debug.debugEditorContents",
@@ -166,6 +191,11 @@
                 }
             }
         },
+        "breakpoints": [
+            {
+                "language": "greyscript"
+            }
+        ],
         "debuggers": [
             {
                 "type": "greyscript",
@@ -217,8 +247,8 @@
     },
     "dependencies": {
         "greybel-core": "^0.1.5",
-        "greybel-interpreter": "^0.2.2",
-        "greybel-intrinsics": "^0.1.3",
+        "greybel-interpreter": "^0.2.3",
+        "greybel-intrinsics": "^0.1.4",
         "greybel-transpiler": "^0.1.1"
     }
 }
