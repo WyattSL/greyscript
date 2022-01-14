@@ -1,5 +1,4 @@
 import vscode, {
-    ExtensionContext,
     TextDocument,
     CancellationToken,
     ColorInformation,

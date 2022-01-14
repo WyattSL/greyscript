@@ -14,11 +14,9 @@ import vscode, {
     ProviderResult
 } from 'vscode';
 import CompData from './grammar/CompletionData.json';
-import TypeData from './grammar/TypeData.json';
 import ArgData from './grammar/ArgData.json';
 import ReturnData from './grammar/ReturnData.json';
 import CompTypes from './grammar/CompletionTypes.json';
-import Encryption from './grammar/Encryption.json';
 import {
     getHoverData,
     getOptionsBasedOfPriorCommand,

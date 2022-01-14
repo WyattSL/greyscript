@@ -21,8 +21,12 @@
         "@types/vscode": "^1.32.0",
         "@typescript-eslint/eslint-plugin": "^4.16.0",
         "@typescript-eslint/parser": "^4.16.0",
+        "@vscode/debugadapter": "^1.51.1",
+        "@vscode/debugprotocol": "^1.51.0",
+        "@vscode/test-electron": "^2.0.3",
         "eslint": "^7.21.0",
         "glob": "^7.1.4",
+        "mocha": "^9.1.3",
         "source-map-support": "^0.5.12",
         "typescript": "^4.2.2"
     },
@@ -50,6 +54,30 @@
         "onLanguage:greyscript"
     ],
     "contributes": {
+        "menus": {
+            "editor/title/run": [
+                {
+                    "command": "greyscript.debug.runEditorContents",
+                    "when": "resourceLangId == greyscript",
+                    "group": "navigation@1"
+                },
+                {
+                    "command": "greyscript.debug.debugEditorContents",
+                    "when": "resourceLangId == greyscript",
+                    "group": "navigation@2"
+                }
+            ],
+            "commandPalette": [
+                {
+                    "command": "greyscript.debug.debugEditorContents",
+                    "when": "resourceLangId == greyscript"
+                },
+                {
+                    "command": "greyscript.debug.runEditorContents",
+                    "when": "resourceLangId == greyscript"
+                }
+            ]
+        },
         "languages": [
             {
                 "id": "greyscript",
@@ -77,12 +105,30 @@
                 "title": "GreyScript: Goto Error"
             },
             {
+                "command": "greyscript.build",
+                "title": "GreyScript: Build"
+            },
+            {
                 "command": "greyscript.minify",
                 "title": "GreyScript: Minify"
             },
             {
                 "command": "greyscript.run",
                 "title": "GreyScript: Run"
+            },
+            {
+                "command": "greyscript.debug.debugEditorContents",
+                "title": "Debug File",
+                "category": "Mock Debug",
+                "enablement": "!inDebugMode",
+                "icon": "$(debug-alt)"
+            },
+            {
+                "command": "greyscript.debug.runEditorContents",
+                "title": "Run File",
+                "category": "Mock Debug",
+                "enablement": "!inDebugMode",
+                "icon": "$(play)"
             }
         ],
         "configuration": {
@@ -102,14 +148,77 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Enable GreyScript's color picker."
+                },
+                "greyscript.transpiler.uglify": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable uglify."
+                },
+                "greyscript.transpiler.dlo": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Disable literals optimization."
+                },
+                "greyscript.transpiler.dno": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Disable namespaces optimization."
                 }
             }
-        }
+        },
+        "debuggers": [
+            {
+                "type": "greyscript",
+                "languages": [
+                    "greyscript"
+                ],
+                "label": "Greyscript Debug",
+                "program": "./out/debug/adapter.js",
+                "runtime": "node",
+                "configurationAttributes": {
+                    "launch": {
+                        "required": [
+                            "program"
+                        ],
+                        "properties": {
+                            "program": {
+                                "type": "string",
+                                "description": "Absolute path to a text file.",
+                                "default": "${workspaceFolder}/${command:AskForProgramName}"
+                            }
+                        }
+                    }
+                },
+                "initialConfigurations": [
+                    {
+                        "type": "greyscript",
+                        "request": "launch",
+                        "name": "Ask for file name",
+                        "program": "${workspaceFolder}/${command:AskForProgramName}"
+                    }
+                ],
+                "configurationSnippets": [
+                    {
+                        "label": "Greyscript Debug: Launch",
+                        "description": "A new configuration for 'debugging' a user selected greyscript file.",
+                        "body": {
+                            "type": "greyscript",
+                            "request": "launch",
+                            "name": "Ask for file name",
+                            "program": "^\"\\${workspaceFolder}/\\${command:AskForProgramName}\""
+                        }
+                    }
+                ],
+                "variables": {
+                    "AskForProgramName": "greyscript.debug.getProgramName"
+                }
+            }
+        ]
     },
     "dependencies": {
         "greybel-core": "^0.1.5",
-        "greybel-interpreter": "^0.2.0",
-        "greybel-intrinsics": "^0.1.1",
+        "greybel-interpreter": "^0.2.2",
+        "greybel-intrinsics": "^0.1.3",
         "greybel-transpiler": "^0.1.1"
     }
 }

@@ -1,4 +1,9 @@
-import vscode from 'vscode';
+import {
+    MarkdownString,
+    TextDocument,
+    Range,
+    Position
+} from 'vscode';
 import CompData from './grammar/CompletionData.json';
 import CompTypes from './grammar/CompletionTypes.json';
 import ArgData from './grammar/ArgData.json';
@@ -32,9 +37,9 @@ export function processFunctionParameter(p: string): string {
     else return p.trim() + ": any"
 }
 
-export function getHoverData (type: string, cmd: string | null = 'unknown', asMarkdown: boolean = true): string | vscode.MarkdownString {
+export function getHoverData (type: string, cmd: string | null = 'unknown', asMarkdown: boolean = true): string | MarkdownString {
     // Create markdownString
-    const str = new vscode.MarkdownString("", true);
+    const str = new MarkdownString("");
 
     // Get type of cmd
     // @ts-ignore: Claims to be implicitly any; needs to be revisited
@@ -99,11 +104,11 @@ export function getHoverData (type: string, cmd: string | null = 'unknown', asMa
 }
 
 export function getOptionsBasedOfPriorCommand(
-    document: vscode.TextDocument,
-    range: vscode.Range
+    document: TextDocument,
+    range: Range
 ): any {
     // Get Target if there was a delimiter before starting character
-    const position = new vscode.Position(range.start.line, range.start.character - 2);
+    const position = new Position(range.start.line, range.start.character - 2);
     const targetRange = document.getWordRangeAtPosition(position);
     const targetWord = document.getText(targetRange);
 

@@ -4,16 +4,17 @@ import vscode, {
     Location,
     Range,
     Diagnostic,
-    Event,
     TextDocumentChangeEvent,
     TextEditor,
     TextEditorEdit,
-    TextDocument
+    TextDocument,
+    Uri
 } from 'vscode';
 import Encryption from './grammar/Encryption.json';
 import { activate as activateHover } from './hover';
 import { activate as activateAutocomplete } from './autocomplete';
 import { activate as activateColorpicker } from './colorpicker';
+import { activate as activateDebug } from './debug';
 import {
     TranspilerResourceProvider,
     InterpreterResourceProvider
@@ -24,26 +25,15 @@ import {
     CustomType
 } from 'greybel-interpreter';
 import { init as initIntrinsics } from 'greybel-intrinsics';
-import {
-    Parser,
-    UnexpectedStringEOL,
-    InvalidCharacter,
-    UnexpectedValue,
-    UnexpectedValues,
-    UnexpectedIdentifier,
-    UnexpectedArguments,
-    UnexpectedAssignmentOrCall,
-    UnexpectedExpression,
-    UnexpectedParameterInFunction,
-    UnexpectedEOF,
-    UnexpectedNonStringLiteralInImportCode,
-    CallExpressionEOL
-} from 'greybel-core';
+import { Parser } from 'greybel-core';
+import { TextEncoder } from 'util';
+import path from 'path';
 
 export function activate(context: ExtensionContext) {
     activateHover(context);
     activateAutocomplete(context);
     activateColorpicker(context);
+    activateDebug(context);
 
     context.subscriptions.push(vscode.languages.registerDeclarationProvider('greyscript', {
         provideDeclaration(document, position, token) {
@@ -102,27 +92,70 @@ export function activate(context: ExtensionContext) {
             updateDiagnosticCollection(event.document);
         })
     );
+
+    async function build(
+        editor: TextEditor,
+        edit: TextEditorEdit,
+        args: any[]
+    ) {
+        const config = vscode.workspace.getConfiguration("greyscript");
+        const result = await (new Transpiler({
+            target: editor.document.fileName,
+            resourceHandler: new TranspilerResourceProvider().getHandler(),
+            uglify: config.get("transpiler.uglify"),
+            disableLiteralsOptimization: config.get("transpiler.dlo"),
+            disableNamespacesOptimization: config.get("transpiler.dno")
+        }).parse());
+
+        if (!vscode.workspace.rootPath) {
+            throw new Error('Cannot build when root path is undefined.');
+        }
+
+        const rootPath = vscode.workspace.rootPath;
+        const buildPath = path.resolve(rootPath, './build');
+        const buildUri = Uri.file(buildPath);
+
+        try {
+            await vscode.workspace.fs.delete(buildUri, { recursive: true });
+        } catch (err) {
+            console.error(err);
+        }
+
+        await vscode.workspace.fs.createDirectory(buildUri);
+
+        Object.entries(result).forEach(([file, code]) => {
+            const relativePath = file.replace(new RegExp("^" + rootPath), '.');
+            const fullPath = path.resolve(buildPath, relativePath);
+            const targetUri = Uri.file(fullPath);
+            vscode.workspace.fs.writeFile(targetUri, new TextEncoder().encode(code));
+        });
+	}
+	
+	context.subscriptions.push(vscode.commands.registerTextEditorCommand("greyscript.build", build));
     
 	async function minify(
         editor: TextEditor,
         edit: TextEditorEdit,
         args: any[]
     ) {
+        const config = vscode.workspace.getConfiguration("greyscript");
         const result = await (new Transpiler({
             target: editor.document.fileName,
             resourceHandler: new TranspilerResourceProvider().getHandler(),
-            uglify: true
+            uglify: config.get("transpiler.uglify"),
+            disableLiteralsOptimization: config.get("transpiler.dlo"),
+            disableNamespacesOptimization: config.get("transpiler.dno")
         }).parse());
+
         const firstLine = editor.document.lineAt(0);
         const lastLine = editor.document.lineAt(editor.document.lineCount - 1);
-        const textRange = new Range(
-            firstLine.range.start.line,
-            firstLine.range.start.character,
-            lastLine.range.end.line,
-            lastLine.range.end.character
-        );
+        const textRange = new Range(firstLine.range.start, lastLine.range.end);
 
-        edit.replace(textRange, result[editor.document.fileName]);
+        editor.edit(function(editBuilder: TextEditorEdit) {
+            editBuilder.replace(textRange, result[editor.document.fileName]);
+        });
+        
+        vscode.window.showInformationMessage('Minified...', { modal: false });
 	}
 	
 	context.subscriptions.push(vscode.commands.registerTextEditorCommand("greyscript.minify", minify));
@@ -146,29 +179,15 @@ export function activate(context: ExtensionContext) {
 
         try {
             parser.parseChunk();
-            console.log("all good :)");
-        } catch (err) {
-            console.error(err);
-
-            if (
-                err instanceof UnexpectedStringEOL ||
-                err instanceof InvalidCharacter
-            ) {
+            vscode.window.showInformationMessage('all good :)', { modal: false });
+        } catch (err: any) {
+            if (err.hasOwnProperty('line')) {
                 selectedLine(err.line);
-            } else if (
-                err instanceof UnexpectedValue ||
-                err instanceof UnexpectedValues ||
-                err instanceof UnexpectedIdentifier ||
-                err instanceof UnexpectedArguments ||
-                err instanceof UnexpectedAssignmentOrCall ||
-                err instanceof UnexpectedExpression ||
-                err instanceof UnexpectedParameterInFunction ||
-                err instanceof UnexpectedEOF ||
-                err instanceof UnexpectedNonStringLiteralInImportCode ||
-                err instanceof CallExpressionEOL
-            ) {
+            } else if (err.hasOwnProperty('token')) {
                 selectedLine(err.token.line);
             }
+
+            vscode.window.showErrorMessage(err.message, { modal: false });
         }
     }
 
@@ -180,13 +199,9 @@ export function activate(context: ExtensionContext) {
         args: any[]
     ) {
         const vsAPI = new Map();
+        const outputChannel = vscode.window.createOutputChannel('greyscript-run');
         const sendMessage = (str: string) => {
-            const terminal = vscode.window.activeTerminal;
-
-            if (terminal) {
-                terminal.sendText(str, true);
-            }
-
+            outputChannel.appendLine(str);
             console.log(str);
         };
 
@@ -194,9 +209,12 @@ export function activate(context: ExtensionContext) {
             sendMessage(customValue.toString());
         });
 
+        outputChannel.show();
+
         const interpreter = new Interpreter({
             target: editor.document.fileName,
-            api: initIntrinsics(vsAPI)
+            api: initIntrinsics(vsAPI),
+            resourceHandler: new InterpreterResourceProvider().getHandler()
         });
 
         try {
@@ -204,6 +222,8 @@ export function activate(context: ExtensionContext) {
         } catch (err) {
             sendMessage((err as Error).message);
         }
+
+        vscode.window.showInformationMessage('Done...', { modal: false });
     }
     
     context.subscriptions.push(vscode.commands.registerTextEditorCommand("greyscript.run", run));

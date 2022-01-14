@@ -69,7 +69,7 @@ export function activate(context: ExtensionContext) {
                 return new Hover(getHoverData(output.key, output.cmd));
             } else {
                 // Variable hover
-                const hoverText = new MarkdownString("", true);
+                const hoverText = new MarkdownString("");
 
                 // Get Text
                 let text = document.getText()
