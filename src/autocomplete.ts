@@ -13,10 +13,12 @@ import vscode, {
     SignatureHelpContext,
     ProviderResult
 } from 'vscode';
-import CompData from './grammar/CompletionData.json';
-import ArgData from './grammar/ArgData.json';
-import ReturnData from './grammar/ReturnData.json';
-import CompTypes from './grammar/CompletionTypes.json';
+import {
+    CompData,
+    ArgData,
+    ReturnData,
+    CompTypes
+} from './grammar';
 import {
     getHoverData,
     getOptionsBasedOfPriorCommand,
@@ -48,7 +50,6 @@ export function activate(context: ExtensionContext) {
                     // @ts-ignore: Claims to be implicitly any; needs to be revisited
                     for (let c of options[key]){
                         // Get type of completion item
-                        // @ts-ignore: Claims to be implicitly any; needs to be revisited
                         let type = CompTypes[c] || CompTypes["default"];
                         
                         // Create completion item
@@ -148,7 +149,6 @@ export function activate(context: ExtensionContext) {
             for (let key in output) {
                 for (let c of output[key]){
                     // Get type of completion item
-                    // @ts-ignore: Claims to be implicitly any; needs to be revisited
                     let type = CompTypes[c] || CompTypes["default"];
                     
                     // Create completion item
@@ -206,20 +206,16 @@ export function activate(context: ExtensionContext) {
 
                 // Get all the possible signatures from comp data
                 for (let key in CompData) {
-                    // @ts-ignore: Claims to be implicitly any; needs to be revisited
                     if (CompData[key].includes(word)) {
-                        // @ts-ignore: Claims to be implicitly any; needs to be revisited
                         let cmdType = CompTypes[word] || CompTypes["default"];
 
                         if(cmdType != 2 && cmdType != 1) {
                             continue;
                         }
 
-                         // @ts-ignore: Claims to be implicitly any; needs to be revisited
                         const args = (ArgData[key][word] || []).map((d: ArgDataCmd) => {
                             return d.name + (d.optional ? "?" : "") + ": " + d.type + (d.type == "Map" || d.type == "List" ? `[${d.subType}]` : "")
                         }).join(", ")
-                         // @ts-ignore: Claims to be implicitly any; needs to be revisited
                         const results = ": " + (ReturnData[key][word] || []).map((d: ReturnDataType) => {
                             return d.type + (d.type == "Map" || d.type == "List" ? `[${d.subType}]` : "");
                         }).join(" or ")

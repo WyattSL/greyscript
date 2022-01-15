@@ -4,13 +4,15 @@ import {
     Range,
     Position
 } from 'vscode';
-import CompData from './grammar/CompletionData.json';
-import CompTypes from './grammar/CompletionTypes.json';
-import ArgData from './grammar/ArgData.json';
-import Encryption from './grammar/Encryption.json';
-import Examples from './grammar/Examples.json';
-import HoverData from './grammar/HoverData.json';
-import ReturnData from './grammar/ReturnData.json';
+import {
+    CompData,
+    CompTypes,
+    ArgData,
+    Encryption,
+    Examples,
+    HoverData,
+    ReturnData
+} from './grammar';
 import { getCompTypeText } from './utils';
 import {
     ArgDataCmd,
@@ -37,12 +39,11 @@ export function processFunctionParameter(p: string): string {
     else return p.trim() + ": any"
 }
 
-export function getHoverData (type: string, cmd: string | null = 'unknown', asMarkdown: boolean = true): string | MarkdownString {
+export function getHoverData (type: string, cmd: string = 'unknown', asMarkdown: boolean = true): string | MarkdownString {
     // Create markdownString
     const str = new MarkdownString("");
 
     // Get type of cmd
-    // @ts-ignore: Claims to be implicitly any; needs to be revisited
     const cmdType: number = CompTypes[cmd] || CompTypes["default"];
 
     // Get type text, example: Shell.
@@ -54,9 +55,7 @@ export function getHoverData (type: string, cmd: string | null = 'unknown', asMa
         description: ""
     };
 
-    // @ts-ignore: Claims to be implicitly any; needs to be revisited
     const argData = ArgData[type][cmd] || [];
-    // @ts-ignore: Claims to be implicitly any; needs to be revisited
     const returnData = ReturnData[type][cmd] || [];
 
     // Add arguments if its a function/method
@@ -73,7 +72,6 @@ export function getHoverData (type: string, cmd: string | null = 'unknown', asMa
     }).join(" or ");
 
     // Add info/hover text
-    // @ts-ignore: Claims to be implicitly any; needs to be revisited
     docs.description = HoverData[type][cmd] || "";
 
     // Apply encryption text to hover text if available
@@ -82,7 +80,6 @@ export function getHoverData (type: string, cmd: string | null = 'unknown', asMa
     }
 
     // Add examples
-    // @ts-ignore: Claims to be implicitly any; needs to be revisited
     const codeExamples = Examples[type]?.[cmd] || [];
 
     // Return normal text
@@ -116,7 +113,6 @@ export function getOptionsBasedOfPriorCommand(
     // Check if target is command
     let prevCmd = null;
     for (let type in CompData) {
-        // @ts-ignore: Claims to be implicitly any; needs to be revisited
         if (CompData[type].includes(targetWord)) {
             prevCmd = {
                 type,
@@ -128,7 +124,6 @@ export function getOptionsBasedOfPriorCommand(
 
     // Get return data from command
     if (prevCmd) {
-        // @ts-ignore: Claims to be implicitly any; needs to be revisited
         const returnValues = ReturnData[prevCmd.type][prevCmd.cmd];
         const options: { [key: string]: string[] } = {};
 
@@ -137,7 +132,6 @@ export function getOptionsBasedOfPriorCommand(
             const returnTypeValue = <string>returnValue.type;
 
              if (CompData.hasOwnProperty(returnTypeValue)) {
-                // @ts-ignore: Claims to be implicitly any; needs to be revisited
                 options[returnTypeValue] = CompData[returnTypeValue];
             }
         }
@@ -197,7 +191,6 @@ export function getOptionsBasedOfPriorCommand(
 
         // Check if value is command
         for (let type in CompData) {
-            // @ts-ignore: Claims to be implicitly any; needs to be revisited
             if (CompData[type].includes(assignment)) {
                 prevCmd = {
                     type,
@@ -209,7 +202,6 @@ export function getOptionsBasedOfPriorCommand(
 
         // Set options based off command
         if (prevCmd) {
-            // @ts-ignore: Claims to be implicitly any; needs to be revisited
             const returnValues: any = ReturnData[prevCmd.type][prevCmd.cmd];
             const options: { [key: string]: string[] } = {};
 
@@ -218,7 +210,6 @@ export function getOptionsBasedOfPriorCommand(
                 const returnTypeValue = <string>returnValue.type;
 
                 if (CompData.hasOwnProperty(returnTypeValue)) {
-                    // @ts-ignore: Claims to be implicitly any; needs to be revisited
                     options[returnTypeValue] = CompData[returnTypeValue];
                 }
             }

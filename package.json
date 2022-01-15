@@ -249,6 +249,6 @@
         "greybel-core": "^0.1.5",
         "greybel-interpreter": "^0.2.3",
         "greybel-intrinsics": "^0.1.4",
-        "greybel-transpiler": "^0.1.1"
+        "greybel-transpiler": "^0.1.2"
     }
 }

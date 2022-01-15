@@ -8,7 +8,7 @@ import vscode, {
     MarkdownString,
     ProviderResult
 } from 'vscode';
-import CompData from './grammar/CompletionData.json';
+import { CompData } from './grammar';
 import {
     getHoverData,
     getOptionsBasedOfPriorCommand,
@@ -66,7 +66,7 @@ export function activate(context: ExtensionContext) {
             }
 
             if (output.key) {
-                return new Hover(getHoverData(output.key, output.cmd));
+                return new Hover(getHoverData(output.key, output.cmd || ''));
             } else {
                 // Variable hover
                 const hoverText = new MarkdownString("");
