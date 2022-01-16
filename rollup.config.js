@@ -11,14 +11,16 @@ const options = {
     output: {
         file: 'out/extension.browser.js',
         name: 'greyscript',
-        format: 'iife',
+        format: 'cjs',
         globals: {
             'vscode': 'vscode'
         }
     },
     plugins: [
         json(),
-        commonjs(),
+        commonjs({
+            esmExternals: ['vscode']
+        }),
         nodePolyfills(),
         nodeResolve({
             preferBuiltins: false
@@ -26,12 +28,10 @@ const options = {
         babel({
             presets: ['@babel/preset-env'],
             babelHelpers: 'bundled'
-        }),
-        terser()
+        })/*,
+        terser()*/
     ],
-    external: [
-        'vscode'
-    ]
+    external: ['vscode']
 };
 
 export default options;
