@@ -17,6 +17,20 @@
                 "--extensionDevelopmentPath=${workspaceFolder}"
             ],
             "preLaunchTask": "npm: compile"
-        }
+        },
+        {
+			"name": "Web Extension",
+			"type": "extensionHost",
+			"debugWebWorkerHost": true,
+			"request": "launch",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--extensionDevelopmentKind=web"
+			],
+			"outFiles": [
+				"${workspaceFolder}/out/extension.browser.js"
+			],
+			"preLaunchTask": "npm: compile"
+		},
     ]
 }
