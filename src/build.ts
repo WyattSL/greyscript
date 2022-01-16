@@ -6,7 +6,8 @@ import vscode, {
 } from 'vscode';
 import { TranspilerResourceProvider } from './resource';
 import { Transpiler, TranspilerParseResult } from 'greybel-transpiler';
-import { TextEncoder } from 'util';
+// @ts-ignore: No type definitions
+import { TextEncoderLite as TextEncoder } from 'text-encoder-lite';
 import path from 'path';
 
 function createContentHeader(): string {

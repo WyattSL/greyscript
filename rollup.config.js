@@ -4,7 +4,7 @@ const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const { babel } = require('@rollup/plugin-babel');
 const { terser } = require('rollup-plugin-terser');
 const json = require('@rollup/plugin-json');
-const nodePolyfills = require('rollup-plugin-polyfill-node');
+const nodePolyfills = require('rollup-plugin-node-polyfills');
 
 const options = {
     input: 'out/extension.js',
@@ -28,9 +28,14 @@ const options = {
         }),
         babel({
             presets: ['@babel/preset-env'],
-            babelHelpers: 'bundled'
-        }),
-        terser()
+            babelHelpers: 'runtime',
+            plugins: [
+                ["@babel/plugin-transform-runtime", {
+                    "regenerator": true
+                }]
+            ]
+        })/*,
+        terser()*/
     ],
     external: ['vscode']
 };

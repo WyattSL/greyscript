@@ -73,52 +73,7 @@ function lookupErrors(document: TextDocument): Diagnostic[] {
                 }
             }
         });
-
-
-        //check for encryption
-        /*
-        chunk.body.forEach((item) => {
-            if (item.type === 'AssignmentStatement') {
-                const { init, variable } = item as ASTAssignmentStatement;
-                const left = variable.type === 'Identifier' ? variable as ASTIdentifier : null;
-                const right = init.type === 'FunctionDeclaration' ? init as ASTFunctionStatement : null;
-
-                if (
-                    left &&
-                    right &&
-                    /^(Encode|Decode)$/.test(left.name)
-                ) {
-                    right.body.forEach((innerItem) => {
-                        const name = getEncryptionCallName(innerItem);
-
-                        console.log(name, innerItem);
-
-                        if (name) {
-                            result.push(
-                                new Diagnostic(
-                                    document.lineAt(innerItem.line - 1).range,
-                                    `Cannot use ${name} in ${left.name}`,
-                                    vscode.DiagnosticSeverity.Error
-                                )
-                            );
-                        } else if (innerItem.type === 'AssignmentStatement') {
-                            const rightName = getEncryptionCallName((innerItem as ASTAssignmentStatement).init);
-
-                            result.push(
-                                new Diagnostic(
-                                    document.lineAt(innerItem.line - 1).range,
-                                    `Cannot use ${rightName} in ${left.name}`,
-                                    vscode.DiagnosticSeverity.Error
-                                )
-                            );
-                        }
-                    });
-                }
-            }
-        });*/
     } catch (err: any) {
-        vscode.window.showErrorMessage(err.message, { modal: false });
-
         let line;
 
         if (err.hasOwnProperty('line')) {

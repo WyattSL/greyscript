@@ -1,6 +1,7 @@
 import vscode, { Uri } from 'vscode';
 import path from 'path';
-import { TextDecoder } from 'util';
+// @ts-ignore: No type definitions
+import { TextDecoderLite as TextDecoder } from 'text-encoder-lite';
 import {
     ResourceProvider as TranspilerResourceProviderBase,
     ResourceHandler as TranspilerResourceHandler
