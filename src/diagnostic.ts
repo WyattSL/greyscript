@@ -16,6 +16,7 @@ import {
     ASTCallExpression,
     Parser
 } from 'greybel-core';
+import * as ASTScraper from './helper/ast-scraper';
 
 function getEncryptionCallName(item: ASTBase): string | undefined {
     let expression;
@@ -45,7 +46,37 @@ function lookupErrors(document: TextDocument): Diagnostic[] {
     try {
         const chunk = parser.parseChunk();
 
+        chunk.body.forEach((item) => {
+            if (item.type === 'AssignmentStatement') {
+                const { init, variable } = item as ASTAssignmentStatement;
+                const left = variable.type === 'Identifier' ? variable as ASTIdentifier : null;
+                const right = init.type === 'FunctionDeclaration' ? init as ASTFunctionStatement : null;
+
+                if (
+                    left &&
+                    right &&
+                    /^(Encode|Decode)$/.test(left.name)
+                ) {
+                    ASTScraper.forEach((item: ASTBase, level: number) => {
+                        const name = getEncryptionCallName(item);
+
+                        if (name) {
+                            result.push(
+                                new Diagnostic(
+                                    document.lineAt(item.line - 1).range,
+                                    `Cannot use ${name} in ${left.name}`,
+                                    vscode.DiagnosticSeverity.Error
+                                )
+                            );
+                        }
+                    }, right);
+                }
+            }
+        });
+
+
         //check for encryption
+        /*
         chunk.body.forEach((item) => {
             if (item.type === 'AssignmentStatement') {
                 const { init, variable } = item as ASTAssignmentStatement;
@@ -84,7 +115,7 @@ function lookupErrors(document: TextDocument): Diagnostic[] {
                     });
                 }
             }
-        });
+        });*/
     } catch (err: any) {
         vscode.window.showErrorMessage(err.message, { modal: false });
 

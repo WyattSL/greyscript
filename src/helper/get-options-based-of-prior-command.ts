@@ -1,106 +1,14 @@
 import {
-    MarkdownString,
     TextDocument,
     Range,
     Position
 } from 'vscode';
 import {
     CompData,
-    CompTypes,
-    ArgData,
-    Encryption,
-    Examples,
-    HoverData,
     ReturnData
-} from './grammar';
-import { getCompTypeText } from './utils';
-import {
-    ArgDataCmd,
-    ReturnDataType
-} from './types';
+} from '../grammar';
 
-export function processFunctionParameter(p: string): string {
-    if (p.length == 0) return "";
-
-    // Parse the user defined function parameters
-    const optionalParam = p.match(/\b\w+(\s|)=(\s|)/);
-
-    if (optionalParam) {
-        let value = p.substring(optionalParam[0].length);
-        let name = optionalParam[0].replace(/(\s|)=(\s|)/, "");
-
-        if (value == "true" || value == "false") return name + ": Bool";
-        else if(!Number.isNaN(Number(value))) return name + ": Number";
-        else if(value.startsWith("\"")) return name + ": String";
-        else if(value.startsWith("[")) return name + ": List";
-        else if(value.startsWith("{")) return name + ": Map";
-        else return name + ": any";
-    }
-    else return p.trim() + ": any"
-}
-
-export function getHoverData (type: string, cmd: string = 'unknown', asMarkdown: boolean = true): string | MarkdownString {
-    // Create markdownString
-    const str = new MarkdownString("");
-
-    // Get type of cmd
-    const cmdType: number = CompTypes[cmd] || CompTypes["default"];
-
-    // Get type text, example: Shell.
-    const typeText = type !== "General" ? type + "." : "";
-
-    // Combine base data together
-    const docs = {
-        title: "(" + getCompTypeText(cmdType) + ") " + typeText + cmd,
-        description: ""
-    };
-
-    const argData = ArgData[type][cmd] || [];
-    const returnData = ReturnData[type][cmd] || [];
-
-    // Add arguments if its a function/method
-    if (cmdType === 2 || cmdType === 1){
-        const args: string = argData.map((d: ArgDataCmd) => {
-            return d.name + (d.optional ? "?" : "") + ": " + d.type + (d.type == "Map" || d.type == "List" ? `[${d.subType}]` : "");
-        }).join(", ");
-        docs.title += `(${args})`;
-    }
-
-    // Add result
-    docs.title += ": " + returnData.map((d: ReturnDataType) => {
-        return d.type + (d.type == "Map" || d.type == "List" ? `[${d.subType}]` : "");
-    }).join(" or ");
-
-    // Add info/hover text
-    docs.description = HoverData[type][cmd] || "";
-
-    // Apply encryption text to hover text if available
-    if (cmd && Encryption.includes(cmd)) {
-        docs.description += "\n\n\**This function cannot be used in encryption.*";
-    }
-
-    // Add examples
-    const codeExamples = Examples[type]?.[cmd] || [];
-
-    // Return normal text
-    if (!asMarkdown) {
-        return docs.title + "\n\n\n" + docs.description.replace(/<[^>]*>?/gm, '') + "\n\n" + codeExamples.join("\n\n\n");
-    }
-
-    // Append markdown string areas
-    str.appendCodeblock(docs.title);
-    str.appendMarkdown("---\n"+docs.description);
-
-    if (codeExamples.length > 0) {
-        str.appendMarkdown("\n### Examples\n---");
-        str.appendCodeblock(codeExamples.join("\n\n"));
-    }
-
-    // Return markdown string
-    return str;
-}
-
-export function getOptionsBasedOfPriorCommand(
+export default function getOptionsBasedOfPriorCommand(
     document: TextDocument,
     range: Range
 ): any {

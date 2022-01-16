@@ -11,6 +11,7 @@ const options = {
     output: {
         file: 'out/extension.browser.js',
         name: 'greyscript',
+        exports: 'named',
         format: 'cjs',
         globals: {
             'vscode': 'vscode'
@@ -28,8 +29,8 @@ const options = {
         babel({
             presets: ['@babel/preset-env'],
             babelHelpers: 'bundled'
-        })/*,
-        terser()*/
+        }),
+        terser()
     ],
     external: ['vscode']
 };

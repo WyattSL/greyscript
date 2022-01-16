@@ -7,6 +7,6 @@ const compTypeTextMapping: { [type: number]: string } = {
     20: "constant"
 };
 
-export function getCompTypeText(type: number): string {
+export default function getCompTypeText(type: number): string {
     return compTypeTextMapping[type];
 }
