@@ -1,10 +1,8 @@
 import vscode, {
     ExtensionContext,
-    Range,
     Diagnostic,
     TextDocumentChangeEvent,
-    TextDocument,
-    Position
+    TextDocument
 } from 'vscode';
 import { Encryption } from './grammar';
 import {
@@ -14,9 +12,11 @@ import {
     ASTFunctionStatement,
     ASTCallStatement,
     ASTCallExpression,
-    Parser
+    Parser,
+    ASTChunk
 } from 'greybel-core';
 import * as ASTScraper from './helper/ast-scraper';
+import { createDocumentAST, getDocumentAST, getLastDocumentASTErrors } from './helper/document-manager';
 
 function getEncryptionCallName(item: ASTBase): string | undefined {
     let expression;
@@ -40,11 +40,11 @@ function getEncryptionCallName(item: ASTBase): string | undefined {
 
 function lookupErrors(document: TextDocument): Diagnostic[] {
     const source = document.getText();
-    const parser = new Parser(source);
-    const result = [];
+    const errors = getLastDocumentASTErrors(document);
+    const result: Diagnostic[] = [];
 
-    try {
-        const chunk = parser.parseChunk();
+    if (errors.length === 0) {
+        const chunk = getDocumentAST(document) as ASTChunk;
 
         chunk.body.forEach((item) => {
             if (item.type === 'AssignmentStatement') {
@@ -63,7 +63,7 @@ function lookupErrors(document: TextDocument): Diagnostic[] {
                         if (name) {
                             result.push(
                                 new Diagnostic(
-                                    document.lineAt(item.line - 1).range,
+                                    document.lineAt(item.start.line - 1).range,
                                     `Cannot use ${name} in ${left.name}`,
                                     vscode.DiagnosticSeverity.Error
                                 )
@@ -73,22 +73,22 @@ function lookupErrors(document: TextDocument): Diagnostic[] {
                 }
             }
         });
-    } catch (err: any) {
-        let line;
+    } else {
+        return errors.map((err: any) => {
+            let line = -1;
 
-        if (err.hasOwnProperty('line')) {
-            line = err.line;
-        } else if (err.hasOwnProperty('token')) {
-            line = err.token.line;
-        }
+            if (err.hasOwnProperty('line')) {
+                line = err.line;
+            } else if (err.hasOwnProperty('token')) {
+                line = err.token.line;
+            }
 
-        result.push(
-            new Diagnostic(
+            return new Diagnostic(
                 document.lineAt(line - 1).range,
                 err.message,
                 vscode.DiagnosticSeverity.Error
-            )
-        );
+            );
+        });
     }
 
     return result;
@@ -98,6 +98,7 @@ export function activate(context: ExtensionContext) {
     const collection = vscode.languages.createDiagnosticCollection("greyscript");
 
     function updateDiagnosticCollection(document: TextDocument) {
+        createDocumentAST(document);
         const err = lookupErrors(document);
         collection.set(document.uri, err);
     }

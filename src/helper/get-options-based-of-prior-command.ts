@@ -10,7 +10,8 @@ import {
 import {
     ASTBase,
     ASTAssignmentStatement,
-    Parser
+    Parser,
+    Lexer
 } from 'greybel-core';
 import * as ASTScraper from './ast-scraper';
 import ASTStringify from './ast-stringify';
@@ -48,7 +49,11 @@ export default function getOptionsBasedOfPriorCommand(
 
         return Object.keys(options).length > 0 ? options : undefined;
     } else {
-        const parser = new Parser(document.getText());
+        const content = document.getText();
+        const parser = new Parser(content, {
+            unsafe: true,
+            lexer: new Lexer(content, { unsafe: true })
+        });
         const chunk = parser.parseChunk();
         const assignments = ASTScraper.findEx((item: ASTBase, level: number) => {
             if (item.type === 'AssignmentStatement') {
@@ -61,8 +66,6 @@ export default function getOptionsBasedOfPriorCommand(
                     };
                 }
             }
-            
-            return {};
         }, chunk);
 
         console.log('>>', assignments);

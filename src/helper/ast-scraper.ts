@@ -205,7 +205,7 @@ class ScraperWalker {
 
 type ScraperNext = (item: any, level: number) => void;
 type ScraperValidate = (item: any, level: number) => boolean;
-type ScraperValidateEx = (item: any, level: number) => { valid?: boolean; skip?: boolean; exit?: boolean; };
+type ScraperValidateEx = (item: any, level: number) => { valid?: boolean; skip?: boolean; exit?: boolean; } | void;
 
 export function forEach(next: ScraperNext, rootItem: ASTBase): ASTBase | null {
     let result = null;
@@ -259,7 +259,7 @@ export function findAll(validate: ScraperValidate, rootItem: ASTBase): ASTBase[]
 export function findEx(validate: ScraperValidateEx, rootItem: ASTBase): ASTBase[] {
     const result: ASTBase[] = [];
     const walker = new ScraperWalker((item: ASTBase, level: number) => {
-        const state = validate(item, level);
+        const state = validate(item, level) || {};
         
         if (state.valid) {
             result.push(item);
@@ -297,11 +297,11 @@ export function findAllByType(validate: ScraperValidate, rootItem: ASTBase): { [
 export function findAllByLine(validate: ScraperValidate, rootItem: ASTBase): { [type: number]: ASTBase[] } {
     const result: { [type: number]: ASTBase[] } = {};
     const walker = new ScraperWalker((item: ASTBase, level: number) => {
-        const typeResult = result[item.line] || [];
+        const typeResult = result[item.start.line] || [];
 
         if (validate(item, level)) {
             typeResult.push(item);
-            result[item.line] = typeResult;
+            result[item.start.line] = typeResult;
         }
 
         return {
