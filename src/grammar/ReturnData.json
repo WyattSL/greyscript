@@ -978,7 +978,11 @@
                 "type": "null"
             }
         ],
-        "join": [],
+        "join": [
+            {
+                "type": "String"
+            }
+        ],
         "push": [],
         "pop": [
             {
