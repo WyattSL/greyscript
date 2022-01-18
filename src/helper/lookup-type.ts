@@ -8,7 +8,9 @@ import {
     ASTCallExpression,
     ASTCallStatement,
     ASTLiteral,
-    ASTFunctionStatement
+    ASTFunctionStatement,
+    ASTMapConstructorExpression,
+    ASTListConstructorExpression
 } from 'greybel-core';
 import {
     Position,
@@ -245,13 +247,10 @@ export class LookupHelper {
 
     resolveMemberPath(item: ASTBase, root?: ASTBase): MetaData | undefined {
         const me = this;
-        console.log('>>', 'resolve member', item);
 
         if (item.type === 'MemberExpression') {
             const { base, identifier } = item as ASTMemberExpression;
             const property = me.lookupIdentifier(identifier);
-
-            console.log('>>', 'member expr property', property, base);
 
             if (!property) {
                 return;
@@ -259,8 +258,6 @@ export class LookupHelper {
 
             if (base.type === 'MemberExpression' || base.type === 'IndexExpression') {
                 const memberBaseMeta = me.resolveMemberPath(base);
-
-                console.log('>>', 'member parent is expr', memberBaseMeta);
 
                 if (!memberBaseMeta) {
                     return;
@@ -279,8 +276,6 @@ export class LookupHelper {
         } else if (item.type === 'IndexExpression') {
             const { base, index } = item as ASTIndexExpression;
             const property = me.lookupIdentifierOfIndex(index);
-
-            console.log('>>', 'index expr property', property);
 
             if (!property) {
                 return;
@@ -338,14 +333,10 @@ export class LookupHelper {
             if (previous?.type === 'MemberExpression' || previous?.type === 'IndexExpression') {
                 const previousMeta = me.resolveMemberPath(previous, root);
 
-                console.log('>>', 'member', name, previousMeta);
-
                 if (previousMeta) {
                     return previousMeta;
                 }
             } else {
-                console.log('>>', 'simple', name, isNative('General', name));
-
                 if (isNative('General', name)) {
                     return createNativeMeta('General', name) as MetaData;
                 }
@@ -356,16 +347,12 @@ export class LookupHelper {
                 name
             };
 
-            console.log('>>', 'current root', root);
-
             if (!root) {
                 return metaResult;
             }
 
             if (root.type === 'FunctionDeclaration') {
                 const fnBlockMeta = me.lookupMeta({ closest: root, outer: [] }) as FunctionMetaData;
-
-                console.log('>>', 'function scope', fnBlockMeta);
 
                 if (!fnBlockMeta) {
                     return metaResult;
@@ -380,8 +367,6 @@ export class LookupHelper {
             }
 
             const assignments = ASTScraper.findEx((item: ASTBase, level: number) => {
-                console.log('>>', 'search previous assign', item, item.start.line, closest.end.line);
-
                 if (item.start.line > closest.end.line - 1) {
                     return {
                         exit: true
@@ -405,17 +390,11 @@ export class LookupHelper {
                 }
             }, root);
 
-            console.log('>>', 'searching assignments', name, assignments);
-
             for (let assignItem of assignments) {
                 const { init } = assignItem as ASTAssignmentStatement;
                 const initMeta = me.lookupMeta({ closest: init, outer: [root] });
-                console.log('>>', 'init meta', name, initMeta);
                 metaResult = me.resolveReturn(initMeta || metaResult, name);
-                console.log('>>', 'running assign', name, metaResult);
             }
-
-            console.log('>>', 'final assign', name, metaResult);
 
             metaResult.name = name;
 
@@ -428,7 +407,6 @@ export class LookupHelper {
                 name = ASTStringify((previous as ASTAssignmentStatement).variable);
             }
 
-            console.log('>>', 'function dec', closest);
             return createFunctionMeta(name, functionDeclaration.parameters.reduce((result: MetaData[], argItem: ASTBase) => {
                 if (argItem.type === 'Identifier') {
                     const identifierValue = ASTStringify(argItem);
@@ -448,14 +426,17 @@ export class LookupHelper {
                 return result;
             }, []));
         } else if (closest.type === 'StringLiteral') {
-            console.log('>>', 'string literal dec', closest);
             return createLiteralMeta('String', (closest as ASTLiteral).raw.toString());
         } else if (closest.type === 'NumericLiteral') {
-            console.log('>>', 'numeric literal dec', closest);
             return createLiteralMeta('Number', (closest as ASTLiteral).value.toString());
         } else if (closest.type === 'BooleanLiteral') {
-            console.log('>>', 'boolean literal dec', closest);
-            return createLiteralMeta('BooleanLiteral', (closest as ASTLiteral).value.toString());
+            return createLiteralMeta('Boolean', (closest as ASTLiteral).value.toString());
+        } else if (closest.type === 'MapConstructorExpression') {
+            //TODO: full implementation
+            return createLiteralMeta('Map', '{}');
+        } else if (closest.type === 'ListConstructorExpression') {
+            //TODO: full implementation
+            return createLiteralMeta('List', '[]');
         }
     }
 
