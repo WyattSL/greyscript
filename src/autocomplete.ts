@@ -20,14 +20,12 @@ import {
     CompTypes
 } from './grammar';
 import {
-    getHoverData,
-    getOptionsBasedOfPriorCommand,
-    processFunctionParameter
-} from './helper';
-import {
-    ReturnDataType,
-    ArgDataCmd
-} from './types';
+    FunctionMetaData,
+    NativeMetaData,
+    MetaData,
+    LookupHelper,
+    lookupType
+} from './helper/lookup-type';
 
 export function activate(context: ExtensionContext) {
 	const feature = vscode.languages.registerCompletionItemProvider('greyscript', {
@@ -37,8 +35,74 @@ export function activate(context: ExtensionContext) {
             token: CancellationToken,
             ctx: CompletionContext
         ) {
-            if (!vscode.workspace.getConfiguration("greyscript").get("autocomplete")) return;
-            let out = [];
+            if (!vscode.workspace.getConfiguration("greyscript").get("autocomplete")) {
+                return;
+            }
+
+            const lastCharacter = document.getText(new Range(
+                position.translate(0, -1),
+                position
+            ));
+
+            if (lastCharacter === '.') {
+                let itemPosition = position.translate(0, -2);
+                let item = lookupType(document, itemPosition);
+
+                while (!item && itemPosition.character > 0) {
+                    itemPosition = itemPosition.translate(0, -1); 
+                    item = lookupType(document, itemPosition);
+                }
+
+                if (!item) {
+                    return;
+                }
+
+                if (item.type === 'native') {
+                    const returns = item.returns || [];
+
+                    return new CompletionList(
+                        returns.reduce((result: CompletionItem[], returnItem: MetaData) => {
+                            return result.concat(
+                                CompData[returnItem.type]?.map((property: string) => {
+                                    return new CompletionItem(property, CompTypes[property] || CompTypes.default);
+                                }) || []
+                            );
+                        }, [])
+                    );
+                }
+
+                console.log('here', item);
+
+                if (item.type in CompData) {
+                    return new CompletionList(
+                        CompData[item.type].map((property: string) => {
+                            return new CompletionItem(property, CompTypes[property] || CompTypes.default);
+                        })
+                    );
+                }
+            } else {
+                const helper = new LookupHelper(document);
+                const astResult = helper.lookupAST(position);
+
+                if (!astResult) {
+                    return;
+                }
+
+                const item = helper.lookupMeta(astResult);
+
+                if (item && item.type === 'any') {
+                    return new CompletionList(
+                        CompData.General.map((property: string) => {
+                            return new CompletionItem(property, CompTypes[property] || CompTypes.default);
+                        })
+                    );
+                }
+            }
+
+            //let type = CompTypes[c] || CompTypes["default"];
+            
+            
+            /*let out = [];
 
             // Set default options (THIS IS ALSO THE FALLBACK)
             let options = {"General": CompData["General"]};
@@ -169,9 +233,9 @@ export function activate(context: ExtensionContext) {
             }
 
             // Return completion items
-            return new CompletionList(out,true);
+            return new CompletionList(out,true);*/
         }
-    });
+    }, '.');
 
     if (vscode.workspace.getConfiguration("greyscript").get("autocomplete")) {
         context.subscriptions.push(feature);
@@ -182,8 +246,10 @@ export function activate(context: ExtensionContext) {
                 token: CancellationToken,
                 ctx: SignatureHelpContext
             ): ProviderResult<SignatureHelp> {
+                console.log('signature >>');
+                return;
                 // Check if current line is not a function creation
-                const re = RegExp("(\\s|)=(\\s|)function");
+                /*const re = RegExp("(\\s|)=(\\s|)function");
                 const curLine = document.lineAt(position.line);
                 const textTillCharacter = curLine.text.slice(0, position.character);
                 if((ctx.triggerCharacter == "(" && curLine.text.match(re)) || textTillCharacter.lastIndexOf("(") < 1) return;
@@ -269,7 +335,7 @@ export function activate(context: ExtensionContext) {
                 t.signatures.push(info);
 
                 // Return all found signatures
-                return t;
+                return t;*/
             }
         }, ",", "("));
     }

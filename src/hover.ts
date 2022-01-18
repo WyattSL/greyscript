@@ -18,6 +18,8 @@ import {
 function transformMetaToHover(meta: MetaData): Hover {
     const hoverText = new MarkdownString('');
 
+    hoverText.supportHtml = true;
+
     if (meta.type === 'native') {
         const nativeMeta = meta as NativeMetaData;
         const returnValues = nativeMeta.returns
@@ -34,7 +36,16 @@ function transformMetaToHover(meta: MetaData): Hover {
             hoverText.appendCodeblock(`(native) ${nativeMeta.name} (${argValues}): ${returnValues}`);
         }
 
-        hoverText.appendCodeblock(`${nativeMeta.description || 'n/a'}`);
+        hoverText.appendMarkdown('<hr><br>');
+        hoverText.appendMarkdown(`${nativeMeta.description}`);
+
+        if (nativeMeta.examples.length > 0) { 
+            hoverText.appendMarkdown('<br><br><b>Examples:</b><br>');
+
+            nativeMeta.examples.forEach((example: string) => {
+                hoverText.appendCodeblock(example);
+            });
+        }
 
         return new Hover(hoverText);
     } else if (meta.type === 'Function') {

@@ -20,11 +20,10 @@ import {
     ReturnData,
     HoverData,
     CompData,
-    ArgData
+    ArgData,
+    Examples
 } from '../grammar';
 import {
-    ReturnDataType,
-    CompletionDataMap,
     ArgDataCmd
 } from '../types';
 import { getDocumentAST } from './document-manager';
@@ -41,6 +40,7 @@ export interface MetaData {
 export interface NativeMetaData extends MetaData {
     description: string;
     arguments: ArgDataCmd[];
+    examples: string[];
 }
 
 export function isNative(type: string, property: string) {
@@ -58,7 +58,8 @@ export function createNativeMeta(type: string, property: string): NativeMetaData
                 type: item.type,
                 name: null
             };
-        })
+        }),
+        examples: Examples[type]?.[property] || []
     };
 }
 
@@ -257,13 +258,16 @@ export class LookupHelper {
             }
 
             if (base.type === 'MemberExpression' || base.type === 'IndexExpression') {
-                const memberBaseMeta = me.resolveMemberPath(base);
+                const memberBaseMeta = me.resolveMemberPath(base, root);
 
                 if (!memberBaseMeta) {
                     return;
                 }
                 
-                return me.resolveMetaProperty(memberBaseMeta, property);
+                return me.resolveMetaProperty(
+                    me.resolveReturn(memberBaseMeta, property),
+                    property
+                );
             }
 
             const baseMeta = me.lookupMeta({ closest: base, outer: root ? [root] : [] });
@@ -272,7 +276,10 @@ export class LookupHelper {
                 return;
             }
             
-            return me.resolveMetaProperty(baseMeta, property);
+            return me.resolveMetaProperty(
+                me.resolveReturn(baseMeta, property),
+                property
+            );
         } else if (item.type === 'IndexExpression') {
             const { base, index } = item as ASTIndexExpression;
             const property = me.lookupIdentifierOfIndex(index);
@@ -399,6 +406,9 @@ export class LookupHelper {
             metaResult.name = name;
 
             return metaResult;
+        } else if (closest.type === 'MemberExpression' || closest.type === 'IndexExpression') {
+            const root = me.lookupScope(outer);
+            return me.resolveMemberPath(closest, root);
         } else if (closest.type === 'FunctionDeclaration') {
             const functionDeclaration = closest as ASTFunctionStatement;
             let name = null;
@@ -437,6 +447,13 @@ export class LookupHelper {
         } else if (closest.type === 'ListConstructorExpression') {
             //TODO: full implementation
             return createLiteralMeta('List', '[]');
+        } else if (closest.type === 'CallStatement') {
+            const { expression } = closest as ASTCallStatement;
+            return me.lookupMeta({ closest: expression, outer })
+        } else if (closest.type === 'CallExpression') {
+            const { base } = closest as ASTCallExpression;
+            const newOuter = outer.concat([closest]);
+            return me.lookupMeta({ closest: base, outer: newOuter })
         }
     }
 
