@@ -47,18 +47,22 @@ export function activate(context: ExtensionContext) {
             ));
 
             if (lastCharacter === '.') {
-                let itemPosition = position.translate(0, -1);
-                let item = lookupType(document, itemPosition);
+                //if triggering character is dot
+                const itemPosition = position.translate(0, -1);
+                const helper = new LookupHelper(document);
+                const astResult = helper.lookupAST(itemPosition);
 
-                while (!item && itemPosition.character > 0) {
-                    itemPosition = itemPosition.translate(0, -1); 
-                    item = lookupType(document, itemPosition);
+                if (!astResult) {
+                    return;
                 }
+
+                const item = helper.lookupMeta(astResult);
 
                 if (!item) {
                     return;
                 }
 
+                //in case item type is native returns it's completion data
                 if (item.type === 'native') {
                     const returns = item.returns || [];
 
@@ -73,6 +77,7 @@ export function activate(context: ExtensionContext) {
                     );
                 }
 
+                //try to resolve completion data by type
                 if (item.type in CompData) {
                     return new CompletionList(
                         CompData[item.type].map((property: string) => {

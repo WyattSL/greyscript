@@ -149,6 +149,7 @@ export class LookupHelper {
     }
 
     lookupScope(outer: LookupOuter): ASTBase | undefined {
+        //lookup closest wrapping scope
         for (let index = outer.length - 1; index >= 0; index--) {
             const type = outer[index]?.type;
 
@@ -224,7 +225,9 @@ export class LookupHelper {
     }
 
     lookupIdentifier(root: ASTBase): string | undefined {
+        //non greey identifier to string method; can be used instead of ASTStringify
         const me = this;
+
         if (root.type === 'CallStatement') {
             return me.lookupIdentifier((root as ASTCallStatement).expression);
         } else if (root.type === 'CallExpression') {
@@ -241,6 +244,7 @@ export class LookupHelper {
     }
 
     resolveReturn(metaItem: MetaData, name: string | null = null): MetaData {
+        //transform signature of possible previous context meta
         if (metaItem.type === 'native') {
             const type = metaItem.returns?.[0]?.type || 'any';
             return {
@@ -275,6 +279,7 @@ export class LookupHelper {
         const me = this;
 
         if (item.type === 'MemberExpression') {
+            //try to resolve member expression
             const { base, identifier } = item as ASTMemberExpression;
             const property = me.lookupIdentifier(identifier);
 
@@ -283,6 +288,7 @@ export class LookupHelper {
             }
 
             if (base.type === 'MemberExpression' || base.type === 'IndexExpression') {
+                //do recursive execution if parent is member or index expression as well
                 const memberBaseMeta = me.resolveMemberPath(base, root);
 
                 if (!memberBaseMeta) {
@@ -306,6 +312,7 @@ export class LookupHelper {
                 property
             );
         } else if (item.type === 'IndexExpression') {
+            //try to resolve index expression
             const { base, index } = item as ASTIndexExpression;
             const property = me.lookupIdentifierOfIndex(index);
 
@@ -314,6 +321,7 @@ export class LookupHelper {
             }
 
             if (base.type === 'MemberExpression' || base.type === 'IndexExpression') {
+                //do recursive execution if parent is member or index expression as well
                 const baseMeta = me.resolveMemberPath(base);
 
                 if (baseMeta) {
@@ -330,6 +338,7 @@ export class LookupHelper {
             return me.resolveMetaProperty(baseMeta, property);
         }
 
+        //point back to lookup meta in case member path is completly resolved
         return me.resolveReturn(
             me.lookupMeta({ closest: item, outer: root ? [root] : [] }) ||
             {
@@ -348,6 +357,7 @@ export class LookupHelper {
             const root = me.lookupScope(outer);
 
             if (previous?.type === 'AssignmentStatement') {
+                //if identifier is left hand in assignment then resolve right instead
                 const { variable, init } = previous as ASTAssignmentStatement;
 
                 if (
@@ -362,18 +372,46 @@ export class LookupHelper {
                 }
             }
 
-            if (previous?.type === 'MemberExpression' || previous?.type === 'IndexExpression') {
-                const previousMeta = me.resolveMemberPath(previous, root);
+            if (previous?.type === 'MemberExpression') {
+                //resolve previous member expression
+                const memberExpression = previous as ASTMemberExpression;
 
-                if (previousMeta) {
-                    return previousMeta;
+                if (memberExpression.identifier.type === 'InvalidCodeExpression') {
+                    return me.lookupMeta({
+                        closest: memberExpression.base,
+                        outer: outer.slice(0, outer.length - 1)
+                    });
+                } else {
+                    const previousMeta = me.resolveMemberPath(memberExpression, root);
+
+                    if (previousMeta) {
+                        return previousMeta;
+                    }
+                } 
+            } else if (previous?.type === 'IndexExpression') {
+                //resolve previous index expression
+                const memberExpression = previous as ASTIndexExpression;
+
+                if (memberExpression.index.type === 'InvalidCodeExpression') {
+                    return me.lookupMeta({
+                        closest: memberExpression.base,
+                        outer: outer.slice(0, outer.length - 1)
+                    });
+                } else {
+                    const previousMeta = me.resolveMemberPath(memberExpression, root);
+
+                    if (previousMeta) {
+                        return previousMeta;
+                    }
                 }
             } else {
+                //resolve default expression
                 if (isNative('General', name)) {
                     return createNativeMeta('General', name) as MetaData;
                 }
             }
 
+            //trying to resolve variable type in current scope
             let metaResult: MetaData = {
                 type: 'any',
                 name
@@ -398,6 +436,7 @@ export class LookupHelper {
                 }
             }
 
+            //gather all available assignments in scope with certain namespace
             const assignments = ASTScraper.findEx((item: ASTBase, level: number) => {
                 if (item.start.line > closest.end.line - 1) {
                     return {
@@ -438,6 +477,7 @@ export class LookupHelper {
             const functionDeclaration = closest as ASTFunctionStatement;
             let name = null;
 
+            //lookup left hand assigment identifer if available to get function namespace
             if (previous?.type === 'AssignmentStatement') {
                 name = ASTStringify((previous as ASTAssignmentStatement).variable);
             }
