@@ -105,7 +105,7 @@ function createSetContentLine(): string {
 }
 
 function createImportList(parseResult: TranspilerParseResult, mainTarget: string): any[] {
-	const pseudoRoot = vscode.workspace.rootPath || '';
+	const pseudoRoot = path.dirname(mainTarget) || '';
 	const list = [{
 		filepath: mainTarget,
 		pseudoFilepath: path.basename(mainTarget),
@@ -209,6 +209,7 @@ export function activate(context: ExtensionContext) {
         const rootPath = vscode.workspace.rootPath;
         const buildPath = path.resolve(rootPath, './build');
         const buildUri = Uri.file(buildPath);
+		const targetRoot = path.dirname(target);
 
         try {
             await vscode.workspace.fs.delete(buildUri, { recursive: true });
@@ -219,13 +220,15 @@ export function activate(context: ExtensionContext) {
         await vscode.workspace.fs.createDirectory(buildUri);
 
         Object.entries(result).forEach(([file, code]) => {
-            const relativePath = file.replace(new RegExp("^" + rootPath), '.');
+            const relativePath = file.replace(new RegExp("^" + targetRoot), '.');
             const fullPath = path.resolve(buildPath, relativePath);
             const targetUri = Uri.file(fullPath);
             vscode.workspace.fs.writeFile(targetUri, new TextEncoder().encode(code));
         });
 
-        createInstaller(result, target, 75000);
+		if (config.get("installer")) {
+			createInstaller(result, target, 75000);
+		}
 	}
 
 	context.subscriptions.push(vscode.commands.registerTextEditorCommand("greyscript.build", build));

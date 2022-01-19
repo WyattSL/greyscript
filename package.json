@@ -89,6 +89,23 @@
                     "group": "navigation"
                 }
             ],
+            "explorer/context": [
+                {
+                    "command": "greyscript.minify",
+                    "when": "resourceLangId == greyscript",
+                    "group": "navigation"
+                },
+                {
+                    "command": "greyscript.build",
+                    "when": "resourceLangId == greyscript",
+                    "group": "navigation"
+                },
+                {
+                    "command": "greyscript.gotoError",
+                    "when": "resourceLangId == greyscript",
+                    "group": "navigation"
+                }
+            ],
             "commandPalette": [
                 {
                     "command": "greyscript.debug.debugEditorContents",
@@ -193,6 +210,11 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Disable namespaces optimization."
+                },
+                "greyscript.installer": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Generate installer when building."
                 }
             }
         },
