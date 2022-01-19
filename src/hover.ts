@@ -51,7 +51,7 @@ function transformMetaToHover(meta: MetaData): Hover {
     } else if (meta.type === 'Function') {
         const fnMeta = meta as FunctionMetaData;
         const argValues = fnMeta.arguments.map((argMeta) => {
-            return `${argMeta.name}:${argMeta.type}`;
+            return `${argMeta.name}: ${argMeta.type}`;
         });
         
         if (meta.name) {

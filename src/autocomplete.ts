@@ -156,18 +156,15 @@ export function activate(context: ExtensionContext) {
             //figure out argument position
             let selectedIndex = 0;
 
-            //TODO Bug: doesn't work on custom functions
-            if (rootCallExpression.type !== astResult.closest.type) {
-                for (let index = 0; index < rootCallExpression.arguments.length; index++) {
-                    const argItem = rootCallExpression.arguments[index];
+            for (let index = 0; index < rootCallExpression.arguments.length; index++) {
+                const argItem = rootCallExpression.arguments[index];
 
-                    if (
-                        argItem.start.character <= astResult.closest.start.character &&
-                        argItem.end.character >= astResult.closest.end.character
-                    ) {
-                        selectedIndex = index;
-                        break;
-                    }
+                if (
+                    (argItem.start.character - 1) <= position.character &&
+                    (argItem.end.character - 1) >= position.character
+                ) {
+                    selectedIndex = index;
+                    break;
                 }
             }
 
@@ -203,11 +200,13 @@ export function activate(context: ExtensionContext) {
                 signatureHelp.signatures = [];
                 signatureHelp.activeSignature = 0;
 
-                const argValues = fnMeta.arguments.map((argMeta) => {
-                    return `${argMeta.name}:${argMeta.type}`;
-                });
+                const argValues = fnMeta.arguments
+                    .map((argMeta) => {
+                        return `${argMeta.name}: ${argMeta.type}`;
+                    })
+                    .join(', ');
 
-                const signatureInfo = new SignatureInformation(`(native) ${fnMeta.name} (${argValues}): any`);
+                const signatureInfo = new SignatureInformation(`(function) ${fnMeta.name} (${argValues}): any`);
 
                 for (let argItem of fnMeta.arguments) {
                     const paramInfo = new ParameterInformation(`${argItem.name}: ${argItem.type}`);
