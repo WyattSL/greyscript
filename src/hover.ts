@@ -1,3 +1,8 @@
+import {
+    ASTImportCodeExpression,
+    ASTFeatureImportExpression,
+    ASTLiteral
+} from 'greybel-core';
 import vscode, {
     ExtensionContext,
     TextDocument,
@@ -6,46 +11,56 @@ import vscode, {
     Range,
     Hover,
     MarkdownString,
-    ProviderResult
+    ProviderResult,
+    Uri
 } from 'vscode';
 import {
     FunctionMetaData,
     NativeMetaData,
     MetaData,
-    lookupType
+    lookupType,
+    LookupHelper
 } from './helper/lookup-type';
+import path from 'path';
 
 function transformMetaToHover(meta: MetaData): Hover {
     const hoverText = new MarkdownString('');
-
-    hoverText.supportHtml = true;
 
     if (meta.type === 'native') {
         const nativeMeta = meta as NativeMetaData;
         const returnValues = nativeMeta.returns
             ?.map((item) => item.type)
             ?.join(' or ') || 'null';
+        let headline;
 
         if (nativeMeta.arguments.length === 0) {
-            hoverText.appendCodeblock(`(native) ${nativeMeta.name}: ${returnValues}`);
+            headline = `(native) ${nativeMeta.name}: ${returnValues}`;
         } else {
             const argValues = nativeMeta.arguments
                 .map((item) => `${item.name}${item.optional ? '?' : ''}: ${item.type}`)
                 .join(', ');
 
-            hoverText.appendCodeblock(`(native) ${nativeMeta.name} (${argValues}): ${returnValues}`);
+            headline = `(native) ${nativeMeta.name} (${argValues}): ${returnValues}`;
         }
 
-        hoverText.appendMarkdown('<hr><br>');
-        hoverText.appendMarkdown(`${nativeMeta.description}`);
+        const output = [
+            '```',
+            headline,
+            '```',
+            '***',
+            nativeMeta.description
+        ];
 
-        if (nativeMeta.examples.length > 0) { 
-            hoverText.appendMarkdown('<br><br><b>Examples:</b><br>');
-
-            nativeMeta.examples.forEach((example: string) => {
-                hoverText.appendCodeblock(example);
-            });
+        if (nativeMeta.examples.length > 0) {
+            output.push(...[
+                '#### Examples:',
+                '```',
+                ...nativeMeta.examples,
+                '```'
+            ]);
         }
+
+        hoverText.appendMarkdown(output.join('\n'));
 
         return new Hover(hoverText);
     } else if (meta.type === 'Function') {
@@ -81,9 +96,80 @@ export function activate(context: ExtensionContext) {
             	return;
             }
 
-            const meta = lookupType(document, position);
+            const helper = new LookupHelper(document);
+            const astResult = helper.lookupAST(position);
+
+            if (!astResult) {
+                return;
+            }
+
+            const meta = helper.lookupMeta(astResult);
 
             if (!meta) {
+                if (astResult.closest.type === 'ImportCodeExpression') {
+                    //shows link to importCode resource
+                    const hoverText = new MarkdownString('');
+                    const importAst = astResult.closest as ASTImportCodeExpression;
+                    const gameDir = importAst.gameDirectory as ASTLiteral;
+                    const fileDir = importAst.fileSystemDirectory as ASTLiteral;
+                    let output = [];
+
+                    if (fileDir) {
+                        const rootDir = path.dirname(document.fileName);
+                        const target = path.resolve(rootDir, fileDir.value.toString());
+                        const uri = Uri.file(target);
+
+                        output = [
+                            `[Imports file "${path.basename(target)}" inside this code](${uri.toString()})`,
+                            '***',
+                            'Click the link above to open the file.',
+                            '',
+                            'Use the build command to create an installer',
+                            'file which will bundle all dependencies.'
+                        ];
+                    } else {
+                        output = [
+                            `Imports game file "${gameDir.value}" inside this code`,
+                            '***',
+                            'WARNING: There is no actual file path',
+                            'therefore this will be ignored while building.',
+                            '',
+                            'Following example shows how to enable inclusion when building.',
+                            '',
+                            '**Example:**',
+                            '```',
+                            'import_code("/ingame/path":"/relative/physical/path")',
+                            '```'
+                        ];
+                    }
+
+                    hoverText.appendMarkdown(output.join('\n'));
+
+                    return new Hover(hoverText);
+                } else if (
+                    astResult.closest.type === 'FeatureImportExpression' ||
+                    astResult.closest.type === 'FeatureIncludeExpression'
+                ) {
+                    //shows link to import/include resource
+                    const hoverText = new MarkdownString('');
+                    const importCodeAst = astResult.closest as ASTFeatureImportExpression;
+                    const fileDir = importCodeAst.path;
+
+                    const rootDir = path.dirname(document.fileName);
+                    const target = path.resolve(rootDir, fileDir);
+                    const uri = Uri.file(target);
+
+                    const output = [
+                        `[Inserts file "${path.basename(target)}" inside this code when building](${uri.toString()})`,
+                        '***',
+                        'Click the link above to open the file.'
+                    ];
+
+                    hoverText.appendMarkdown(output.join('\n'));
+
+                    return new Hover(hoverText);
+                }
+
                 return;
             }
 

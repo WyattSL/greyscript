@@ -8,6 +8,7 @@ import vscode, {
     DebugConfiguration
 } from 'vscode';
 import { GreybelDebugSession } from './session';
+import path from 'path';
 
 export function activate(context: ExtensionContext, factory?: DebugAdapterDescriptorFactory) {
 	context.subscriptions.push(
@@ -43,11 +44,24 @@ export function activate(context: ExtensionContext, factory?: DebugAdapterDescri
 		})
 	);
 
-	context.subscriptions.push(vscode.commands.registerCommand('greyscript.debug.getProgramName', config => {
-		return vscode.window.showInputBox({
+	context.subscriptions.push(vscode.commands.registerCommand('greyscript.debug.getProgramName', async (config) => {
+		const target = vscode.window.activeTextEditor?.document.uri.fsPath;
+
+		if (target) {
+			return target;
+		}
+
+		const rootPath = vscode.workspace.rootPath || 'unknown';
+		const value = await vscode.window.showInputBox({
 			placeHolder: "Please enter the name of a src file in the workspace folder",
 			value: "test.src"
 		});
+
+		if (!value) {
+			return;
+		}
+
+		return path.resolve(rootPath, value);
 	}));
 
 	// register a configuration provider for 'mock' debug type

@@ -142,6 +142,7 @@ export class GreybelDebugSession extends LoggingDebugSession {
 			await me._runtime.digest();
 			me.sendResponse(response);
 		} catch (err: any) {
+			console.error(err);
 			me.sendErrorResponse(response, {
 				id: 1001,
 				format: err.message,
@@ -178,7 +179,7 @@ export class GreybelDebugSession extends LoggingDebugSession {
 		try {
 			await this._runtime.exit();
 		} catch (err: any) {
-			console.warn(err.message);
+			console.warn(`WARNING: ${err.message}`);
 		}
 
 		this.sendResponse(response);
@@ -210,17 +211,21 @@ export class GreybelDebugSession extends LoggingDebugSession {
 		let index = 0;
 		let current = last;
 
-		while (current && current.stackItem) {
+		while (current) {
 			const stackItem = current.stackItem;
-			const stackFrame: IRuntimeStackFrame = {
-				index: index++,
-				name: stackItem.type,	// use a word of the line as the stackframe name
-				file: current.target,
-				line: stackItem.start.line,
-				column: stackItem.start.character
-			};
 
-			frames.push(stackFrame);
+			if (stackItem) {
+				const stackFrame: IRuntimeStackFrame = {
+					index: index++,
+					name: stackItem.type,	// use a word of the line as the stackframe name
+					file: current.target,
+					line: stackItem.start.line,
+					column: stackItem.start.character
+				};
+
+				frames.push(stackFrame);
+			}
+
 			current = current.previous;
 		}
 

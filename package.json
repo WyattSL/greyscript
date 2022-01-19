@@ -241,7 +241,7 @@
                             "program": {
                                 "type": "string",
                                 "description": "Absolute path to a text file.",
-                                "default": "${workspaceFolder}/${command:AskForProgramName}"
+                                "default": "${command:AskForProgramName}"
                             }
                         }
                     }
@@ -251,7 +251,7 @@
                         "type": "greyscript",
                         "request": "launch",
                         "name": "Ask for file name",
-                        "program": "${workspaceFolder}/${command:AskForProgramName}"
+                        "program": "${command:AskForProgramName}"
                     }
                 ],
                 "configurationSnippets": [
@@ -262,7 +262,7 @@
                             "type": "greyscript",
                             "request": "launch",
                             "name": "Ask for file name",
-                            "program": "^\"\\${workspaceFolder}/\\${command:AskForProgramName}\""
+                            "program": "^\"\\${command:AskForProgramName}\""
                         }
                     }
                 ],
@@ -274,10 +274,11 @@
     },
     "dependencies": {
         "greybel-core": "^0.1.9",
-        "greybel-interpreter": "^0.4.4",
-        "greybel-intrinsics": "^0.3.3",
+        "greybel-interpreter": "^0.4.5",
+        "greybel-intrinsics": "^0.3.4",
         "greybel-transpiler": "^0.1.8",
         "greyscript-core": "^0.1.7",
         "text-encoder-lite": "^2.0.0"
-    }
+    },
+    "browserslist": "> 0.25%, not dead"
 }
