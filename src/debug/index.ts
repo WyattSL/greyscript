@@ -37,8 +37,7 @@ export function activate(context: ExtensionContext, factory?: DebugAdapterDescri
 					type: 'greyscript',
 					name: 'Debug File',
 					request: 'launch',
-					program: targetResource.fsPath,
-					stopOnEntry: true
+					program: targetResource.fsPath
 				});
 			}
 		})
@@ -46,8 +45,8 @@ export function activate(context: ExtensionContext, factory?: DebugAdapterDescri
 
 	context.subscriptions.push(vscode.commands.registerCommand('greyscript.debug.getProgramName', config => {
 		return vscode.window.showInputBox({
-			placeHolder: "Please enter the name of a markdown file in the workspace folder",
-			value: "readme.md"
+			placeHolder: "Please enter the name of a src file in the workspace folder",
+			value: "test.src"
 		});
 	}));
 

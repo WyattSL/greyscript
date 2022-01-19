@@ -252,8 +252,8 @@
     },
     "dependencies": {
         "greybel-core": "^0.1.9",
-        "greybel-interpreter": "^0.3.0",
-        "greybel-intrinsics": "^0.2.0",
+        "greybel-interpreter": "^0.4.4",
+        "greybel-intrinsics": "^0.3.3",
         "greybel-transpiler": "^0.1.8",
         "greyscript-core": "^0.1.7",
         "text-encoder-lite": "^2.0.0"

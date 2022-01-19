@@ -7,16 +7,31 @@ import {
 	Thread,
 	Breakpoint,
 	BreakpointEvent,
-	Source
+	Source,
+	StackFrame
 } from '@vscode/debugadapter';
 import { DebugProtocol } from '@vscode/debugprotocol';
 import { Interpreter, CustomType, Debugger, OperationContext, ContextType } from 'greybel-interpreter';
 import { InterpreterResourceProvider } from '../resource';
 import { init as initIntrinsics } from 'greybel-intrinsics';
+import path from 'path';
 
 interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 	program: string;
 	noDebug?: boolean;
+}
+
+interface IRuntimeStackFrame {
+	index: number;
+	name: string;
+	file: string;
+	line: number;
+	column?: number;
+}
+
+interface IRuntimeStack {
+	count: number;
+	frames: IRuntimeStackFrame[];
 }
 
 export class GreybelDebugSession extends LoggingDebugSession {
@@ -24,15 +39,29 @@ export class GreybelDebugSession extends LoggingDebugSession {
 	public lastContext: OperationContext | undefined;
 	public breakpoints: Map<string, DebugProtocol.Breakpoint[]> = new Map();
 
-	private _runtime: Interpreter | undefined;
+	private _runtime: Interpreter;
 	private _breakpointIncrement: number = 0;
 
 	public constructor() {
 		super("greybel-debug.txt");
 
 		// this debugger uses zero-based lines and columns
-		this.setDebuggerLinesStartAt1(false);
-		this.setDebuggerColumnsStartAt1(false);
+		const me = this;
+		const vsAPI = new Map();
+
+		vsAPI.set('print', (customValue: CustomType): void => {
+            const e: DebugProtocol.OutputEvent = new OutputEvent(`${customValue.toString()}\n`);
+			me.sendEvent(e);
+        });
+
+		me.setDebuggerLinesStartAt1(false);
+		me.setDebuggerColumnsStartAt1(false);
+
+		this._runtime = new Interpreter({
+            resourceHandler: new InterpreterResourceProvider().getHandler(),
+			debugger: new GrebyelDebugger(me),
+			api: initIntrinsics(vsAPI)
+		});
 	}
 
 	/**
@@ -100,19 +129,13 @@ export class GreybelDebugSession extends LoggingDebugSession {
 
 	protected async launchRequest(response: DebugProtocol.LaunchResponse, args: ILaunchRequestArguments) {
 		const me = this;
-		const vsAPI = new Map();
-
-		vsAPI.set('print', (customValue: CustomType): void => {
-            const e: DebugProtocol.OutputEvent = new OutputEvent(`${customValue.toString()}\n`);
-			me.sendEvent(e);
-        });
 		
-		me._runtime = new Interpreter({
-			target: args.program,
-			api: initIntrinsics(vsAPI),
-            resourceHandler: new InterpreterResourceProvider().getHandler(),
-			debugger: args.noDebug ? new GrebyelPseudoDebugger() : new GrebyelDebugger(me)
-		});
+		me._runtime.setTarget(args.program);
+		me._runtime.setDebugger(
+			args.noDebug 
+				? new GrebyelPseudoDebugger()
+				: new GrebyelDebugger(me)
+		);
 
 		// start the program in the runtime
 		try {
@@ -140,25 +163,31 @@ export class GreybelDebugSession extends LoggingDebugSession {
 	}
 
 	protected continueRequest(response: DebugProtocol.ContinueResponse, args: DebugProtocol.ContinueArguments): void {
-		this._runtime?.context?.debugger.setBreakpoint(false);
+		this._runtime.debugger.setBreakpoint(false);
 		this.sendResponse(response);
 	}
 
 	protected nextRequest(response: DebugProtocol.NextResponse, args: DebugProtocol.NextArguments): void {
-		this._runtime?.context?.debugger.next();
+		this._runtime.debugger.next();
 		this.sendResponse(response);
 	}
 
-	protected disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments, request?: DebugProtocol.Request): void {
-		this._runtime?.context?.debugger.setBreakpoint(false);
-		this._runtime?.exit();
+	protected async disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments, request?: DebugProtocol.Request): Promise<void> {
+		this._runtime.debugger.setBreakpoint(false);
+
+		try {
+			await this._runtime.exit();
+		} catch (err: any) {
+			console.warn(err.message);
+		}
+
 		this.sendResponse(response);
 		this.shutdown();
 	}
 
 	protected async evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): Promise<void> {
 		try {
-			await this._runtime?.context?.debugger.run(args.expression);
+			await this._runtime.injectInLastContext(args.expression);
 
 			response.body = {
 				result: `Execution of ${args.expression} was successful.`,
@@ -171,6 +200,58 @@ export class GreybelDebugSession extends LoggingDebugSession {
 			};
 		}
 
+		this.sendResponse(response);
+	}
+
+	public getStack(): IRuntimeStack {
+		const me = this;
+		const frames: IRuntimeStackFrame[] = [];
+		const last = me._runtime.apiContext.getLastActive();
+		let index = 0;
+		let current = last;
+
+		while (current && current.stackItem) {
+			const stackItem = current.stackItem;
+			const stackFrame: IRuntimeStackFrame = {
+				index: index++,
+				name: stackItem.type,	// use a word of the line as the stackframe name
+				file: current.target,
+				line: stackItem.start.line,
+				column: stackItem.start.character
+			};
+
+			frames.push(stackFrame);
+			current = current.previous;
+		}
+
+		return {
+			frames: frames,
+			count: frames.length
+		};
+	}
+
+	protected stackTraceRequest(response: DebugProtocol.StackTraceResponse, args: DebugProtocol.StackTraceArguments): void {
+		const me = this;
+		const stk = me.getStack();
+
+		response.body = {
+			stackFrames: stk.frames.map((f, ix) => {
+				const sf: DebugProtocol.StackFrame = new StackFrame(
+					f.index,
+					f.name,
+					new Source(path.basename(f.file), f.file),
+					f.line,
+					f.column
+				);
+
+				return sf;
+			}),
+			// 4 options for 'totalFrames':
+			//omit totalFrames property: 	// VS Code has to probe/guess. Should result in a max. of two requests
+			totalFrames: stk.count			// stk.count is the correct size, should result in a max. of two requests
+			//totalFrames: 1000000 			// not the correct size, should result in a max. of two requests
+			//totalFrames: endFrame + 20 	// dynamically increases the size with every requested chunk, results in paging
+		};
 		this.sendResponse(response);
 	}
 
@@ -236,13 +317,9 @@ class GrebyelDebugger extends Debugger {
 	}
 
 	getBreakpoint(operationContext: OperationContext): boolean {
-		if (operationContext.type === ContextType.INJECTION) {
-			return false;
-		}
-
 		const breakpoints = this.session.breakpoints.get(operationContext.target) || [];
 		const actualBreakpoint = breakpoints.find((bp: DebugProtocol.Breakpoint) => {
-			return bp.line === operationContext.line;
+			return bp.line === operationContext.stackItem?.start.line;
 		}) as DebugProtocol.Breakpoint;
 
 		if (actualBreakpoint) {
