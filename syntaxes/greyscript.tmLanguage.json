@@ -20,7 +20,11 @@
 			"patterns": [
 				{
 					"name": "keyword.control.greyscript",
-					"match": "\\b(if|while|for|function|then|return|end if|end for|end while|end function|else|and|or|in|not|continue|break|new|null|#import|#include)\\b"
+					"match": "\\b(if|while|for|function|then|return|end if|end for|end while|end function|else|and|or|in|not|continue|break|new|null)\\b"
+				},
+				{
+					"name": "keyword.control.greyscript",
+					"match": "#(include|import) [^;]+;"
 				},
 				{
 					"name": "support.class",

@@ -107,7 +107,7 @@ export class LookupHelper {
         }
 
         const identifier = ASTScraper.findEx((item: ASTBase, level: number) => {
-            if (item.type === 'FunctionDeclaration') {
+            if (item.type === 'FunctionDeclaration' && level > 0) {
                 return {
                     skip: true
                 };
@@ -131,7 +131,7 @@ export class LookupHelper {
                 };
             }
 
-            if (item.type === 'FunctionDeclaration') {
+            if (item.type === 'FunctionDeclaration' && level > 0) {
                 return {
                     skip: true
                 };
@@ -444,7 +444,7 @@ export class LookupHelper {
                     };
                 }
 
-                if (item.type === 'FunctionDeclaration') {
+                if (item.type === 'FunctionDeclaration' && level > 0) {
                     return {
                         skip: true
                     };

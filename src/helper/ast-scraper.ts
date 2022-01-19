@@ -198,7 +198,7 @@ class ScraperWalker {
 		const next = me.map[o.type];
 
 		if (next != null) {
-			next.call(me, o, level++);
+			next.call(me, o, level + 1);
 		}
 	}
 }

@@ -34,7 +34,8 @@ const options = {
                     "regenerator": true
                 }]
             ]
-        })
+        }),
+        terser()
     ],
     external: ['vscode']
 };

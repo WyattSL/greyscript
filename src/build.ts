@@ -199,7 +199,7 @@ export function activate(context: ExtensionContext) {
             resourceHandler: new TranspilerResourceProvider().getHandler(),
             uglify: config.get("transpiler.uglify"),
             disableLiteralsOptimization: config.get("transpiler.dlo"),
-            disableNamespacesOptimization: config.get("transpiler.dno")
+            disableNamespacesOptimization: !config.get("transpiler.dno")
         }).parse());
 
         if (!vscode.workspace.rootPath) {
