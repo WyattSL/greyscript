@@ -47,7 +47,7 @@ export function activate(context: ExtensionContext) {
             ));
 
             if (lastCharacter === '.') {
-                let itemPosition = position.translate(0, -2);
+                let itemPosition = position.translate(0, -1);
                 let item = lookupType(document, itemPosition);
 
                 while (!item && itemPosition.character > 0) {
@@ -88,15 +88,27 @@ export function activate(context: ExtensionContext) {
                     return;
                 }
 
+                const result = [];
+                
+                //get all available identifier
+                result.push(
+                    ...helper.findAllAvailableIdentifier(astResult.outer).map((property: string) => {
+                        return new CompletionItem(property, CompTypes[property] || CompTypes.default);
+                    })
+                );
+
                 const item = helper.lookupMeta(astResult);
 
+                //get general items
                 if (item && item.type === 'any') {
-                    return new CompletionList(
-                        CompData.General.map((property: string) => {
+                    result.push(
+                        ...CompData.General.map((property: string) => {
                             return new CompletionItem(property, CompTypes[property] || CompTypes.default);
                         })
                     );
                 }
+
+                return new CompletionList(result);
             }
         }
     }, '.');
@@ -144,6 +156,7 @@ export function activate(context: ExtensionContext) {
             //figure out argument position
             let selectedIndex = 0;
 
+            //TODO Bug: doesn't work on custom functions
             if (rootCallExpression.type !== astResult.closest.type) {
                 for (let index = 0; index < rootCallExpression.arguments.length; index++) {
                     const argItem = rootCallExpression.arguments[index];

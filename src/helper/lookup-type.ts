@@ -98,6 +98,31 @@ export class LookupHelper {
         this.document = document;
     }
 
+    findAllAvailableIdentifier(outer: LookupOuter): string[] {
+        const me = this;
+        const root = me.lookupScope(outer);
+
+        if (!root) {
+            return [];
+        }
+
+        const identifier = ASTScraper.findEx((item: ASTBase, level: number) => {
+            if (item.type === 'FunctionDeclaration') {
+                return {
+                    skip: true
+                };
+            } else if (item.type === 'AssignmentStatement') {
+                return {
+                    valid: true
+                };
+            }
+        }, root);
+
+        return identifier.map((item: ASTBase) => {
+            return ASTStringify((item as ASTAssignmentStatement).variable)
+        });
+    }
+
     findAllAssignmentsOfIdentifier(identifier: string, root: ASTBase, end?: Position): ASTBase[] {
         return ASTScraper.findEx((item: ASTBase, level: number) => {
             if (end && item.end.line - 1 >= end.line) {
