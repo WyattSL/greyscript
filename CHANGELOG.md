@@ -1,3 +1,16 @@
+# 2.0.0
+- autocompletion overhaul
+- hover overhaul
+- diagnostics overhaul
+- next-error command overhaul
+- minify command overhaul
+- added build command
+- added interpreter
+- added debugger
+- added typescript
+- replace webpack with rollup for browser extension
+- added test launch.json for extension
+
 # 1.8.1
 - Fix matching patterns for keywords.
 - Add support for `File.allow_import`
