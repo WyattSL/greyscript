@@ -7,9 +7,20 @@ Greyscript's syntax highlighting (*should*) automatically activate if you edit a
 
 To use commands, press CTRL+SHIFT+P to view the command bar, and enter `Greyscript:`.
 
-Greyscript has a `Goto Error` command, which *should* be able to take the error line given from a program, and translate it to the actual line. Grey Hack has (*or had?*) a known bug where the line given would sometimes be off by an amount, due to certain circumstances.
+## Features
 
-Greyscript also has a `Minify` command, which *should* able to minify the current file.
+* `Goto Error` command: will highlight the next existing syntax error
+* `Minify` command: will minify current file
+* `Build` command: will build your files and put them into a `build` folder. It's also able to minfiy and bundle your files.
+* `Interpreger` which enables you to execute code (only MiniScript intrinsics are supported for now)
+* `Debugger` which enables you to set breakpoints, run code in a breakpoint context, jump to the next line of execution etc.
+* `Autocompletion` which figures out the current context and tries to give suggestions accordingly
+* `Hover Tooltips` which give you informations about functions/types
+* `Diagnostics` which give you information about syntax errors or invalid encryption methods in the Encode/Decode context
 
 ## Settings
 If you decide that you do not like some of the awesome features provided by the extension, you may disable certain aspects in the [settings menu](https://code.visualstudio.com/docs/getstarted/settings) of Visual Studio Code.
+
+## Todo
+
+* Add `Grey Hack` intrinsics

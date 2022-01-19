@@ -1,4 +1,3 @@
-.vscode/*
 *.vsix
 npm-debug.log
 out/*
