@@ -51,7 +51,21 @@ export function activate(context: ExtensionContext, factory?: DebugAdapterDescri
 			return target;
 		}
 
-		const rootPath = vscode.workspace.rootPath || 'unknown';
+		const rootPath = vscode.workspace.rootPath;
+
+		if (!rootPath) {
+			const value = await vscode.window.showInputBox({
+				placeHolder: "Please enter the full file path",
+				value: "test.src"
+			});
+	
+			if (!value) {
+				return;
+			}
+
+			return value;
+		}
+
 		const value = await vscode.window.showInputBox({
 			placeHolder: "Please enter the name of a src file in the workspace folder",
 			value: "test.src"
