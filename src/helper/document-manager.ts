@@ -18,6 +18,11 @@ export function createDocumentAST(document: TextDocument): { chunk: ASTBase, err
     };
 }
 
+export function clearDocumentAST(document: TextDocument): void {
+    activeDocumentASTMap.delete(document.fileName);
+    lastErrorsMap.delete(document.fileName);
+}
+
 export function getLastDocumentASTErrors(document: TextDocument): Error[] {
     return lastErrorsMap.get(document.fileName) || createDocumentAST(document).errors;
 }

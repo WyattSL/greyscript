@@ -16,7 +16,12 @@ import {
     ASTChunk
 } from 'greybel-core';
 import * as ASTScraper from './helper/ast-scraper';
-import { createDocumentAST, getDocumentAST, getLastDocumentASTErrors } from './helper/document-manager';
+import {
+    createDocumentAST,
+    getDocumentAST,
+    getLastDocumentASTErrors,
+    clearDocumentAST
+} from './helper/document-manager';
 
 function getEncryptionCallName(item: ASTBase): string | undefined {
     let expression;
@@ -103,12 +108,18 @@ export function activate(context: ExtensionContext) {
         collection.set(document.uri, err);
     }
 
+    function clearDiagnosticCollection(document: TextDocument) {
+        clearDocumentAST(document);
+        collection.delete(document.uri);
+    }
+
 	context.subscriptions.push(
         collection,
         vscode.workspace.onDidOpenTextDocument(updateDiagnosticCollection),
         vscode.workspace.onDidChangeTextDocument((event: TextDocumentChangeEvent) => {
             updateDiagnosticCollection(event.document);
         }),
-        vscode.workspace.onDidSaveTextDocument(updateDiagnosticCollection)
+        vscode.workspace.onDidSaveTextDocument(updateDiagnosticCollection),
+        vscode.workspace.onDidCloseTextDocument(clearDiagnosticCollection)
     );
 }
