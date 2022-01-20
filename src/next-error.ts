@@ -13,7 +13,6 @@ export function activate(context: ExtensionContext) {
         edit: TextEditorEdit,
         args: any[]
     ) {
-        const parser = new Parser(editor.document.getText());
         const selectedLine = (line: number) => {
             const eol = editor.document.lineAt(line - 1).text.length;
             const start = new Position(line - 1, 0)
@@ -26,6 +25,7 @@ export function activate(context: ExtensionContext) {
         };
 
         try {
+            const parser = new Parser(editor.document.getText());
             parser.parseChunk();
             vscode.window.showInformationMessage('all good :)', { modal: false });
         } catch (err: any) {

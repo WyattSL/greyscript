@@ -1,4 +1,5 @@
 import vscode, {
+	DocumentHighlight,
     ExtensionContext,
     TextEditor,
     TextEditorEdit,
@@ -124,8 +125,7 @@ function createImportList(parseResult: TranspilerParseResult, mainTarget: string
 	return list.concat(imports);
 }
 
-function createInstaller(parseResult: TranspilerParseResult, mainTarget: string, maxWords: number): void {
-    const targetRoot = vscode.workspace.rootPath || '';
+function createInstaller(parseResult: TranspilerParseResult, mainTarget: string, targetRoot: string, maxWords: number): void {
 	const importList = createImportList(parseResult, mainTarget);
 	const maxWordsWithBuffer = maxWords - 1000;
 	let installerSplits = 0;
@@ -192,42 +192,52 @@ export function activate(context: ExtensionContext) {
         edit: TextEditorEdit,
         args: any[]
     ) {
-        const config = vscode.workspace.getConfiguration("greyscript");
-        const target = editor.document.fileName;
-        const result = await (new Transpiler({
-            target,
-            resourceHandler: new TranspilerResourceProvider().getHandler(),
-            uglify: config.get("transpiler.uglify"),
-            disableLiteralsOptimization: config.get("transpiler.dlo"),
-            disableNamespacesOptimization: !config.get("transpiler.dno")
-        }).parse());
+		if (editor.document.isDirty) {
+			const isSaved = await editor.document.save();
 
-        if (!vscode.workspace.rootPath) {
-            throw new Error('Cannot build when root path is undefined.');
-        }
+			if (!isSaved) {
+				vscode.window.showErrorMessage('You cannot build a file which does not exist in the file system.', { modal: false });
+				return;
+			}
+		}
+		
+		try {
+			const config = vscode.workspace.getConfiguration("greyscript");
+			const target = editor.document.fileName;
+			const result = await (new Transpiler({
+				target,
+				resourceHandler: new TranspilerResourceProvider().getHandler(),
+				uglify: config.get("transpiler.uglify"),
+				disableLiteralsOptimization: config.get("transpiler.dlo"),
+				disableNamespacesOptimization: !config.get("transpiler.dno")
+			}).parse());
 
-        const rootPath = vscode.workspace.rootPath;
-        const buildPath = path.resolve(rootPath, './build');
-        const buildUri = Uri.file(buildPath);
-		const targetRoot = path.dirname(target);
 
-        try {
-            await vscode.workspace.fs.delete(buildUri, { recursive: true });
-        } catch (err) {
-            console.error(err);
-        }
+			const rootPath = vscode.workspace.rootPath || path.dirname(editor.document.fileName);
+			const buildPath = path.resolve(rootPath, './build');
+			const buildUri = Uri.file(buildPath);
+			const targetRoot = path.dirname(target);
 
-        await vscode.workspace.fs.createDirectory(buildUri);
+			try {
+				await vscode.workspace.fs.delete(buildUri, { recursive: true });
+			} catch (err) {
+				console.warn(err);
+			}
 
-        Object.entries(result).forEach(([file, code]) => {
-            const relativePath = file.replace(new RegExp("^" + targetRoot), '.');
-            const fullPath = path.resolve(buildPath, relativePath);
-            const targetUri = Uri.file(fullPath);
-            vscode.workspace.fs.writeFile(targetUri, new TextEncoder().encode(code));
-        });
+			await vscode.workspace.fs.createDirectory(buildUri);
 
-		if (config.get("installer")) {
-			createInstaller(result, target, 75000);
+			Object.entries(result).forEach(([file, code]) => {
+				const relativePath = file.replace(new RegExp("^" + targetRoot), '.');
+				const fullPath = path.resolve(buildPath, relativePath);
+				const targetUri = Uri.file(fullPath);
+				vscode.workspace.fs.writeFile(targetUri, new TextEncoder().encode(code));
+			});
+
+			if (config.get("installer")) {
+				createInstaller(result, target, rootPath, 75000);
+			}
+		} catch (err: any) {
+			vscode.window.showErrorMessage(err.message, { modal: false });
 		}
 	}
 
