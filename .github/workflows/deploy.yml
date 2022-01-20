@@ -32,9 +32,6 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Transpile TypeScript and build Browser version
-        run: npm run compile
-
       - name: Package Extension
         run: vsce package -o extension.vsix
         

@@ -25,8 +25,6 @@
         "@types/vscode": "^1.32.0",
         "@typescript-eslint/eslint-plugin": "^4.16.0",
         "@typescript-eslint/parser": "^4.16.0",
-        "@vscode/debugadapter": "^1.51.1",
-        "@vscode/debugprotocol": "^1.51.0",
         "@vscode/test-electron": "^2.0.3",
         "rollup": "^2.64.0",
         "rollup-plugin-node-polyfills": "^0.2.1",
@@ -73,23 +71,6 @@
                 }
             ],
             "editor/context": [
-                {
-                    "command": "greyscript.minify",
-                    "when": "resourceLangId == greyscript",
-                    "group": "navigation"
-                },
-                {
-                    "command": "greyscript.build",
-                    "when": "resourceLangId == greyscript",
-                    "group": "navigation"
-                },
-                {
-                    "command": "greyscript.gotoError",
-                    "when": "resourceLangId == greyscript",
-                    "group": "navigation"
-                }
-            ],
-            "explorer/context": [
                 {
                     "command": "greyscript.minify",
                     "when": "resourceLangId == greyscript",
@@ -273,6 +254,8 @@
         ]
     },
     "dependencies": {
+        "@vscode/debugadapter": "^1.51.1",
+        "@vscode/debugprotocol": "^1.51.0",
         "greybel-core": "^0.1.9",
         "greybel-interpreter": "^0.4.6",
         "greybel-intrinsics": "^0.3.5",
