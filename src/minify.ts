@@ -40,7 +40,7 @@ export function activate(context: ExtensionContext) {
                 editBuilder.replace(textRange, result[editor.document.fileName]);
             });
 
-            vscode.window.showInformationMessage('Minified...', { modal: false });
+            vscode.window.showInformationMessage('Minifying done.', { modal: false });
         } catch (err: any) {
 			vscode.window.showErrorMessage(err.message, { modal: false });
 		}

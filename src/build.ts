@@ -234,8 +234,11 @@ export function activate(context: ExtensionContext) {
 			});
 
 			if (config.get("installer")) {
+				vscode.window.showInformationMessage('Creating installer.', { modal: false });
 				createInstaller(result, target, rootPath, 75000);
 			}
+
+			vscode.window.showInformationMessage(`Build done. Available under ${buildPath}.`, { modal: false });
 		} catch (err: any) {
 			vscode.window.showErrorMessage(err.message, { modal: false });
 		}
