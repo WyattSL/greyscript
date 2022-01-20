@@ -9,8 +9,6 @@ export function createDocumentAST(document: TextDocument): { chunk: ASTBase, err
     const parser = new Parser(document.getText(), { unsafe: true });
     const chunk = parser.parseChunk();
 
-    vscode.window.showInformationMessage(`Parsing ${document.fileName}.`, { modal: false });
-
     activeDocumentASTMap.set(document.fileName, chunk);
     lastErrorsMap.set(document.fileName, parser.errors);
 
