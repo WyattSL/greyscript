@@ -7,3 +7,4 @@ grammar/
 SECURITY.md
 tests/
 src/
+rollup.config.js

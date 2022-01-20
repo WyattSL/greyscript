@@ -1,29 +1,29 @@
+import vscode from 'vscode';
 import { TextDocument } from 'vscode';
 import { ASTBase, Parser } from 'greybel-core';
 
 const activeDocumentASTMap: Map<string, ASTBase> = new Map();
 const lastErrorsMap: Map<string, Error[]> = new Map();
 
-export function getLastDocumentASTErrors(document: TextDocument): Error[] {
-    return lastErrorsMap.get(document.fileName) || [];
-}
-
-export function createDocumentAST(document: TextDocument): ASTBase {
+export function createDocumentAST(document: TextDocument): { chunk: ASTBase, errors: Error[] } {
     const parser = new Parser(document.getText(), { unsafe: true });
     const chunk = parser.parseChunk();
+
+    vscode.window.showInformationMessage(`Parsing ${document.fileName}.`, { modal: false });
 
     activeDocumentASTMap.set(document.fileName, chunk);
     lastErrorsMap.set(document.fileName, parser.errors);
 
-    return chunk;
+    return {
+        chunk,
+        errors: parser.errors
+    };
+}
+
+export function getLastDocumentASTErrors(document: TextDocument): Error[] {
+    return lastErrorsMap.get(document.fileName) || createDocumentAST(document).errors;
 }
 
 export function getDocumentAST(document: TextDocument): ASTBase {
-    const activeDocumentAST = activeDocumentASTMap.get(document.fileName);
-
-    if (activeDocumentAST) {
-        return activeDocumentAST;
-    }
-
-    return createDocumentAST(document);
+    return activeDocumentASTMap.get(document.fileName) || createDocumentAST(document).chunk;
 }

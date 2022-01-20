@@ -73,6 +73,11 @@
             ],
             "editor/context": [
                 {
+                    "command": "greyscript.refresh",
+                    "when": "resourceLangId == greyscript",
+                    "group": "navigation"
+                },
+                {
                     "command": "greyscript.minify",
                     "when": "resourceLangId == greyscript",
                     "group": "navigation"
@@ -107,6 +112,10 @@
                 },
                 {
                     "command": "greyscript.gotoError",
+                    "when": "resourceLangId == greyscript"
+                },
+                {
+                    "command": "greyscript.refresh",
                     "when": "resourceLangId == greyscript"
                 }
             ]
@@ -144,6 +153,10 @@
             {
                 "command": "greyscript.minify",
                 "title": "GreyScript: Minify"
+            },
+            {
+                "command": "greyscript.refresh",
+                "title": "GreyScript: Refresh"
             },
             {
                 "command": "greyscript.debug.debugEditorContents",
@@ -257,11 +270,11 @@
     "dependencies": {
         "@vscode/debugadapter": "^1.51.1",
         "@vscode/debugprotocol": "^1.51.0",
-        "greybel-core": "^0.1.9",
-        "greybel-interpreter": "^0.4.6",
-        "greybel-intrinsics": "^0.3.5",
-        "greybel-transpiler": "^0.1.8",
-        "greyscript-core": "^0.1.7",
+        "greybel-core": "^0.2.0",
+        "greybel-interpreter": "^0.4.7",
+        "greybel-intrinsics": "^0.3.6",
+        "greybel-transpiler": "^0.1.9",
+        "greyscript-core": "^0.1.8",
         "text-encoder-lite": "^2.0.0"
     },
     "browserslist": "> 0.25%, not dead"

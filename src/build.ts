@@ -15,7 +15,8 @@ function createContentHeader(): string {
 	return [
 		's = get_shell',
 		'c = s.host_computer',
-		'h = home_dir'
+		'h = home_dir',
+		'p = @push'
 	].join('\n');
 }
 
@@ -34,13 +35,13 @@ function createFolderLine(folder: string): string[] {
 
 	if (isRootDirectory(parent)) {
 		output = output.concat([
-			'folder = c.File(h + "/' + target + '")',
-			'if (folder == null) then c.create_folder(h, "/' + target + '")'
+			'd = c.File(h + "/' + target + '")',
+			'if (d == null) then c.create_folder(h, "/' + target + '")'
 		]);
 	} else {
 		output = output.concat([
-			'folder = c.File(h + "' + parent + '/' + target + '")',
-			'if (folder == null) then c.create_folder(h + "' + parent + '", "/' + target + '")'
+			'd = c.File(h + "' + parent + '/' + target + '")',
+			'if (d == null) then c.create_folder(h + "' + parent + '", "/' + target + '")'
 		]);
 	}
 
@@ -58,34 +59,34 @@ function createFileLine(file: string, isNew?: boolean): string {
 				'print("Creating " + h + "/' + base + '")',
 				'c.touch(h, "' + base + '")',
 				'file = c.File(h + "/' + base + '")',
-				'lines = []'
+				'l = []'
 			]);
 		} else {
 			output = output.concat([
 				'print("Creating " + h + "' + folder + '/' + base + '")',
 				'c.touch(h + "' + folder + '", "' + base + '")',
 				'file = c.File(h + "' + folder + '/' + base + '")',
-				'lines = []'
+				'l = []'
 			]);
 		}
 	} else {
 		if (isRootDirectory(folder)) {
 			output = output.concat([
-				'file = c.File(h + "/' + base + '")',
+				'f = c.File(h + "/' + base + '")',
 				'if (file == null) then',
 				'c.touch(h, "' + base + '")',
-				'file = c.File(h + "/' + base + '")',
+				'f = c.File(h + "/' + base + '")',
 				'end if',
-				'lines = file.get_content.split(char(10))'
+				'l = file.get_content.split(char(10))'
 			]);
 		} else {
 			output = output.concat([
-				'file = c.File(h + "' + folder + '/' + base + '")',
+				'f = c.File(h + "' + folder + '/' + base + '")',
 				'if (file == null) then',
 				'c.touch(h + "' + folder + '", "' + base + '")',
-				'file = c.File(h + "' + folder + '/' + base + '")',
+				'f = c.File(h + "' + folder + '/' + base + '")',
 				'end if',
-				'lines = file.get_content.split(char(10))'
+				'l = file.get_content.split(char(10))'
 			]);
 		}
 	}
@@ -98,11 +99,11 @@ function createCodeInsertLine(line: string): string {
 		.replace(/"/g, '""')
 		.replace(/^import_code\(/i, 'import" + "_" + "code(');
 
-	return 'lines.push("' + parsed + '")';
+	return 'p(l, "' + parsed + '")';
 }
 
 function createSetContentLine(): string {
-	return 'file.set_content(lines.join(char(10)))';
+	return 'f.set_content(l.join(char(10)))';
 }
 
 function createImportList(parseResult: TranspilerParseResult, mainTarget: string): any[] {

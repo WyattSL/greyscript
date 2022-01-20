@@ -108,6 +108,7 @@ export function activate(context: ExtensionContext) {
         vscode.workspace.onDidOpenTextDocument(updateDiagnosticCollection),
         vscode.workspace.onDidChangeTextDocument((event: TextDocumentChangeEvent) => {
             updateDiagnosticCollection(event.document);
-        })
+        }),
+        vscode.workspace.onDidSaveTextDocument(updateDiagnosticCollection)
     );
 }

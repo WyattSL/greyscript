@@ -1,13 +1,4 @@
-import vscode, {
-    ExtensionContext,
-    Position,
-    Location,
-    Range,
-    Diagnostic,
-    TextDocumentChangeEvent,
-    TextDocument
-} from 'vscode';
-import Encryption from './grammar/Encryption.json';
+import { ExtensionContext } from 'vscode';
 import { activate as activateHover } from './hover';
 import { activate as activateAutocomplete } from './autocomplete';
 import { activate as activateColorpicker } from './colorpicker';
@@ -17,8 +8,10 @@ import { activate as activateMinify } from './minify';
 import { activate as activateNextError } from './next-error';
 import { activate as activateDiagnostic } from './diagnostic';
 import { activate as activateDeclaration } from './declaration';
+import { activate as activateRefresh } from './refresh';
 
 export function activate(context: ExtensionContext) {
+    activateRefresh(context);
     activateHover(context);
     activateAutocomplete(context);
     activateColorpicker(context);
