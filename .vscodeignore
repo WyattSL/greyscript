@@ -1,6 +1,6 @@
 .vscode
 node_modules
-tsconig.json
+tsconfig.json
 .gitignore
 .git/
 .github/

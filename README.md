@@ -12,7 +12,7 @@ To use commands, press CTRL+SHIFT+P to view the command bar, and enter `Greyscri
 * `Goto Error` command: will highlight the next existing syntax error
 * `Minify` command: will minify current file
 * `Build` command: will build your files and put them into a `build` folder. It's also able to minfiy and bundle your files.
-* `Interpreger` which enables you to execute code (only MiniScript intrinsics are supported for now)
+* `Interpreter` which enables you to execute code (only MiniScript intrinsics are supported for now)
 * `Debugger` which enables you to set breakpoints, run code in a breakpoint context, jump to the next line of execution etc.
 * `Autocompletion` which figures out the current context and tries to give suggestions accordingly
 * `Hover Tooltips` which give you informations about functions/types
