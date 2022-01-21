@@ -110,13 +110,13 @@ export function activate(context: ExtensionContext) {
                     //shows link to importCode resource
                     const hoverText = new MarkdownString('');
                     const importAst = astResult.closest as ASTImportCodeExpression;
-                    const gameDir = importAst.gameDirectory as ASTLiteral;
-                    const fileDir = importAst.fileSystemDirectory as ASTLiteral;
+                    const gameDir = importAst.gameDirectory;
+                    const fileDir = importAst.fileSystemDirectory;
                     let output = [];
 
                     if (fileDir) {
                         const rootDir = path.dirname(document.fileName);
-                        const target = path.resolve(rootDir, fileDir.value.toString());
+                        const target = path.resolve(rootDir, fileDir);
                         const uri = Uri.file(target);
 
                         output = [
@@ -129,7 +129,7 @@ export function activate(context: ExtensionContext) {
                         ];
                     } else {
                         output = [
-                            `Imports game file "${gameDir.value}" inside this code`,
+                            `Imports game file "${gameDir}" inside this code`,
                             '***',
                             'WARNING: There is no actual file path',
                             'therefore this will be ignored while building.',

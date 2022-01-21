@@ -12,7 +12,6 @@ import {
     ASTFunctionStatement,
     ASTCallStatement,
     ASTCallExpression,
-    Parser,
     ASTChunk
 } from 'greybel-core';
 import * as ASTScraper from './helper/ast-scraper';
