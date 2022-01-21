@@ -8,7 +8,8 @@ import {
 	Breakpoint,
 	BreakpointEvent,
 	Source,
-	StackFrame
+	StackFrame,
+	Scope
 } from '@vscode/debugadapter';
 import { DebugProtocol } from '@vscode/debugprotocol';
 import { Interpreter, CustomType, Debugger, OperationContext, ContextType } from 'greybel-interpreter';
@@ -159,6 +160,45 @@ export class GreybelDebugSession extends LoggingDebugSession {
 			threads: [
 				new Thread(GreybelDebugSession.threadID, "thread 1")
 			]
+		};
+		this.sendResponse(response);
+	}
+
+	protected scopesRequest(response: DebugProtocol.ScopesResponse, args: DebugProtocol.ScopesArguments): void {
+		response.body = {
+			scopes: [
+				new Scope("Current scope", 1, true)
+			]
+		};
+		this.sendResponse(response);
+	}
+
+	protected async variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments, request?: DebugProtocol.Request): Promise<void> {
+		const me = this;
+		const opc = me._runtime.globalContext.getLastActive();
+		const variables: DebugProtocol.Variable[] = [];
+		const setVariables = (current: OperationContext, ref: number) => {
+			current.scope.value.forEach((item: any, name: string) => {
+				const v: DebugProtocol.Variable = {
+					name,
+					value: item.toString(),
+					type: item.getType(),
+					variablesReference: ref,
+					evaluateName: '$' + name
+				};
+
+				variables.push(v);
+			});
+		};
+
+		if (opc && opc.type !== ContextType.GLOBAL) {
+			setVariables(opc, 1);
+		}
+
+		setVariables(me._runtime.globalContext, 1);
+
+		response.body = {
+			variables
 		};
 		this.sendResponse(response);
 	}
