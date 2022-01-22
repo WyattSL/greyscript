@@ -210,7 +210,7 @@ export function activate(context: ExtensionContext) {
 				resourceHandler: new TranspilerResourceProvider().getHandler(),
 				uglify: config.get("transpiler.uglify"),
 				disableLiteralsOptimization: config.get("transpiler.dlo"),
-				disableNamespacesOptimization: !config.get("transpiler.dno")
+				disableNamespacesOptimization: config.get("transpiler.dno")
 			}).parse());
 
 
@@ -228,7 +228,7 @@ export function activate(context: ExtensionContext) {
 			await vscode.workspace.fs.createDirectory(buildUri);
 
 			Object.entries(result).forEach(([file, code]) => {
-				const relativePath = file.replace(new RegExp("^" + targetRoot), '.');
+				const relativePath = file.replace(targetRoot, '.');
 				const fullPath = path.resolve(buildPath, relativePath);
 				const targetUri = Uri.file(fullPath);
 				vscode.workspace.fs.writeFile(targetUri, new TextEncoder().encode(code));
@@ -239,7 +239,7 @@ export function activate(context: ExtensionContext) {
 				createInstaller(result, target, rootPath, 75000);
 			}
 
-			vscode.window.showInformationMessage(`Build done. Available under ${buildPath}.`, { modal: false });
+			vscode.window.showInformationMessage(`Build done. Available [here](${buildPath}).`, { modal: false });
 		} catch (err: any) {
 			vscode.window.showErrorMessage(err.message, { modal: false });
 		}
