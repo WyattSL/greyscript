@@ -15,7 +15,9 @@ import { DebugProtocol } from '@vscode/debugprotocol';
 import { Interpreter, CustomType, Debugger, OperationContext, ContextType } from 'greybel-interpreter';
 import { InterpreterResourceProvider } from '../resource';
 import { init as initIntrinsics } from 'greybel-intrinsics';
+import { init as initGHIntrinsics } from 'greybel-gh-mock-intrinsics';
 import path from 'path';
+import vscode from 'vscode';
 
 interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 	program: string;
@@ -55,13 +57,25 @@ export class GreybelDebugSession extends LoggingDebugSession {
 			me.sendEvent(e);
         });
 
+		vsAPI.set('user_input', async (message: CustomType, isPassword: CustomType, anyKey: CustomType): Promise<string | null> => {
+            return new Promise((resolve) => {
+				vscode.window.showInputBox({
+					title: message.toString()
+				}).then((value: any) => {
+					resolve(value);
+				}, (value: any) => {
+					resolve(null);
+				})
+			})
+        });
+
 		me.setDebuggerLinesStartAt1(false);
 		me.setDebuggerColumnsStartAt1(false);
 
 		this._runtime = new Interpreter({
             resourceHandler: new InterpreterResourceProvider().getHandler(),
 			debugger: new GrebyelDebugger(me),
-			api: initIntrinsics(vsAPI)
+			api: initIntrinsics(initGHIntrinsics(vsAPI))
 		});
 	}
 
