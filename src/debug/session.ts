@@ -12,7 +12,7 @@ import {
 	Scope
 } from '@vscode/debugadapter';
 import { DebugProtocol } from '@vscode/debugprotocol';
-import { Interpreter, CustomType, Debugger, OperationContext, ContextType } from 'greybel-interpreter';
+import { Interpreter, CustomType, Debugger, OperationContext, ContextType, CustomList } from 'greybel-interpreter';
 import { InterpreterResourceProvider } from '../resource';
 import { init as initIntrinsics } from 'greybel-intrinsics';
 import { init as initGHIntrinsics } from 'greybel-gh-mock-intrinsics';
@@ -160,6 +160,12 @@ export class GreybelDebugSession extends LoggingDebugSession {
 
 		// start the program in the runtime
 		try {
+			const params = await vscode.window.showInputBox({
+				title: 'Enter execution parameters'
+			});
+			const paramSegments = params?.split(' ') || [];
+
+			me._runtime.params = paramSegments;
 			await me._runtime.digest();
 			me.sendResponse(response);
 		} catch (err: any) {
