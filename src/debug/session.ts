@@ -57,6 +57,12 @@ export class GreybelDebugSession extends LoggingDebugSession {
 			me.sendEvent(e);
         });
 
+		vsAPI.set('exit', (customValue: CustomType): void => {
+            const e: DebugProtocol.OutputEvent = new OutputEvent(`${customValue.toString()}\n`);
+			me.sendEvent(e);
+			me._runtime.exit();
+        });
+
 		vsAPI.set('user_input', async (message: CustomType, isPassword: CustomType, anyKey: CustomType): Promise<string | null> => {
             return new Promise((resolve) => {
 				vscode.window.showInputBox({
