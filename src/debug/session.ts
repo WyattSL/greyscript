@@ -169,10 +169,11 @@ export class GreybelDebugSession extends LoggingDebugSession {
 			await me._runtime.digest();
 			me.sendResponse(response);
 		} catch (err: any) {
+			const opc = me._runtime.apiContext.getLastActive() || me._runtime.globalContext;
 			console.error(err);
 			me.sendErrorResponse(response, {
 				id: 1001,
-				format: err.message,
+				format: `${err.message} at line ${opc.stackItem?.start.line}:${opc.stackItem?.start.character} in ${opc.target}`,
 				showUser: true
 			});
 		}
