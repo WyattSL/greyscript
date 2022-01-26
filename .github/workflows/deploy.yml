@@ -50,4 +50,37 @@ jobs:
         run: |
           echo ${{ github.token }} | gh auth login --with-token
           gh release create $ver extension.vsix -F CHANGELOG.md -d
+  Preview:
+    environment: preview
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # Install NodeJS
+      - name: Install NodeJS
+        uses: actions/setup-node@v2.4.1
+        with:
+          node-version: '16'
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Install VSCE
+        run: npm install -g vsce
+        
+      - name: Install Webpack Dependencies
+        run: npm install -g esbuild webpack webpack-cli
+
+      - name: Package Extension
+        run: vsce package -o extension.vsix
       
+      - name: Publish to DevOps
+        run: vsce publish
+        env:
+          VSCE_PAT: ${{ SECRETS.DEPLOYTOKEN }}
+      
+      - name: Publish GitHub Release
+        run: |
+          ver=$(npm pkg get version)
+          ver=${ver//\"/}
+          echo ${{ github.token }} | gh auth login --with-token
+          gh release create $ver extension.vsix -F CHANGELOG.md -d
