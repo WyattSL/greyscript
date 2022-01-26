@@ -34,12 +34,6 @@ jobs:
 
       - name: Package Extension
         run: vsce package -o extension.vsix
-        
-      - name: Find Version
-        id: find-version
-        run: |
-          ver=$(npm pkg get version)
-          ver=${ver//\"/}
       
       - name: Publish to DevOps
         run: vsce publish
@@ -48,8 +42,14 @@ jobs:
       
       - name: Publish GitHub Release
         run: |
+          ver=$(npm pkg get version)
+          ver=${ver//\"/}
+          reg="^(#{1,2}\s$ver(?:\n.+)+)"
+          grep -zoP $reg CHANGELOG.md > notes.md
+          tr < notes.md -d '\000' > release-notes.md
           echo ${{ github.token }} | gh auth login --with-token
-          gh release create $ver extension.vsix -F CHANGELOG.md -d
+          echo gh release create $ver extension.vsix -F release-notes.md -d
+          gh release create $ver extension.vsix -F release-notes.md
   Preview:
     environment: preview
     runs-on: ubuntu-latest
@@ -74,7 +74,7 @@ jobs:
         run: vsce package -o extension.vsix
       
       - name: Publish to DevOps
-        run: vsce publish
+        run: vsce publish --pre-release
         env:
           VSCE_PAT: ${{ SECRETS.DEPLOYTOKEN }}
       
@@ -82,5 +82,9 @@ jobs:
         run: |
           ver=$(npm pkg get version)
           ver=${ver//\"/}
+          reg="^(#{1,2}\s$ver(?:\n.+)+)"
+          grep -zoP $reg CHANGELOG.md > notes.md
+          tr < notes.md -d '\000' > release-notes.md
           echo ${{ github.token }} | gh auth login --with-token
-          gh release create $ver extension.vsix -F CHANGELOG.md -d
+          echo gh release create $ver extension.vsix -F release-notes.md -d
+          gh release create $ver extension.vsix -F release-notes.md -p
