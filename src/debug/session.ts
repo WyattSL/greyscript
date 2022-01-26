@@ -289,7 +289,7 @@ export class GreybelDebugSession extends LoggingDebugSession {
 					name: stackItem.type,	// use a word of the line as the stackframe name
 					file: current.target,
 					line: stackItem.start.line,
-					column: stackItem.start.character
+					column: 0
 				};
 
 				frames.push(stackFrame);
