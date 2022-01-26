@@ -53,12 +53,12 @@ export class GreybelDebugSession extends LoggingDebugSession {
 		const vsAPI = new Map();
 
 		vsAPI.set('print', (customValue: CustomType): void => {
-            const e: DebugProtocol.OutputEvent = new OutputEvent(`${customValue.toString()}\n`);
+            const e: DebugProtocol.OutputEvent = new OutputEvent(`${customValue?.toString()}\n`);
 			me.sendEvent(e);
         });
 
 		vsAPI.set('exit', (customValue: CustomType): void => {
-            const e: DebugProtocol.OutputEvent = new OutputEvent(`${customValue.toString()}\n`);
+            const e: DebugProtocol.OutputEvent = new OutputEvent(`${customValue?.toString()}\n`);
 			me.sendEvent(e);
 			me._runtime.exit();
         });
@@ -66,7 +66,7 @@ export class GreybelDebugSession extends LoggingDebugSession {
 		vsAPI.set('user_input', async (message: CustomType, isPassword: CustomType, anyKey: CustomType): Promise<string | null> => {
             return new Promise((resolve) => {
 				vscode.window.showInputBox({
-					title: message.toString()
+					title: message?.toString()
 				}).then((value: any) => {
 					resolve(value);
 				}, (value: any) => {
@@ -163,7 +163,7 @@ export class GreybelDebugSession extends LoggingDebugSession {
 			const params = await vscode.window.showInputBox({
 				title: 'Enter execution parameters'
 			});
-			const paramSegments = params?.split(' ') || [];
+			const paramSegments = params && params.length > 0 ? params.split(' ') : [];
 
 			me._runtime.params = paramSegments;
 			await me._runtime.digest();
