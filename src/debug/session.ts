@@ -388,6 +388,10 @@ class GrebyelDebugger extends Debugger {
 		this.session = session;
 	}
 
+	debug(): void {
+		
+	}
+
 	getBreakpoint(operationContext: OperationContext): boolean {
 		const breakpoints = this.session.breakpoints.get(operationContext.target) || [];
 		const actualBreakpoint = breakpoints.find((bp: DebugProtocol.Breakpoint) => {
@@ -412,6 +416,10 @@ class GrebyelDebugger extends Debugger {
 class GrebyelPseudoDebugger extends Debugger {
 	getBreakpoint(operationContext: OperationContext): boolean {
 		return false;
+	}
+
+	debug(): void {
+		
 	}
 
 	interact(operationContext: OperationContext) {
