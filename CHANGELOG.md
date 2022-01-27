@@ -1,3 +1,7 @@
+# 2.0.1
+- bundle commonjs
+- bundle browser with iife format
+
 # 2.0.0
 - autocompletion overhaul
 - hover overhaul

@@ -1,4 +1,5 @@
 .vscode
+out
 tsconfig.json
 .gitignore
 .git/
@@ -8,3 +9,4 @@ SECURITY.md
 tests/
 src/
 rollup.config.js
+.vscode-test-web

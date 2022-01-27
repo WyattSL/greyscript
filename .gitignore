@@ -3,3 +3,6 @@ npm-debug.log
 out/*
 node_modules/*
 tests/*
+extension.js
+extension.browser.js
+.vscode-test-web

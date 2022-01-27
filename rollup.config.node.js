@@ -9,7 +9,7 @@ const nodePolyfills = require('rollup-plugin-node-polyfills');
 const options = {
     input: 'out/extension.js',
     output: {
-        file: 'out/extension.browser.js',
+        file: 'extension.js',
         name: 'greyscript',
         exports: 'named',
         format: 'cjs',
@@ -21,10 +21,6 @@ const options = {
         json(),
         commonjs({
             esmExternals: ['vscode']
-        }),
-        nodePolyfills(),
-        nodeResolve({
-            preferBuiltins: false
         }),
         babel({
             presets: ['@babel/preset-env'],
