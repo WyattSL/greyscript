@@ -10,6 +10,7 @@
 - added typescript
 - replace webpack with rollup for browser extension
 - added test launch.json for extension
+- Refer to the README.md for more information regarding these specific features
 
 # 1.8.1
 - Fix matching patterns for keywords.
