@@ -22,14 +22,8 @@ const options = {
         commonjs({
             esmExternals: ['vscode']
         }),
-        babel({
-            presets: ['@babel/preset-env'],
-            babelHelpers: 'runtime',
-            plugins: [
-                ["@babel/plugin-transform-runtime", {
-                    "regenerator": true
-                }]
-            ]
+        nodeResolve({
+            preferBuiltins: false
         }),
         terser()
     ],

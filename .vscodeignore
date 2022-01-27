@@ -10,3 +10,4 @@ tests/
 src/
 rollup.config.js
 .vscode-test-web
+node_modules/

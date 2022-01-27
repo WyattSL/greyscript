@@ -1,3 +1,7 @@
+# 2.0.2
+- bundle commonjs differently
+- exclude node_modules
+
 # 2.0.1
 - bundle commonjs
 - bundle browser with iife format
