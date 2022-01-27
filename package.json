@@ -9,32 +9,46 @@
         "url": "https://github.com/WyattSL"
     },
     "icon": "icon.png",
-    "version": "1.8.1",
+    "version": "2.0.0",
     "repository": {
         "type": "git",
         "url": "https://github.com/WyattSL/greyscript.git"
     },
     "devDependencies": {
-        "esbuild": "^0.13.12",
-        "vsce": "^2.2.0",
-        "webpack": "^5.61.0",
-        "webpack-cli": "^4.9.1"
+        "@babel/core": "^7.16.10",
+        "@babel/plugin-transform-runtime": "^7.16.8",
+        "@babel/preset-env": "^7.16.8",
+        "@rollup/plugin-babel": "^5.3.0",
+        "@rollup/plugin-commonjs": "^21.0.1",
+        "@rollup/plugin-json": "^4.1.0",
+        "@rollup/plugin-node-resolve": "^13.1.3",
+        "@types/node": "^12.12.0",
+        "@types/vscode": "^1.63.1",
+        "@typescript-eslint/eslint-plugin": "^4.16.0",
+        "@typescript-eslint/parser": "^4.16.0",
+        "@vscode/test-electron": "^2.0.3",
+        "rollup": "^2.64.0",
+        "rollup-plugin-node-polyfills": "^0.2.1",
+        "rollup-plugin-terser": "^7.0.2",
+        "source-map-support": "^0.5.12",
+        "typescript": "^4.5.4"
     },
     "scripts": {
-        "vscode:prepublish-nonminified": "npm run esbuild-base -- ",
-        "vscode:prepublish": "npm run esbuild-base -- --minify",
-        "esbuild-base": "esbuild ./extension.js --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
-        "esbuild": "npm run esbuild-base -- --sourcemap",
-        "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch"
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./ && rollup --config rollup.config.js",
+        "lint": "eslint . --ext .ts,.tsx",
+        "watch": "tsc -watch -p ./",
+        "pretest": "npm run compile"
     },
     "homepage": "https://github.com/WyattSL/greyscript/blob/main/CHANGELOG.md",
     "engines": {
-        "vscode": "^1.51.0"
+        "vscode": "^1.63.1"
     },
     "categories": [
         "Programming Languages"
     ],
-    "browser": "./out/main.js",
+    "main": "./out/extension.js",
+    "browser": "./out/extension.browser.js",
     "qna": "false",
     "bugs": {
         "url": "https://github.com/WyattSL/greyscript/issues",
@@ -44,6 +58,68 @@
         "onLanguage:greyscript"
     ],
     "contributes": {
+        "menus": {
+            "editor/title/run": [
+                {
+                    "command": "greyscript.debug.runEditorContents",
+                    "when": "resourceLangId == greyscript",
+                    "group": "navigation@1"
+                },
+                {
+                    "command": "greyscript.debug.debugEditorContents",
+                    "when": "resourceLangId == greyscript",
+                    "group": "navigation@2"
+                }
+            ],
+            "editor/context": [
+                {
+                    "command": "greyscript.refresh",
+                    "when": "resourceLangId == greyscript",
+                    "group": "navigation"
+                },
+                {
+                    "command": "greyscript.minify",
+                    "when": "resourceLangId == greyscript",
+                    "group": "navigation"
+                },
+                {
+                    "command": "greyscript.build",
+                    "when": "resourceLangId == greyscript",
+                    "group": "navigation"
+                },
+                {
+                    "command": "greyscript.gotoError",
+                    "when": "resourceLangId == greyscript",
+                    "group": "navigation"
+                }
+            ],
+            "commandPalette": [
+                {
+                    "command": "greyscript.debug.debugEditorContents",
+                    "when": "resourceLangId == greyscript"
+                },
+                {
+                    "command": "greyscript.debug.runEditorContents",
+                    "when": "resourceLangId == greyscript"
+                },
+                {
+                    "command": "greyscript.minify",
+                    "when": "resourceLangId == greyscript"
+                },
+                {
+                    "command": "greyscript.build",
+                    "when": "resourceLangId == greyscript"
+                },
+                {
+                    "command": "greyscript.gotoError",
+                    "when": "resourceLangId == greyscript"
+                },
+                {
+                    "command": "greyscript.refresh",
+                    "when": "resourceLangId == greyscript"
+                }
+            ]
+        },
         "languages": [
             {
                 "id": "greyscript",
@@ -67,12 +143,34 @@
         ],
         "commands": [
             {
-                "command": "greyScript.gotoError",
+                "command": "greyscript.gotoError",
                 "title": "GreyScript: Goto Error"
+            },
+            {
+                "command": "greyscript.build",
+                "title": "GreyScript: Build"
             },
             {
                 "command": "greyscript.minify",
                 "title": "GreyScript: Minify"
+            },
+            {
+                "command": "greyscript.refresh",
+                "title": "GreyScript: Refresh"
+            },
+            {
+                "command": "greyscript.debug.debugEditorContents",
+                "title": "Debug File",
+                "category": "Mock Debug",
+                "enablement": "!inDebugMode",
+                "icon": "$(debug-alt)"
+            },
+            {
+                "command": "greyscript.debug.runEditorContents",
+                "title": "Run File",
+                "category": "Mock Debug",
+                "enablement": "!inDebugMode",
+                "icon": "$(play)"
             }
         ],
         "configuration": {
@@ -92,8 +190,93 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Enable GreyScript's color picker."
+                },
+                "greyscript.transpiler.uglify": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable uglify."
+                },
+                "greyscript.transpiler.dlo": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Disable literals optimization."
+                },
+                "greyscript.transpiler.dno": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Disable namespaces optimization."
+                },
+                "greyscript.installer": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Generate installer when building."
                 }
             }
-        }
-    }
+        },
+        "breakpoints": [
+            {
+                "language": "greyscript"
+            }
+        ],
+        "debuggers": [
+            {
+                "type": "greyscript",
+                "languages": [
+                    "greyscript"
+                ],
+                "label": "Greyscript Debug",
+                "program": "./out/debug/adapter.js",
+                "runtime": "node",
+                "configurationAttributes": {
+                    "launch": {
+                        "required": [
+                            "program"
+                        ],
+                        "properties": {
+                            "program": {
+                                "type": "string",
+                                "description": "Absolute path to a text file.",
+                                "default": "${command:AskForProgramName}"
+                            }
+                        }
+                    }
+                },
+                "initialConfigurations": [
+                    {
+                        "type": "greyscript",
+                        "request": "launch",
+                        "name": "Ask for file name",
+                        "program": "${command:AskForProgramName}"
+                    }
+                ],
+                "configurationSnippets": [
+                    {
+                        "label": "Greyscript Debug: Launch",
+                        "description": "A new configuration for 'debugging' a user selected greyscript file.",
+                        "body": {
+                            "type": "greyscript",
+                            "request": "launch",
+                            "name": "Ask for file name",
+                            "program": "^\"\\${command:AskForProgramName}\""
+                        }
+                    }
+                ],
+                "variables": {
+                    "AskForProgramName": "greyscript.debug.getProgramName"
+                }
+            }
+        ]
+    },
+    "dependencies": {
+        "@vscode/debugadapter": "^1.51.1",
+        "@vscode/debugprotocol": "^1.51.0",
+        "greybel-core": "^0.2.5",
+        "greybel-gh-mock-intrinsics": "^0.3.3",
+        "greybel-interpreter": "^0.6.8",
+        "greybel-intrinsics": "^0.5.7",
+        "greybel-transpiler": "^0.2.5",
+        "greyscript-core": "^0.2.6",
+        "text-encoder-lite": "^2.0.0"
+    },
+    "browserslist": "> 0.25%, not dead"
 }

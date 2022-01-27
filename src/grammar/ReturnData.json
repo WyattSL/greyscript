@@ -978,7 +978,11 @@
                 "type": "null"
             }
         ],
-        "join": [],
+        "join": [
+            {
+                "type": "String"
+            }
+        ],
         "push": [],
         "pop": [
             {
@@ -1061,7 +1065,9 @@
             }
         ],
         "values": [
-            "List"
+            {
+                "type": "List"
+            }
         ],
         "sum": [
             {
