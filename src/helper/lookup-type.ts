@@ -106,7 +106,9 @@ export class LookupHelper {
             return [];
         }
 
-        const identifier = ASTScraper.findEx((item: ASTBase, level: number) => {
+        const identifier = [];
+
+        identifier.push(...ASTScraper.findEx((item: ASTBase, level: number) => {
             if (item.type === 'FunctionDeclaration' && level > 0) {
                 return {
                     skip: true
@@ -116,7 +118,21 @@ export class LookupHelper {
                     valid: true
                 };
             }
-        }, root);
+        }, root));
+
+        me.lookupScopes(outer).forEach((scope) => {
+            identifier.push(...ASTScraper.findEx((item: ASTBase, level: number) => {
+                if (item.type === 'FunctionDeclaration' && level > 0) {
+                    return {
+                        skip: true
+                    };
+                } else if (item.type === 'AssignmentStatement') {
+                    return {
+                        valid: true
+                    };
+                }
+            }, scope));
+        });
 
         return identifier.map((item: ASTBase) => {
             return ASTStringify((item as ASTAssignmentStatement).variable)
@@ -157,6 +173,21 @@ export class LookupHelper {
                 return outer[index];
             }
         }
+    }
+
+    lookupScopes(outer: LookupOuter): ASTBase[] {
+        const result: ASTBase[] = [];
+
+        //lookup closest wrapping scope
+        for (let index = outer.length - 1; index >= 0; index--) {
+            const type = outer[index]?.type;
+
+            if (type === 'FunctionDeclaration' || type === 'Chunk') {
+                result.push(outer[index]);
+            }
+        }
+
+        return result;
     }
 
     lookupAST(position: Position): LookupASTResult | undefined {
