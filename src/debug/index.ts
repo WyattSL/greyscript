@@ -8,7 +8,6 @@ import vscode, {
     DebugConfiguration
 } from 'vscode';
 import { GreybelDebugSession } from './session';
-import path from 'path';
 
 export function activate(context: ExtensionContext, factory?: DebugAdapterDescriptorFactory) {
 	context.subscriptions.push(
@@ -75,7 +74,7 @@ export function activate(context: ExtensionContext, factory?: DebugAdapterDescri
 			return;
 		}
 
-		return path.resolve(rootPath, value);
+		return Uri.joinPath(Uri.file(rootPath), value).fsPath;
 	}));
 
 	// register a configuration provider for 'mock' debug type

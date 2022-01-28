@@ -21,7 +21,7 @@ import {
     lookupType,
     LookupHelper
 } from './helper/lookup-type';
-import path from 'path';
+import { PseudoFS } from './resource';
 
 function transformMetaToHover(meta: MetaData): Hover {
     const hoverText = new MarkdownString('');
@@ -115,12 +115,11 @@ export function activate(context: ExtensionContext) {
                     let output = [];
 
                     if (fileDir) {
-                        const rootDir = path.dirname(document.fileName);
-                        const target = path.resolve(rootDir, fileDir);
-                        const uri = Uri.file(target);
+                        const rootDir = Uri.joinPath(Uri.file(document.fileName), '..');
+                        const target = Uri.joinPath(rootDir, fileDir);
 
                         output = [
-                            `[Imports file "${path.basename(target)}" inside this code](${uri.toString()})`,
+                            `[Imports file "${PseudoFS.basename(target.fsPath)}" inside this code](${target.toString(true)})`,
                             '***',
                             'Click the link above to open the file.',
                             '',
@@ -155,12 +154,11 @@ export function activate(context: ExtensionContext) {
                     const importCodeAst = astResult.closest as ASTFeatureImportExpression;
                     const fileDir = importCodeAst.path;
 
-                    const rootDir = path.dirname(document.fileName);
-                    const target = path.resolve(rootDir, fileDir);
-                    const uri = Uri.file(target);
+                    const rootDir = Uri.joinPath(Uri.file(document.fileName), '..');
+                    const target = Uri.joinPath(rootDir, fileDir);
 
                     const output = [
-                        `[Inserts file "${path.basename(target)}" inside this code when building](${uri.toString()})`,
+                        `[Inserts file "${PseudoFS.basename(target.fsPath)}" inside this code when building](${target.toString(true)})`,
                         '***',
                         'Click the link above to open the file.'
                     ];

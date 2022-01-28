@@ -1,5 +1,11 @@
+# 2.0.5
+- fixed bundler boilerplate "file not defined"
+- fixed dynamic file loading - which means builder and interpreter should work now everywhere
+- fixed hover link on imported files
+- switched to vscode path handling instead of NodeJS path
+
 # 2.0.4
-- fixed debugger error handling, differentiates now between runtime and parser erros
+- fixed debugger error handling, differentiates now between runtime and parser errors
 - fixed diagnostic when unsafe mode would return an empty result in edge cases
 
 # 2.0.3

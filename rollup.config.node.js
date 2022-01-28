@@ -14,13 +14,14 @@ const options = {
         exports: 'named',
         format: 'cjs',
         globals: {
-            'vscode': 'vscode'
+            'vscode': 'vscode',
+            'path': 'path'
         }
     },
     plugins: [
         json(),
         commonjs({
-            esmExternals: ['vscode']
+            esmExternals: ['vscode', 'path']
         }),
         nodePolyfills(),
         nodeResolve({
@@ -28,7 +29,7 @@ const options = {
         }),
         terser()
     ],
-    external: ['vscode']
+    external: ['vscode', 'path']
 };
 
 export default options;

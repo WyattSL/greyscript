@@ -5,11 +5,10 @@ import vscode, {
     TextEditorEdit,
     Uri
 } from 'vscode';
-import { TranspilerResourceProvider } from './resource';
+import { TranspilerResourceProvider, PseudoFS } from './resource';
 import { Transpiler, TranspilerParseResult } from 'greybel-transpiler';
 // @ts-ignore: No type definitions
 import { TextEncoderLite as TextEncoder } from 'text-encoder-lite';
-import path from 'path';
 
 function createContentHeader(): string {
 	return [
@@ -25,8 +24,8 @@ function isRootDirectory(target: string): boolean {
 }
 
 function createFolderLine(folder: string): string[] {
-	const parent = path.dirname(folder);
-	const target = path.basename(folder);
+	const parent = PseudoFS.dirname(folder);
+	const target = PseudoFS.basename(folder);
 	let output: string[] = [];
 
 	if (isRootDirectory(target)) {
@@ -49,8 +48,8 @@ function createFolderLine(folder: string): string[] {
 }
 
 function createFileLine(file: string, isNew?: boolean): string {
-	const base = path.basename(file);
-	const folder = path.dirname(file);
+	const base = PseudoFS.basename(file);
+	const folder = PseudoFS.dirname(file);
 	let output = createFolderLine(folder);
 
 	if (isNew) {
@@ -58,14 +57,14 @@ function createFileLine(file: string, isNew?: boolean): string {
 			output = output.concat([
 				'print("Creating " + h + "/' + base + '")',
 				'c.touch(h, "' + base + '")',
-				'file = c.File(h + "/' + base + '")',
+				'f = c.File(h + "/' + base + '")',
 				'l = []'
 			]);
 		} else {
 			output = output.concat([
 				'print("Creating " + h + "' + folder + '/' + base + '")',
 				'c.touch(h + "' + folder + '", "' + base + '")',
-				'file = c.File(h + "' + folder + '/' + base + '")',
+				'f = c.File(h + "' + folder + '/' + base + '")',
 				'l = []'
 			]);
 		}
@@ -73,20 +72,20 @@ function createFileLine(file: string, isNew?: boolean): string {
 		if (isRootDirectory(folder)) {
 			output = output.concat([
 				'f = c.File(h + "/' + base + '")',
-				'if (file == null) then',
+				'if (f == null) then',
 				'c.touch(h, "' + base + '")',
 				'f = c.File(h + "/' + base + '")',
 				'end if',
-				'l = file.get_content.split(char(10))'
+				'l = f.get_content.split(char(10))'
 			]);
 		} else {
 			output = output.concat([
 				'f = c.File(h + "' + folder + '/' + base + '")',
-				'if (file == null) then',
+				'if (f == null) then',
 				'c.touch(h + "' + folder + '", "' + base + '")',
 				'f = c.File(h + "' + folder + '/' + base + '")',
 				'end if',
-				'l = file.get_content.split(char(10))'
+				'l = f.get_content.split(char(10))'
 			]);
 		}
 	}
@@ -107,10 +106,10 @@ function createSetContentLine(): string {
 }
 
 function createImportList(parseResult: TranspilerParseResult, mainTarget: string): any[] {
-	const pseudoRoot = path.dirname(mainTarget) || '';
+	const pseudoRoot = PseudoFS.dirname(mainTarget) || '';
 	const list = [{
 		filepath: mainTarget,
-		pseudoFilepath: path.basename(mainTarget),
+		pseudoFilepath: PseudoFS.basename(mainTarget),
 		content: parseResult[mainTarget]
 	}];
 	const imports = Object.entries(parseResult).map(([target, code]) => {
@@ -118,7 +117,7 @@ function createImportList(parseResult: TranspilerParseResult, mainTarget: string
 			filepath: target,
 			pseudoFilepath: target
 				.replace(pseudoRoot, '')
-				.replace(path.sep, '/'),
+				.replace(PseudoFS.sep, '/'),
 			content: code
 		};
 	});
@@ -126,7 +125,7 @@ function createImportList(parseResult: TranspilerParseResult, mainTarget: string
 	return list.concat(imports);
 }
 
-function createInstaller(parseResult: TranspilerParseResult, mainTarget: string, targetRoot: string, maxWords: number): void {
+function createInstaller(parseResult: TranspilerParseResult, mainTarget: string, targetRoot: Uri, maxWords: number): void {
 	const importList = createImportList(parseResult, mainTarget);
 	const maxWordsWithBuffer = maxWords - 1000;
 	let installerSplits = 0;
@@ -137,10 +136,9 @@ function createInstaller(parseResult: TranspilerParseResult, mainTarget: string,
 			return;
 		}
 
-        const target = path.resolve(targetRoot, './build/installer' + installerSplits + '.src');
-        const targetUri = Uri.file(target);
+        const target = Uri.joinPath(targetRoot, './build/installer' + installerSplits + '.src');
 
-        vscode.workspace.fs.writeFile(targetUri, new TextEncoder().encode(content));
+        vscode.workspace.fs.writeFile(target, new TextEncoder().encode(content));
 		installerSplits++;
 	};
 	const openFile = function(file: string) {
@@ -213,25 +211,24 @@ export function activate(context: ExtensionContext) {
 				disableNamespacesOptimization: config.get("transpiler.dno")
 			}).parse());
 
-
-			const rootPath = vscode.workspace.rootPath || path.dirname(editor.document.fileName);
-			const buildPath = path.resolve(rootPath, './build');
-			const buildUri = Uri.file(buildPath);
-			const targetRoot = path.dirname(target);
+			const rootPath = vscode.workspace.rootPath
+				? Uri.file(vscode.workspace.rootPath)
+				: Uri.joinPath(Uri.file(editor.document.fileName), '..');
+			const buildPath = Uri.joinPath(rootPath, './build');
+			const targetRoot = Uri.joinPath(Uri.file(target), '..');
 
 			try {
-				await vscode.workspace.fs.delete(buildUri, { recursive: true });
+				await vscode.workspace.fs.delete(buildPath, { recursive: true });
 			} catch (err) {
 				console.warn(err);
 			}
 
-			await vscode.workspace.fs.createDirectory(buildUri);
+			await vscode.workspace.fs.createDirectory(buildPath);
 
 			Object.entries(result).forEach(([file, code]) => {
-				const relativePath = file.replace(targetRoot, '.');
-				const fullPath = path.resolve(buildPath, relativePath);
-				const targetUri = Uri.file(fullPath);
-				vscode.workspace.fs.writeFile(targetUri, new TextEncoder().encode(code));
+				const relativePath = file.replace(targetRoot.fsPath, '.');
+				const fullPath = Uri.joinPath(buildPath, relativePath);
+				vscode.workspace.fs.writeFile(fullPath, new TextEncoder().encode(code));
 			});
 
 			if (config.get("installer")) {
@@ -239,7 +236,7 @@ export function activate(context: ExtensionContext) {
 				createInstaller(result, target, rootPath, 75000);
 			}
 
-			vscode.window.showInformationMessage(`Build done. Available [here](${buildPath}).`, { modal: false });
+			vscode.window.showInformationMessage(`Build done. Available [here](${buildPath.toString(true)}).`, { modal: false });
 		} catch (err: any) {
 			vscode.window.showErrorMessage(err.message, { modal: false });
 		}

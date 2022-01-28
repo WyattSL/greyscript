@@ -27,7 +27,6 @@ import {
     lookupType
 } from './helper/lookup-type';
 import { ASTBase, ASTCallExpression } from 'greybel-core';
-import ASTStringify from './helper/ast-stringify';
 
 export function activate(context: ExtensionContext) {
 	const completionFeature = vscode.languages.registerCompletionItemProvider('greyscript', {

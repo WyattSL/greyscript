@@ -13,10 +13,9 @@ import {
 } from '@vscode/debugadapter';
 import { DebugProtocol } from '@vscode/debugprotocol';
 import { Interpreter, CustomType, Debugger, OperationContext, ContextType, CustomList } from 'greybel-interpreter';
-import { InterpreterResourceProvider } from '../resource';
+import { InterpreterResourceProvider, PseudoFS } from '../resource';
 import { init as initIntrinsics } from 'greybel-intrinsics';
 import { init as initGHIntrinsics } from 'greybel-gh-mock-intrinsics';
-import path from 'path';
 import vscode from 'vscode';
 
 interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
@@ -337,7 +336,7 @@ export class GreybelDebugSession extends LoggingDebugSession {
 				const sf: DebugProtocol.StackFrame = new StackFrame(
 					f.index,
 					f.name,
-					new Source(path.basename(f.file), f.file),
+					new Source(PseudoFS.basename(f.file), f.file),
 					f.line,
 					f.column
 				);
