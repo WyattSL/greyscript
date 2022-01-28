@@ -1,3 +1,6 @@
+# 2.0.3
+- update to latest greybel which use crypto
+
 # 2.0.2
 - bundle commonjs differently
 - exclude node_modules

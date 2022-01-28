@@ -22,6 +22,7 @@ const options = {
         commonjs({
             esmExternals: ['vscode']
         }),
+        nodePolyfills(),
         nodeResolve({
             preferBuiltins: false
         }),
