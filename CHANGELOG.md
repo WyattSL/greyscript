@@ -1,3 +1,7 @@
+# 2.0.4
+- fixed debugger error handling, differentiates now between runtime and parser erros
+- fixed diagnostic when unsafe mode would return an empty result in edge cases
+
 # 2.0.3
 - update to latest greybel which use crypto
 

@@ -172,12 +172,36 @@ export class GreybelDebugSession extends LoggingDebugSession {
 			me.sendResponse(response);
 		} catch (err: any) {
 			const opc = me._runtime.apiContext.getLastActive() || me._runtime.globalContext;
-			console.error(err);
-			me.sendErrorResponse(response, {
-				id: 1001,
-				format: `${err.message} at line ${opc.stackItem?.start.line}:${opc.stackItem?.start.character} in ${opc.target}`,
-				showUser: true
-			});
+
+			if (opc.stackItem) {
+				me.sendErrorResponse(response, {
+					id: 1001,
+					format: `Runtime error: ${err.message} at line ${opc.stackItem.start.line}:${opc.stackItem.start.character} in ${opc.target}`,
+					showUser: true
+				});
+			} else if (err.hasOwnProperty('line')) {
+				const line = err.line;
+
+				me.sendErrorResponse(response, {
+					id: 1001,
+					format: `Parsing error: ${err.message} at line ${line} in ${opc.target}`,
+					showUser: true
+				});
+			} else if (err.hasOwnProperty('token')) {
+				const line = err.token.line;
+
+				me.sendErrorResponse(response, {
+					id: 1001,
+					format: `Parsing error: ${err.message} at line ${line} in ${opc.target}`,
+					showUser: true
+				});
+			} else {
+				me.sendErrorResponse(response, {
+					id: 1001,
+					format: `Unexpected error: ${err.message} in ${opc.target}`,
+					showUser: true
+				});
+			}
 		}
 
 		me.sendEvent(new TerminatedEvent());
