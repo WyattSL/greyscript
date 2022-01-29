@@ -1,3 +1,8 @@
+# 2.0.6
+- fixed loops not supporting exit request
+- added non blocking while iteration via process.nextTick
+- added message queue to prevent blocking thread
+
 # 2.0.5
 - fixed bundler boilerplate "file not defined"
 - fixed dynamic file loading - which means builder and interpreter should work now everywhere

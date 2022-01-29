@@ -17,6 +17,7 @@ import { InterpreterResourceProvider, PseudoFS } from '../resource';
 import { init as initIntrinsics } from 'greybel-intrinsics';
 import { init as initGHIntrinsics } from 'greybel-gh-mock-intrinsics';
 import vscode from 'vscode';
+import MessageQueue from './message-queue';
 
 interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 	program: string;
@@ -43,6 +44,8 @@ export class GreybelDebugSession extends LoggingDebugSession {
 
 	private _runtime: Interpreter;
 	private _breakpointIncrement: number = 0;
+	private _restart: boolean = false;
+	private _messageQueue: MessageQueue | null;
 
 	public constructor() {
 		super("greybel-debug.txt");
@@ -52,13 +55,11 @@ export class GreybelDebugSession extends LoggingDebugSession {
 		const vsAPI = new Map();
 
 		vsAPI.set('print', (customValue: CustomType): void => {
-            const e: DebugProtocol.OutputEvent = new OutputEvent(`${customValue?.toString()}\n`);
-			me.sendEvent(e);
+            me._messageQueue?.print(customValue?.toString());
         });
 
 		vsAPI.set('exit', (customValue: CustomType): void => {
-            const e: DebugProtocol.OutputEvent = new OutputEvent(`${customValue?.toString()}\n`);
-			me.sendEvent(e);
+			me._messageQueue?.print(customValue?.toString());
 			me._runtime.exit();
         });
 
@@ -79,6 +80,7 @@ export class GreybelDebugSession extends LoggingDebugSession {
 		me.setDebuggerLinesStartAt1(false);
 		me.setDebuggerColumnsStartAt1(false);
 
+		this._messageQueue = null;
 		this._runtime = new Interpreter({
             resourceHandler: new InterpreterResourceProvider().getHandler(),
 			debugger: new GrebyelDebugger(me),
@@ -141,6 +143,8 @@ export class GreybelDebugSession extends LoggingDebugSession {
 		response.body.supportsReadMemoryRequest = false;
 		response.body.supportsWriteMemoryRequest = false;
 
+		response.body.supportsRestartRequest = true;
+
 		this.sendResponse(response);
 
 		// since this debug adapter can accept configuration requests like 'setBreakpoint' at any time,
@@ -149,7 +153,7 @@ export class GreybelDebugSession extends LoggingDebugSession {
 		this.sendEvent(new InitializedEvent());
 	}
 
-	protected async launchRequest(response: DebugProtocol.LaunchResponse, args: ILaunchRequestArguments) {
+	protected async launchRequest(response: DebugProtocol.LaunchResponse, args: ILaunchRequestArguments): Promise<void> {
 		const me = this;
 		
 		me._runtime.setTarget(args.program);
@@ -158,6 +162,9 @@ export class GreybelDebugSession extends LoggingDebugSession {
 				? new GrebyelPseudoDebugger()
 				: new GrebyelDebugger(me)
 		);
+
+		me._restart = false;
+		me._messageQueue = new MessageQueue(me);
 
 		// start the program in the runtime
 		try {
@@ -201,6 +208,13 @@ export class GreybelDebugSession extends LoggingDebugSession {
 					showUser: true
 				});
 			}
+		}
+
+		me._messageQueue.end();
+		me._messageQueue = null;
+
+		if (me._restart) {
+			return me.launchRequest(response, args);
 		}
 
 		me.sendEvent(new TerminatedEvent());
@@ -276,6 +290,36 @@ export class GreybelDebugSession extends LoggingDebugSession {
 
 		this.sendResponse(response);
 		this.shutdown();
+	}
+
+	protected pauseRequest(response: DebugProtocol.PauseResponse, args: DebugProtocol.PauseArguments, request?: DebugProtocol.Request): void {
+		this._runtime.debugger.setBreakpoint(true);
+		this.sendResponse(response);
+	}
+
+	protected async restartRequest(response: DebugProtocol.RestartResponse, args: DebugProtocol.RestartArguments, request?: DebugProtocol.Request): Promise<void> {
+		this._runtime.debugger.setBreakpoint(false);
+
+		try {
+			this._restart = true;
+			await this._runtime.exit();
+		} catch (err: any) {
+			console.warn(`WARNING: ${err.message}`);
+		}
+
+		this.sendResponse(response);
+	}
+
+	protected async terminateRequest(response: DebugProtocol.TerminateResponse, args: DebugProtocol.TerminateArguments, request?: DebugProtocol.Request): Promise<void> {
+		this._runtime.debugger.setBreakpoint(false);
+
+		try {
+			await this._runtime.exit();
+		} catch (err: any) {
+			console.warn(`WARNING: ${err.message}`);
+		}
+
+		this.sendResponse(response);
 	}
 
 	protected async evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): Promise<void> {
