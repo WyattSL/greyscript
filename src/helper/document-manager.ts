@@ -15,7 +15,7 @@ export function createDocumentAST(document: TextDocument): { chunk: ASTBase, err
     } else {
         try {
             const strictParser = new Parser(document.getText());
-            const strictChunk = parser.parseChunk();
+            const strictChunk = strictParser.parseChunk();
 
             activeDocumentASTMap.set(document.fileName, strictChunk);
             lastErrorsMap.set(document.fileName, []);

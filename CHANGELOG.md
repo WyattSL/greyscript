@@ -1,3 +1,6 @@
+# 2.0.7
+- fix issue in parser/lexer which could cause infinite loops
+
 # 2.0.6
 - fixed loops not supporting exit request
 - added non blocking while iteration via process.nextTick

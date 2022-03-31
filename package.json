@@ -9,7 +9,7 @@
         "url": "https://github.com/WyattSL"
     },
     "icon": "icon.png",
-    "version": "2.0.6",
+    "version": "2.0.7",
     "repository": {
         "type": "git",
         "url": "https://github.com/WyattSL/greyscript.git"
@@ -275,12 +275,12 @@
     "dependencies": {
         "@vscode/debugadapter": "^1.51.1",
         "@vscode/debugprotocol": "^1.51.0",
-        "greybel-core": "^0.2.5",
-        "greybel-gh-mock-intrinsics": "^0.3.6",
-        "greybel-interpreter": "^0.7.1",
-        "greybel-intrinsics": "^0.6.0",
-        "greybel-transpiler": "^0.2.5",
-        "greyscript-core": "^0.2.6",
+        "greybel-core": "^0.2.6",
+        "greybel-gh-mock-intrinsics": "^0.3.7",
+        "greybel-interpreter": "^0.7.2",
+        "greybel-intrinsics": "^0.6.1",
+        "greybel-transpiler": "^0.2.6",
+        "greyscript-core": "^0.2.7",
         "text-encoder-lite": "^2.0.0"
     },
     "browserslist": "> 0.25%, not dead"
