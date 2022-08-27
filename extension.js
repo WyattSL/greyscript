@@ -135,20 +135,33 @@ function activate(context) {
     context.subscriptions.push(vscode.languages.registerDeclarationProvider('greyscript', {
         provideDeclaration(document, position, token) {
 
+            locations = [];
             let range = document.getWordRangeAtPosition(position);
+
             let word = document.getText(range);
-            let Text = document.getText();
+            let re = RegExp("\\b.*" + word + "?\\s*=", 'g');
 
-            let re = RegExp("\\b"+word+"(\\s|)=");
-            let Match = Text.match(re);
+            vscode.workspace.textDocuments.forEach(document => {
+                let filename = document.fileName;
+                if (filename.endsWith(".git")) {
+                    return;
+                }
 
-            let index = Match.index;
-            let nt = Text.slice(0, index);
+                let text = document.getText()
+                let matches = text.matchAll(re);
+                let match = matches.next();
+                while (!match.done) {
+                    let index = match.value.index;
+                    let nt = text.slice(0, index);
 
-            let lines = nt.split(new RegExp("\n","g")).length;
-            let Pos = new vscode.Position(lines-1, word.length);
+                    let lines = nt.split(new RegExp("\n", "g")).length;
+                    let Pos = new vscode.Position(lines - 1, word.length);
+                    locations.push(new vscode.Location(document.uri, Pos));
+                    match = matches.next();
+                }
+            });
 
-            return new vscode.Location(document.uri, Pos);
+            return locations
         }
     }));
 
