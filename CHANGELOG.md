@@ -1,3 +1,6 @@
+# 1.9.0
+- Add cross file declarations and multiple declarations per file. Thanks, [@SlaskoCZ](https://github.com/SlaskoCZ)!
+
 # 1.8.1
 - Fix matching patterns for keywords.
 - Add support for `File.allow_import`
