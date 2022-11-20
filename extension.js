@@ -1,4 +1,5 @@
 const vscode = require("vscode");
+//import { Buffer } from 'node:buffer';
 
 var CompData = require("./grammar/CompletionData.json")
 var TypeData = require("./grammar/TypeData.json")
@@ -9,6 +10,9 @@ var CompTypes = require("./grammar/CompletionTypes.json") // Constant 20 Functio
 var HoverData = require("./grammar/HoverData.json");
 var Encryption = require("./grammar/Encryption.json");
 
+var bugout = vscode.window.createOutputChannel("Greyscript Debugger");
+//var bugout = { appendLine: function() {}}
+
 var enumCompTypeText = {
     1: "method",
     2: "function",
@@ -18,9 +22,50 @@ var enumCompTypeText = {
     20: "constant",
 }
 
+async function GetDocumentText(document, range) {
+    //bugout.appendLine(`await GetDocumentText!`);
+	let t = document.getText(range);
+	return await HandleImports(t, document)
+}
+
+var FileCache = {};
+
+async function HandleImports(t, document) {
+    t = `${t}`;
+    let reg = /import_code\("(.+)"\)/g
+    //bugout.appendLine(`await HandleImports`,t,reg)
+    //bugout.appendLine(typeof(t))
+	let ms = t.matchAll(reg);
+    //let ms = [];
+    //bugout.appendLine(`IMPORT IN`);
+    //bugout.appendLine(t);
+    //bugout.appendLine(`MATCHES`)
+    //bugout.appendLine(ms);
+	for (let m of ms) {
+        //bugout.appendLine(`MATCH ${m}`)
+		let path = m[1].split("/").pop();
+		let curPath = document.uri;
+		let pathUrl = vscode.Uri.joinPath(curPath, `../${path}`);
+        let ftext;
+        if (FileCache[pathUrl] && FileCache[pathUrl].time >= Date.now() - 2500) {
+            ftext = FileCache[pathUrl].text;
+        } else {
+            let fdata = await vscode.workspace.fs.readFile(pathUrl);
+            //let fbuf = Buffer.from(fdata);
+            //ftext = fbuf.toString();
+            ftext = new TextDecoder().decode(fdata);
+            FileCache[pathUrl] = {time: Date.now(), text: ftext};
+        }
+		t=t.replace(m[0], ftext);
+	}
+    //bugout.appendLine(`FINAL OUT`);
+    //bugout.appendLine(t);
+    return t;
+}
+
 function activate(context) {
     let hoverD = vscode.languages.registerHoverProvider('greyscript', {
-        provideHover(document,position,token) {
+        async provideHover(document,position,token) {
             if (!vscode.workspace.getConfiguration("greyscript").get("hoverdocs")) return;
 
             let range = document.getWordRangeAtPosition(position)
@@ -52,8 +97,9 @@ function activate(context) {
                 hoverText = new vscode.MarkdownString("", true);
 
                 // Get Text
-                let text = document.getText()
-                let linesTillCurLine = document.getText().split("\n").splice(0, range.start.line);
+                //let text = document.getText()
+                let text = await GetDocumentText(document);
+                let linesTillCurLine = text.split("\n").splice(0, range.start.line)
                 
                 // Check if in function and maybe variable is parameter
                 for(line of linesTillCurLine.reverse()){
@@ -141,13 +187,14 @@ function activate(context) {
             let word = document.getText(range);
             let re = RegExp("\\b.*" + word + "?\\s*=", 'g');
 
-            vscode.workspace.textDocuments.forEach(document => {
+            vscode.workspace.textDocuments.forEach(async document => {
                 let filename = document.fileName;
                 if (filename.endsWith(".git")) {
                     return;
                 }
 
-                let text = document.getText()
+                //let text = document.getText()
+                let text = await GetDocumentText(document);
                 let matches = text.matchAll(re);
                 let match = matches.next();
                 while (!match.done) {
@@ -169,35 +216,35 @@ function activate(context) {
 
     let foldD = vscode.languages.registerFoldingRangeProvider('greyscript', {
         provideFoldingRanges(document, foldContext, token) {
-            console.log(`Request To Provide Folding Ranges`);
+            bugout.appendLine(`Request To Provide Folding Ranges`);
             let Text = document.getText();
             let kind = vscode.FoldingRangeKind.Region;
             var List = [];
             let Exp = new RegExp(`( = |=) function`, `g`);
             let Matches = Text.matchAll(Exp);
-            console.log(`Folding Matches`);
-            console.log(Matches);
+            bugout.appendLine(`Folding Matches`);
+            bugout.appendLine(Matches);
             var i;
             for (i of Matches) {
                 let index = i.index;
-                console.log(`I: ${index}`);
+                bugout.appendLine(`I: ${index}`);
                 let stext = Text.slice(0,index);
                 let text = Text.slice(index,Text.length);
-                console.log(`T: ${text}`);
+                bugout.appendLine(`T: ${text}`);
                 let Exp = new RegExp("end function");
                 let M = text.match(Exp)
-                console.log(`M: ${M}`)
+                bugout.appendLine(`M: ${M}`)
                 if (!M) continue;
                 M = M.index+index;
-                console.log(`M: ${M}`);
+                bugout.appendLine(`M: ${M}`);
                 let start = stext.split("\n").length-1;
                 let etext = Text.slice(0, M);
                 let end = etext.split("\n").length-1;
                 let F = new vscode.FoldingRange(start, end, kind);
                 List.push(F);
             };
-            console.log(`Folding Ranges`)
-            console.log(List);
+            bugout.appendLine(`Folding Ranges`)
+            bugout.appendLine(List);
             return List;
         }
     })
@@ -252,11 +299,13 @@ function activate(context) {
     }
 
     let getOptionsBasedOfPriorCommand = (document, range) => {
-        //console.log("Checking item before .");
+        //bugout.appendLine("Checking item before .");
 
         // Get Target if there was a delimiter before starting character
         let targetRange = document.getWordRangeAtPosition(new vscode.Position(range.start.line, range.start.character - 2));
         let targetWord = document.getText(targetRange);
+
+        //bugout.appendLine(targetWord)
 
         // Find type of target
         // Check if target is command
@@ -271,8 +320,11 @@ function activate(context) {
             if(prevCmd) break;
         }
 
+        //bugout.appendLine(prevCmd);
+
         // Get return data from command
         if(prevCmd){
+            //bugout.appendLine("prevcmd!")
             let returnValues = ReturnData[prevCmd.type][prevCmd.cmd];
             let options = {};
 
@@ -281,10 +333,11 @@ function activate(context) {
                 if(!CompData[returnValue.type]) continue;
                 options[returnValue.type] = CompData[returnValue.type];
             }
-
+            //bugout.appendLine("done prevcmd!")
             return Object.keys(options).length > 0 ? options : undefined;
         }
         else {
+            //bugout.appendLine("no prevcmd!")
             // Check variable assignment if its not a command
             let text = document.getText()
             lines = [];
@@ -354,14 +407,15 @@ function activate(context) {
                 return Object.keys(options).length > 0 ? options : undefined;
             }
             else{
-                console.log("Greyscript: Target is unknown returning all CompData.")
+                bugout.appendLine("Greyscript: Target is unknown returning all CompData.")
                 return CompData;
             }
         }
     }
 
     let compD = vscode.languages.registerCompletionItemProvider('greyscript', {
-        provideCompletionItems(document,position,token,ccontext) {
+        async provideCompletionItems(document,position,token,ccontext) {
+            bugout.appendLine(`Get Completion Options`)
             if (!vscode.workspace.getConfiguration("greyscript").get("autocomplete")) return;
             let out = [];
 
@@ -373,7 +427,7 @@ function activate(context) {
             if(!range) {
                 for (key in options) {
                     for(c of options[key]){
-                        //console.log("Processing result: " + c);
+                        //bugout.appendLine("Processing result: " + c);
     
                         // Get type of completion item
                         let type = CompTypes[c] || CompTypes["default"];
@@ -394,7 +448,7 @@ function activate(context) {
             
             let word = document.getText(range);
             if(!word) return;
-            //console.log(word);
+            //bugout.appendLine(word);
             
             let variableOptions = [];
 
@@ -405,12 +459,14 @@ function activate(context) {
             }
             else {
                 // Get All user defined variables
-                let linesTillLine = document.getText(new vscode.Range(new vscode.Position(0, 0), range.start))
+                //let linesTillLine = document.getText(new vscode.Range(new vscode.Position(0, 0), range.start))
+                let linesTillLine = await GetDocumentText(document, new vscode.Range(new vscode.Position(0, 0), range.start));
                 matches = linesTillLine.matchAll(/\b(\w+(\s|)=|end function)/g);
                 let inFunction = false;
                 let functionVars = [];
                 if(matches){
                     for(match of Array.from(matches).reverse()){
+                        //bugout.appendLine(`MATCHED, ${match}, ${match[0]}`)
                         let fullMatch = match[0];
                         variableName = fullMatch.replace(/(\s|)=/, "");
                         if(variableOptions.every(m => m.name !== variableName)) {
@@ -422,27 +478,39 @@ function activate(context) {
                             let assignment = linesTillLine.substring(match.index, linesTillLine.indexOf("\n", match.index));
                             assignment = assignment.substring(assignment.indexOf("=") + 1).trim();
 
+                            //bugout.appendLine(`ASSIGNMENT: ${assignment}`)
+
                             if(assignment.startsWith("function")){
+                                //bugout.appendLine(`Found function ${variableName}`)
                                 inFunction = false;
-                                params = assignment.match(/(?<=\()(.*?)(?=\))/)[0].split(",").map(p => p.trim());
-                                for(p of params){
-                                    optionalParam = p.match(/\w+(\s|)=(\s|)/);
-                                    if(optionalParam){
-                                        let name = optionalParam[0].replace(/(\s|)=(\s|)/, "");
-                                        functionVars.push({"name": name, "type": 5});
+                                try {
+                                    params = assignment.match(/(?<=\()(.*?)(?=\))/)[0].split(",").map(p => p.trim());
+                                    for(p of params){
+                                        //bugout.appendLine(`PARSE PARAM ${p}`)
+                                        optionalParam = p.match(/\w+(\s|)=(\s|)/);
+                                        if(optionalParam){
+                                            let name = optionalParam[0].replace(/(\s|)=(\s|)/, "");
+                                            functionVars.push({"name": name, "type": 5});
+                                        }
+                                        else functionVars.push({"name": p, "type": 5});
                                     }
-                                    else functionVars.push({"name": p, "type": 5});
+                                    } catch(err) {
+                                    bugout.appendLine(`Failed to parse function params: ${err}`)
                                 }
                             }
 
                             let variable = {"name": variableName, "type": (assignment.startsWith("function") ? 2 : 5)}
                             if(inFunction) functionVars.push(variable);
                             else variableOptions.push(variable);
+                            //bugout.appendLine(`POST MATCH ${match[0]}`)
                         }
                     }
                     variableOptions = variableOptions.concat(functionVars);
                 }
             }
+
+            //bugout.appendLine(`VOPT`)
+            //bugout.appendLine(variableOptions);
            
             let output = {};
 
@@ -458,7 +526,7 @@ function activate(context) {
                 if(variable.name.includes(word)) variablesOutput.push(variable);
             }
 
-            //console.log(output);
+            //bugout.appendLine(output);
 
             // Instantiate result array
 
@@ -468,7 +536,7 @@ function activate(context) {
             // Go through filtered results
             for (key in output) {
                 for(c of output[key]){
-                    //console.log("Processing result: " + c);
+                    //bugout.appendLine("Processing result: " + c);
 
                     // Get type of completion item
                     let type = CompTypes[c] || CompTypes["default"];
@@ -493,8 +561,8 @@ function activate(context) {
                 out.push(new vscode.CompletionItem(variable.name, variable.type));
             }
 
-            //console.log("AutoCompletion result:");
-            //console.log(out);
+            //bugout.appendLine("AutoCompletion result:");
+            //bugout.appendLine(out);
 
             // Return completion items
             return new vscode.CompletionList(out,true);
@@ -523,7 +591,7 @@ function activate(context) {
     if (vscode.workspace.getConfiguration("greyscript").get("autocomplete")) {
         context.subscriptions.push(compD)
         context.subscriptions.push(vscode.languages.registerSignatureHelpProvider("greyscript", {
-            provideSignatureHelp(document, position, token, ctx) {
+            async provideSignatureHelp(document, position, token, ctx) {
                 // Check if current line is not a function creation
                 let re = RegExp("(\\s|)=(\\s|)function");
                 let curLine = document.lineAt(position.line);
@@ -533,7 +601,7 @@ function activate(context) {
 
                 // Get the function being called 
                 let range = document.getWordRangeAtPosition(new vscode.Position(position.line, curLine.text.lastIndexOf("(") - 1));
-                let word = document.getText(range);
+                let word = await GetDocumentText(document, range);
 
                 // Create default signature help
                 let t = new vscode.SignatureHelp();
@@ -563,7 +631,8 @@ function activate(context) {
                 }
                
                 // Get all lines till this line
-                let linesTillLine = document.getText().split("\n").splice(0, range.start.line)
+                let text = await GetDocumentText(document)
+                let linesTillLine = text.split("\n").splice(0, range.start.line)
                 re = RegExp("\\b" + word + "(\\s|)=(\\s|)function");
                 
                 // Get last defined user function using this word
@@ -629,8 +698,9 @@ function activate(context) {
       }
 
     let ColorPicker = vscode.languages.registerColorProvider('greyscript', {
-        provideDocumentColors(document, token) {
-            let txt = document.getText();
+        async provideDocumentColors(document, token) {
+            //let txt = document.getText();
+            let txt = await GetDocumentText(document);
             let reg = /(?:(?:<color=)?(#[0-9a-f]{6})|<color=\"?(black|blue|green|orange|purple|red|white|yellow)\"?)>/gi
             let mchs = txt.matchAll(reg);
             let out = [];
@@ -654,7 +724,7 @@ function activate(context) {
                 let range = new vscode.Range(pl, line.text.indexOf(m[0], startPos), pl, line.text.indexOf(m[0], startPos) + m[0].length);
 
                 // Parse color
-                //console.log(m);
+                //bugout.appendLine(m);
                 let color;
                 if (m[1]) {
                     range = new vscode.Range(pl, line.text.indexOf(m[1], startPos), pl, line.text.indexOf(m[1], startPos) + m[1].length);
@@ -716,6 +786,95 @@ function activate(context) {
     });
 
     if (vscode.workspace.getConfiguration("greyscript").get("colorpicker")) context.subscriptions.push(ColorPicker)
+
+    let GetAvailableVariables = function(text, document) {
+        let variableOptions = [];
+        //let linesTillLine = document.getText(new vscode.Range(new vscode.Position(0, 0), range.start))
+        let linesTillLine = text
+        matches = linesTillLine.matchAll(/\b(\w+(\s|)=|end function)/g);
+        let inFunction = false;
+        let functionVars = [];
+        if(matches){
+            for(match of Array.from(matches).reverse()){
+                //bugout.appendLine(`MATCHED, ${match}, ${match[0]}`)
+                let fullMatch = match[0];
+                variableName = fullMatch.replace(/(\s|)=/, "");
+                if(variableOptions.every(m => m.name !== variableName)) {
+                    if(fullMatch == "end function"){
+                        inFunction = true;
+                        functionVars = [];
+                        continue;
+                    }
+                    let assignment = linesTillLine.substring(match.index, linesTillLine.indexOf("\n", match.index));
+                    assignment = assignment.substring(assignment.indexOf("=") + 1).trim();
+
+                    let range = new vscode.Range(document.positionAt(match.index), document.positionAt(match.index + fullMatch.length));
+
+                    let lb = text.slice(0, match.index).split("\n").length;
+
+                    //bugout.appendLine(`ASSIGNMENT: ${assignment}`)
+
+                    if(assignment.startsWith("function")){
+                        //bugout.appendLine(`Found function ${variableName}`)
+                        inFunction = false;
+                        try {
+                            params = assignment.match(/(?<=\()(.*?)(?=\))/)[0].split(",").map(p => p.trim());
+                            for(p of params){
+                                //bugout.appendLine(`PARSE PARAM ${p}`)
+                                optionalParam = p.match(/\w+(\s|)=(\s|)/);
+                                if(optionalParam){
+                                    let name = optionalParam[0].replace(/(\s|)=(\s|)/, "");
+                                    functionVars.push({"name": name, "type": 5});
+                                }
+                                else functionVars.push({"name": p, "type": 5});
+                            }
+                            } catch(err) {
+                            bugout.appendLine(`Failed to parse function params: ${err}`)
+                        }
+                    }
+
+                    let variable = {"name": variableName, "type": (assignment.startsWith("function") ? 2 : 5), "range": range, "linesBefore": lb}
+                    if(inFunction) functionVars.push(variable);
+                    else variableOptions.push(variable);
+                    //bugout.appendLine(`POST MATCH ${match[0]}`)
+                }
+            }
+        }
+        return variableOptions;
+    }
+
+    let SymbolProvider = vscode.languages.registerDocumentSymbolProvider('greyscript', 
+    {
+        async provideDocumentSymbols(document, token) {
+            bugout.appendLine(`Provide document symbols!`);
+            let text = document.getText();
+            // Don't use GetDocumentText here, only show the symbols in the current file
+            let symbols = [];
+            // Get All user defined variables
+            
+            let variableOptions = GetAvailableVariables(text, document);
+                
+            //bugout.appendLine(`VARS VARS: ${JSON.stringify(variableOptions)}`)
+            variableOptions = variableOptions.filter(v => v.type == 2);
+            //bugout.appendLine(`FINAL VARS: ${JSON.stringify(variableOptions)}`)
+            for (let opt of variableOptions) {
+                let sym = new vscode.DocumentSymbol(opt.name, `Line ${opt.linesBefore}`, vscode.SymbolKind.Function, opt.range, opt.range)
+                symbols.push(sym);
+            }
+            for (let fi in FileCache) {
+                let t = FileCache[fi].text;
+                let vopt = GetAvailableVariables(t, document);
+                for (let opt of vopt) {
+                    if (!text.includes(`${opt.name}(`)) continue;
+                    let sym = new vscode.DocumentSymbol(opt.name, `${fi.split("/").pop()}`, vscode.SymbolKind.Function, opt.range, opt.range)
+                    symbols.push(sym);
+                }
+            }
+            return symbols;
+        }
+    });
+
+    if (vscode.workspace.getConfiguration("greyscript").get("symbols")) context.subscriptions.push(SymbolProvider);
 	
     function LookForErrors(source) {
 	    let outp = [];
@@ -742,21 +901,22 @@ function activate(context) {
 let collection = vscode.languages.createDiagnosticCollection("greyscript");
 
 	
-    function readerror(document) {
+    async function readerror(document) {
 	   let uri = document.uri;
 	   //collection.clear();
-	   let e = LookForErrors(document.getText());
+	   //let e = LookForErrors(document.getText());
+       let e = LookForErrors(await GetDocumentText(document));
 	   collection.set(uri, e);
     }
 	let listen1 = vscode.workspace.onDidOpenTextDocument( readerror);
 	let listen2 = vscode.workspace.onDidChangeTextDocument(function(event) {
 		readerror(event.document);
 	});
-	console.log("Hello Hackers!")
+	bugout.appendLine("Hello Hackers!!")
 	context.subscriptions.push(collection, listen1, listen2);
     
 	function minify(editor, edit, context) {
-        let text = editor.document.getText().replace(/\/\/.*/g, "");
+        //let text = editor.document.getText().replace(/\/\/.*/g, "");
 
         var firstLine = editor.document.lineAt(0);
         var lastLine = editor.document.lineAt(editor.document.lineCount - 1);
