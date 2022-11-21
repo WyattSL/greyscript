@@ -1,3 +1,13 @@
+# 1.9.2
+- Updated grammar to latest version of the game.
+- Fix "Go to Declaration" ([#25](https://github.com/WyattSL/greyscript/issues/25))
+- Added a setting for showing symbols in imported files.
+- Fixed hoverdocs not showing under specific circumstances.
+
+# 1.9.1
+- Added symbols support.
+- Added autocomplete support for import_code
+
 # 1.9.0
 - Add cross file declarations and multiple declarations per file. Thanks, [@SlaskoCZ](https://github.com/SlaskoCZ)!
 
