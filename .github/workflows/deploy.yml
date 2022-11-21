@@ -40,8 +40,8 @@ jobs:
         env:
           VSCE_PAT: ${{ SECRETS.DEPLOYTOKEN }}
 
-      - name: Publish to OSVX
-        run: npx publish extension.vsix -p ${{ SECRETS.OSVXTOKEN }}
+      # - name: Publish to OSVX
+      #   run: npx publish extension.vsix -p ${{ SECRETS.OSVXTOKEN }}
       
       - name: Publish GitHub Release
         run: |
