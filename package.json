@@ -81,22 +81,32 @@
                 "greyscript.autocomplete": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Enable GreyScript's built-in autocomplete."
+                    "description": "Enable GreyScript's built-in autocomplete.",
+                    "order": 1
                 },
                 "greyscript.hoverdocs": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Enable GreyScript's hover-for-documentation."
+                    "description": "Enable GreyScript's hover-for-documentation.",
+                    "order": 2
                 },
                 "greyscript.colorpicker": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Enable GreyScript's color picker."
+                    "description": "Enable GreyScript's color picker.",
+                    "order": 3
                 },
                 "greyscript.symbols": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Enable GreyScript's symbol outline.."
+                    "description": "Enable GreyScript's symbol outline.",
+                    "order": 4
+                },
+                "greyscript.remoteSymbols": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Search imported files for symbols. (May be slow)",
+                    "order": 5
                 }
             }
         }

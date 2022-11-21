@@ -861,13 +861,15 @@ function activate(context) {
                 let sym = new vscode.DocumentSymbol(opt.name, `Line ${opt.linesBefore}`, vscode.SymbolKind.Function, opt.range, opt.range)
                 symbols.push(sym);
             }
-            for (let fi in FileCache) {
-                let t = FileCache[fi].text;
-                let vopt = GetAvailableVariables(t, document);
-                for (let opt of vopt) {
-                    if (!text.includes(`${opt.name}(`)) continue;
-                    let sym = new vscode.DocumentSymbol(opt.name, `${fi.split("/").pop()}`, vscode.SymbolKind.Function, opt.range, opt.range)
-                    symbols.push(sym);
+            if (vscode.workspace.getConfiguration("greyscript").get("remoteSymbols")) {
+                for (let fi in FileCache) {
+                    let t = FileCache[fi].text;
+                    let vopt = GetAvailableVariables(t, document);
+                    for (let opt of vopt) {
+                        if (!text.includes(`${opt.name}(`)) continue;
+                        let sym = new vscode.DocumentSymbol(opt.name, `${fi.split("/").pop()}`, vscode.SymbolKind.Function, opt.range, opt.range)
+                        symbols.push(sym);
+                    }
                 }
             }
             return symbols;
