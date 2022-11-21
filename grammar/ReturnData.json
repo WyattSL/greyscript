@@ -1,4 +1,255 @@
 {
+    "Blockchain": {
+        "amount_mined": [{
+            "type": "Number"
+        }],
+        "coin_price": [{
+                "type": "Number"
+            },
+            {
+                "type": "String"
+        }],
+        "create_wallet": [{
+            "type": "Wallet"
+        },
+        {
+            "type": "String"
+        }],
+        "delete_coin": [
+            {
+                "type": "null"
+            }
+        ],
+        "get_coin": [
+            {
+                "type": "Coin"
+            },
+            {
+                "type": "String"
+            }
+        ],
+        "login_wallet": [
+            {
+                "type": "Wallet"
+            },
+            {
+                "type": "String"
+            }
+        ],
+        "show_history": [
+            {
+                "type": "Map"
+            }
+        ]
+    },
+    "Wallet": {
+        "buy_coin": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "String"
+            }
+        ],
+        "cancel_pending_trade": [
+            {
+                "type": "null"
+            }
+        ],
+        "get_balance": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "String"
+            }
+        ],
+        "get_global_offers": [
+            {
+                "type": "Map"
+            }
+        ],
+        "get_pending_trade": [
+            {
+                "type": "List"
+            }
+        ],
+        "get_pin": [
+            {
+                "type": "String"
+            }
+        ],
+        "list_coins": [
+            {
+                "type": "List",
+                "subType": "String"
+            }
+        ],
+        "list_global_coins": [
+            {
+                "type": "List",
+                "subType": "String"
+            }
+        ],
+        "reset_password": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "String"
+            }
+        ],
+        "sell_coin": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "String"
+            }
+        ],
+        "show_nodes": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "String"
+            }
+        ]
+    },
+    "Coin": {
+        "create_subwallet": [
+            {
+                "type": "null"
+            }
+        ],
+        "get_address": [
+            {
+                "type": "String"
+            }
+        ],
+        "get_cycle_mining": [
+            {
+                "type": "Number"
+            }
+        ],
+        "get_mined_coins": [
+            {
+                "type": "Number"
+            }
+        ],
+        "get_reward": [
+            {
+                "type": "Number"
+            }
+        ],
+        "get_subwallet": [
+            {
+                "type": "SubWallet"
+            }
+        ],
+        "get_subwallets": [
+            {
+                "type": "List",
+                "subType": "SubWallet"
+            }
+        ],
+        "set_address": [
+            {
+                "type": "null"
+            }
+        ],
+        "set_cycle_mining": [
+            {
+                "type": "null"
+            }
+        ],
+        "set_reward": [
+            {
+                "type": "null"
+            }
+        ],
+        "transaction": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "String"
+            }
+        ]
+    },
+    "SubWallet": {
+        "check_password": [
+            {
+                "type": "Number"
+            }
+        ],
+        "delete": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "String"
+            }
+        ],
+        "get_balance": [
+            {
+                "type": "Number"
+            },
+            {
+                "type": "String"
+            }
+        ],
+        "get_info": [
+            {
+                "type": "String"
+            }
+        ],
+        "get_user": [
+            {
+                "type": "String"
+            }
+        ],
+        "last_transaction": [
+            {
+                "type": "Map"
+            }
+        ],
+        "mining": [
+            {
+                "type": "null"
+            }
+        ],
+        "set_info": [
+            {
+                "type": "null"
+            }
+        ],
+        "wallet_username": [
+            {
+                "type": "String"
+            }
+        ]
+    },
+    "Service": {
+        "install_service": [{
+            "type": "Number"
+        },
+        {
+            "type": "String"
+        }],
+        "start_service": [{
+            "type": "Number"
+        },
+        {
+            "type": "String"
+        }],
+        "stop_service": [{
+            "type": "Number"
+        },
+        {
+            "type": "String"
+        }]
+    },
     "Shell": {
         "host_computer": [
             {
@@ -206,7 +457,7 @@
                 "type": "null"
             }
         ],
-        "smtp_user_List": [
+        "smtp_user_list": [
             {
                 "type": "String"
             },
@@ -378,7 +629,11 @@
         ]
     },
     "File": {
-        "chmod": [],
+        "chmod": [
+            {
+                "type": "String"
+            }
+        ],
         "copy": [
             {
                 "type": "String"
@@ -439,6 +694,11 @@
             }
         ],
         "is_binary": [
+            {
+                "type": "Number"
+            }
+        ],
+        "is_folder": [
             {
                 "type": "Number"
             }
@@ -604,9 +864,24 @@
             {
                 "type": "String"
             }
+        ],
+        "local_ip": [
+            {
+                "type": "String"
+            }
+        ],
+        "public_ip": [
+            {
+                "type": "String"
+            }
         ]
     },
     "General": {
+        "md5": [
+            {
+                "type": "String"
+            }
+        ],
         "mail_login": [
             {
                 "type": "String"
@@ -978,8 +1253,16 @@
                 "type": "null"
             }
         ],
-        "join": [],
-        "push": [],
+        "join": [
+            {
+                "type": "String"
+            }
+        ],
+        "push": [
+            {
+                "type": "null"
+            }
+        ],
         "pop": [
             {
                 "type": "Any"
@@ -990,9 +1273,21 @@
                 "type": "Any"
             }
         ],
-        "shuffle": [],
-        "reverse": [],
-        "sort": [],
+        "shuffle": [
+            {
+                "type": "List"
+            }
+        ],
+        "reverse": [
+            {
+                "type": "List"
+            }
+        ],
+        "sort": [
+            {
+                "type": "List"
+            }
+        ],
         "remove": [
             {
                 "type": "List",
@@ -1036,13 +1331,21 @@
                 "type": "null"
             }
         ],
-        "push": [],
+        "push": [
+            {
+                "type": "null"
+            }
+        ],
         "pop": [
             {
                 "type": "Any"
             }
         ],
-        "shuffle": [],
+        "shuffle": [
+            {
+                "type": "Map"
+            }
+        ],
         "remove": [
             {
                 "type": "List",
@@ -1061,7 +1364,9 @@
             }
         ],
         "values": [
-            "List"
+            {
+                "type": "List"
+            }
         ],
         "sum": [
             {

@@ -1,4 +1,55 @@
 {
+    "Blockchain": [
+        "amount_mined",
+        "coin_price",
+        "create_wallet",
+        "delete_coin",
+        "get_coin",
+        "login_wallet",
+        "show_history"
+    ],
+    "Wallet": [
+        "buy_coin",
+        "cancel_pending_trade",
+        "get_balance",
+        "get_global_offers",
+        "get_pending_trade",
+        "get_pin",
+        "list_coins",
+        "list_global_coins",
+        "reset_password",
+        "sell_coin",
+        "show_nodes"
+    ],
+    "Coin": [
+        "create_subwallet",
+        "get_address",
+        "get_cycle_mining",
+        "get_mined_coins",
+        "get_reward",
+        "get_subwallet",
+        "get_subwallets",
+        "set_address",
+        "set_cycle_mining",
+        "set_reward",
+        "transaction"
+    ],
+    "SubWallet": [
+        "check_password",
+        "delete",
+        "get_balance",
+        "get_info",
+        "get_user",
+        "last_transaction",
+        "mining",
+        "set_info",
+        "wallet_username"
+    ],
+    "Service": [
+        "install_service",
+        "start_service",
+        "stop_service"
+    ],
     "Shell": [
         "connect_service",
         "start_terminal",
@@ -170,19 +221,8 @@
         "ceil",
         "pi",
         "slice",
-        "for",
-        "while",
-        "break",
-        "continue",
-        "if",
-        "else",
-        "function",
-        "then",
-        "end",
-        "true",
-        "false",
-        "null",
-        "not"
+        "get_custom_object",
+        ""
     ],
     "String": [
         "remove",

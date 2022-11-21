@@ -1,4 +1,53 @@
 {
+    "Blockchain": {
+        "amount_mined": "Returns an int with the number of units of the coin that have been mined in total.",
+        "coin_price": "Returns an int with the current unit value of the currency. In case of an error, a string is returned with the details.",
+        "create_wallet": "Returns an object of type wallet, used to manage cryptocurrencies. In case of a error, a string is returned with the details.",
+        "delete_coin": "Remove a crypto currency from the world. The credentials used in the creation of the currency are necessary.",
+        "get_coin": "Returns an object of type Coin used to manage the currency. A string with the details is returned in case of an error.",
+        "login_wallet": "Returns a wallet type object or a string in the event of an error, indicating the reason.",
+        "show_history": "Returns a map with the latest changes in the value of a specific currency. The Key of the map is the index represented by an int. Value contains a list, where index 0 is the price of the coin it had in the past, index 1 indicates the date on which the price change occurred."
+    },
+    "Wallet": {
+        "buy_coin": "Publish a purchase offer indicating the number of coins you wish to buy and the price ($) per unit you are willing to pay. The purchase will be finalized if there is any sale offer with a price less than or equal to the one proposed in the purchase. If there is no eligible offer to sell at that time, the offer to buy will remain publicly visible until a new offer to sell satisfies the requirements. If the publication has been successful, true is returned, in case of error a string with the details is returned.",
+        "cancel_pending_trade": "Cancel any pending offer of a certain coin.",
+        "get_balance": "Returns an int with the number of coins of a given currency. In case of error, a string with the details is returned.",
+        "get_pin": "Returns a string with a PIN that refreshes every few minutes. This PIN is used to obtain an account in cryptocurrency services.",
+        "list_coins": "Returns a string list with the names of the coins available in the wallet.",
+        "list_global_coins": "Returns a string list with the names of all the currencies that exist.",
+        "reset_password": "Change the password of the wallet. Only the account owner can change the password. Returns true if the process completed successfully, in case of error a string with the details is returned",
+        "sell_coin": "Publish a sale offer indicating the amount of coins you want to sell and the price ($) per unit you want to assign. The sale will be finalized if there is any purchase offer with a price greater than or equal to that proposed in the sale. If there is no existing offer to buy that matches the requirements at that time, the offer to sell will remain publicly visible until a new offer to buy satisfies the requirements. If the publication has been successful, true is returned, in case of error a string with the details is returned.",
+        "show_nodes": "Returns an int indicating the number of devices mining a specific coin for the same wallet. In case of error a string is returned with the details."
+    },
+    "Coin": {
+        "create_subwallet": "Register a new account in the Coin that can be used to manage services such as stores. It is necessary to use the PIN that the owner of the wallet that wants to register has to provide.",
+        "get_address": "Returns the configured address that will be shown to users who do not have the currency, indicating where they have to register.",
+        "get_cycle_mining": "Returns an int with the number of hours (game time) that each mining cycle lasts. When a cycle ends, it is decided who gets the reward (1 coin) and the next cycle begins.",
+        "get_mined_coins": "Returns an int with the number of coins that have been mined so far.",
+        "get_reward": "Returns an int with the number of coins that will be received as a reward after each mining cycle.",
+        "get_subwallet": "Returns an object of type SubWallet, in case of error it returns a string with the details.",
+        "get_subwallets": "Returns a list of objects of type SubWallet with all the accounts registered in the crypto currency, in case of error it returns a string with the details.",
+        "set_address": "Configure a valid address that will be shown to users who do not have the currency, indicating where to register.",
+        "set_cycle_mining": "Assign the hours (game time) that each mining cycle lasts. When a cycle ends, it is decided who gets the reward (1 coin) and the next cycle begins",
+        "set_reward": "Assign the reward that miners will receive after each mining cycle",
+        "transaction": "Make a transaction of the currency between the indicated subwallets. In case of error, a string with the details is returned."
+    },
+    "SubWallet": {
+        "check_password": "Returns true if the credentials are correct, false otherwise.",
+        "delete": "Delete the account registered in the crypto currency. Returns true on success or a string with the details of the error. It can return false if the account to be deleted does not exist.",
+        "get_balance": "Returns an int with the amount of coins that the Subwallet has. In case of error, a string with the details is returned",
+        "get_info": "Returns a string with the information stored by the coin creator",
+        "get_user": "Returns a string with the username associated with this subwallet",
+        "last_transaction": "Returns a list with the information of the last transaction. Index 0 is a string with the other subWallet. Index 1 is an int with the amount. Index 2 is an int with the direction of the transaction (0 Deposit, 1 Withdrawal). Index 3 is a string indicating the date of the transaction",
+        "mining": "Starts the process of mining the cryptocurrency. The process leaves the terminal busy until a coin is mined, returning true",
+        "set_info": "Optional information that the coin creator can store in the Subwallet for any use.",
+        "wallet_username": "Returns a string with the name of the wallet to which this subwallet belongs."
+    },
+    "Service": {
+        "install_service": "Installs the necessary files for the correct functioning of the service and starts it. Returns true if the installation has been completed successfully, in case of error a string with the details is returned.",
+        "start_service": "Start the service and open its associated port on the local machine. The service needs portforward in the router to be accessible from the outside. Returns true if the service has started correctly, in case of error a string with the details is returned",
+        "stop_service": "Stop the service and close its associated port on the local machine. Returns true if the service has been stopped correctly, in case of error a string with the details is returned"
+    },
     "Shell": {
         "host_computer": "Returns the computer associated with the Shell.",
         "start_terminal": "Launch an active terminal from the Shell.",
@@ -121,6 +170,7 @@
         "active_net_card": "Returns a string with the keyword WIFI if the current device is connected to a router by WiFi, if it is connected by cable a string with the keyword ETHERNET is returned."
     },
     "General": {
+        "get_custom_object": "Returns an empty Map object that can be used to share data back and forth with programs launched with shell.launch.",
         "mail_login": "Access the email account\n\nReturns a MetaMail type object if the login has been correct. In case of error, it returns a string",
         "typeof": "Returns a string with the type of the object passed as a parameter.",
         "get_router": "Returns the router whose public IP matches, otherwise returns null.\nIf the ip_address parameter is not specified, returns the router to which the computer executing this command is connected.",

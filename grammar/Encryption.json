@@ -15,5 +15,6 @@
 	"clear_screen",
 	"connect_service",
 	"start_terminal",
-	"hash"
+	"hash",
+	"show_procs"
 ]

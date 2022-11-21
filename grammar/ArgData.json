@@ -1,4 +1,268 @@
 {
+    "Blockchain": {
+        "amount_mined": [
+            {
+                "type": "string",
+                "name": "coinName",
+                "optional": false
+            }
+        ],
+        "coin_price": [
+            {
+                "type": "string",
+                "name": "coinName",
+                "optional": false
+            }
+        ],
+        "create_wallet": [
+            {
+                "type": "string",
+                "name": "username",
+                "optional": false
+            },
+            {
+                "type": "string",
+                "name": "password",
+                "optional": false
+            }
+        ],
+        "delete_coin": [
+            {
+                "type": "string",
+                "name": "coinName",
+                "optional": false
+            },
+            {
+                "type": "string",
+                "name": "username",
+                "optional": false
+            },
+            {
+                "type": "string",
+                "name": "password",
+                "optional": false
+            }
+        ],
+        "get_coin": [
+            {
+                "type": "string",
+                "name": "coinName",
+                "optional": false
+            },
+            {
+                "type": "string",
+                "name": "username",
+                "optional": false
+            },
+            {
+                "type": "string",
+                "name": "password",
+                "optional": false
+            }
+        ],
+        "login_wallet": [
+            {
+                "type": "string",
+                "name": "username",
+                "optional": false
+            },
+            {
+                "type": "string",
+                "name": "password",
+                "optional": false
+            }
+        ],
+        "show_history": [
+            {
+                "type": "string",
+                "name": "coinName",
+                "optional": false
+            }
+        ]
+    },
+    "Wallet": {
+        "buy_coin": [
+            {
+                "type": "string",
+                "name": "currencyName",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "quantity",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "UnitPrice",
+                "optional": false
+            }
+        ],
+        "cancel_pending_trade": [
+            {
+                "type": "string",
+                "name": "currencyName",
+                "optional": false
+            }
+        ],
+        "get_balance": [
+            {
+                "type": "string",
+                "name": "coinName",
+                "optional": false
+            }
+        ],
+        "get_global_offers": [
+            {
+                "type": "string",
+                "name": "currencyName",
+                "optional": false
+            }
+        ],
+        "get_pending_trade": [
+            {
+                "type": "string",
+                "name": "currencyName",
+                "optional": false
+            }
+        ],
+        "get_pin": [],
+        "list_coins": [],
+        "list_global_coins": [],
+        "reset_password": [
+            {
+                "type": "string",
+                "name": "newPassword",
+                "optional": false
+            }
+        ],
+        "sell_coin": [
+            {
+                "type": "string",
+                "name": "currencyName",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "quantity",
+                "optional": false
+            },
+            {
+                "type": "Number",
+                "name": "UnitPrice",
+                "optional": false
+            }
+        ],
+        "show_nodes": [
+            {
+                "type": "string",
+                "name": "coinName",
+                "optional": false
+            }
+        ]
+    },
+    "Coin": {
+        "create_subwallet": [
+            {
+                "type": "string",
+                "name": "walletID",
+                "optional": false
+            },
+            {
+                "type": "string",
+                "name": "pin",
+                "optional": false
+            },
+            {
+                "type": "string",
+                "name": "subWalletUser",
+                "optional": false
+            },
+            {
+                "type": "string",
+                "name": "subWalletPass",
+                "optional": false
+            }
+        ],
+        "get_address": [],
+        "get_cycle_mining": [],
+        "get_mined_coins": [],
+        "get_reward": [],
+        "get_subwallet": [
+            {
+                "type": "string",
+                "name": "subWalletUser",
+                "optional": false
+            }
+        ],
+        "get_subwallets": [],
+        "set_address": [
+            {
+                "type": "string",
+                "name": "address",
+                "optional": false
+            }
+        ],
+        "set_cycle_mining": [
+            {
+                "type": "Number",
+                "name": "rateHours",
+                "optional": false
+            }
+        ],
+        "set_reward": [
+            {
+                "type": "Number",
+                "name": "coinAmount",
+                "optional": false
+            }
+        ],
+        "transaction": [
+            {
+                "type": "string",
+                "name": "origSubWallet",
+                "optional": false
+            },
+            {
+                "type": "string",
+                "name": "destSubWallet",
+                "optional": false
+            },
+            {
+                "type": "string",
+                "name": "amount",
+                "optional": false
+            }
+        ]
+    },
+    "SubWallet": {
+        "check_password": [
+            {
+                "type": "string",
+                "name": "subWalletPass",
+                "optional": false
+            }
+        ],
+        "delete": [],
+        "get_balance": [],
+        "get_info": [],
+        "get_user": [],
+        "last_transaction": [],
+        "mining": [],
+        "set_info": [
+            {
+                "type": "string",
+                "name": "info",
+                "optional": false
+            }
+        ],
+        "wallet_username": []
+    },
+    "Service": {
+        "install_service": [],
+        "start_service": [],
+        "stop_service": []
+    },
     "Shell": {
         "host_computer": [],
         "start_terminal": [],
@@ -527,7 +791,11 @@
                 "name": "path",
                 "optional": false
             },
-            "folderName"
+            {
+                "type": "String",
+                "name": "folderName",
+                "optional": false
+            }
         ],
         "is_network_active": [],
         "touch": [
@@ -668,6 +936,7 @@
         "active_net_card": []
     },
     "General": {
+        "get_custom_object": [],
         "mail_login": [
             {
                 "type": "String",
