@@ -10,8 +10,8 @@ var CompTypes = require("./grammar/CompletionTypes.json") // Constant 20 Functio
 var HoverData = require("./grammar/HoverData.json");
 var Encryption = require("./grammar/Encryption.json");
 
-var bugout = vscode.window.createOutputChannel("Greyscript Debugger");
-//var bugout = { appendLine: function() {}}
+//var bugout = vscode.window.createOutputChannel("Greyscript Debugger");
+var bugout = { appendLine: function() {}}
 
 var enumCompTypeText = {
     1: "method",
@@ -76,6 +76,7 @@ function activate(context) {
 
             // If there is a . in front of the text check what the previous item accesses
             if(range && range.start.character - 2 >= 0 && document.getText(new vscode.Range(new vscode.Position(range.start.line, range.start.character - 1), new vscode.Position(range.start.line, range.start.character))) == "."){
+                bugout.appendLine(`Hovering on a property, range ${range}`);
                 let res = getOptionsBasedOfPriorCommand(document, range);
                 if(res) options = res;
             }
@@ -302,7 +303,12 @@ function activate(context) {
         //bugout.appendLine("Checking item before .");
 
         // Get Target if there was a delimiter before starting character
+        //bugout.appendLine(`gOBOPC: ${range}, ${range.start.line}:${range.start.character}`)
         let targetRange = document.getWordRangeAtPosition(new vscode.Position(range.start.line, range.start.character - 2));
+        if (!targetRange) targetRange = document.getWordRangeAtPosition(new vscode.Position(range.start.line, range.start.character - 3));
+        if (!targetRange) targetRange = document.getWordRangeAtPosition(new vscode.Position(range.start.line, range.start.character - 4));
+        //bugout.appendLine(`gOBOPC tR ${targetRange}`);
+        if (!targetRange) return []; // No target, return empty array
         let targetWord = document.getText(targetRange);
 
         //bugout.appendLine(targetWord)
