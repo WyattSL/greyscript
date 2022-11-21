@@ -193,8 +193,8 @@ function activate(context) {
                     return;
                 }
 
-                //let text = document.getText()
-                let text = await GetDocumentText(document);
+                let text = document.getText()
+                //let text = await GetDocumentText(document);
                 let matches = text.matchAll(re);
                 let match = matches.next();
                 while (!match.done) {
