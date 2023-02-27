@@ -10,8 +10,8 @@ var CompTypes = require("./grammar/CompletionTypes.json") // Constant 20 Functio
 var HoverData = require("./grammar/HoverData.json");
 var Encryption = require("./grammar/Encryption.json");
 
-//var bugout = vscode.window.createOutputChannel("Greyscript Debugger");
-var bugout = { appendLine: function() {}}
+var bugout = vscode.window.createOutputChannel("Greyscript Debugger");
+//var bugout = { appendLine: function() {}}
 
 var enumCompTypeText = {
     1: "method",
@@ -166,11 +166,20 @@ function activate(context) {
                 // If its a function type return the function hover
                 if(assignment.startsWith("function")) {
                     let description = null;
-                    if(linesTillCurLine[linesTillCurLine.indexOf(lines[lines.length - 1]) + 1].startsWith("//")){
-                        description = linesTillCurLine[linesTillCurLine.indexOf(lines[lines.length - 1]) + 1].substring(2).trim();
-                    }
+                    //if(linesTillCurLine[linesTillCurLine.indexOf(lines[lines.length - 1]) + 1].startsWith("//")){
+                    //    description = linesTillCurLine[linesTillCurLine.indexOf(lines[lines.length - 1]) + 1].substring(2).trim();
+                    let preline = linesTillCurLine[linesTillCurLine.indexOf(lines[lines.length - 1]) + 1]
+                    let thisline = document.getText(new vscode.Range(new vscode.Position(position.line, 0), new vscode.Position(position.line+1,0))).replace(`\n`,``)
+                    let postline = document.getText(new vscode.Range(new vscode.Position(position.line+1, 0), new vscode.Position(position.line+2,0))).replace(`\n`, ``)
+                    bugout.appendLine(preline+`\n`+thisline+`\n`+postline)
+                    bugout.appendLine(new vscode.Position(position.line, 0) + `\n` + new vscode.Position(position.line+1,0) + `\n` + new vscode.Range(new vscode.Position(position.line, 0), new vscode.Position(position.line+1,0)))
+                    if (preline.includes("//")) description = preline.replace(`//`,``);
+                    if (thisline.includes("//")) description = thisline.split(`//`)[1];
+                    if (postline.includes("//")) description = postline.replace(`//`,``);
+                    if (!description) description = ``;
+                    if (word.includes("gk")) description += `\ngk258 is my hero!`;
                     hoverText.appendCodeblock("(function) " + word + "(" +assignment.match(/(?<=\()(.*?)(?=\))/)[0] + ")")
-                    if(description) hoverText.appendText(description);
+                    if(description && description != ``) hoverText.appendText(description);
                     return new vscode.Hover(hoverText);
                 }
             }

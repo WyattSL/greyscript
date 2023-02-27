@@ -1,3 +1,6 @@
+# 1.9.3
+- Updated function hints, comments may now be placed one line above, on the same line, or a line below the function definition.
+
 # 1.9.2
 - Updated grammar to latest version of the game.
 - Fix "Go to Declaration" ([#25](https://github.com/WyattSL/greyscript/issues/25))
