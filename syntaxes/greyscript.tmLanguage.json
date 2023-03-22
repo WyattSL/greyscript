@@ -104,7 +104,7 @@
 				},
 				{
 					"name": "support.function.general",
-					"match": "\\b(clear_screen|print|typeof|md5|get_switch|get_router|get_shell|nslookup|whois|is_valid_ip|is_lan_ip|command_info|format_columns|user_input|include_lib|import_code|exit|bitwise|wait|hash|mail_login)\\b"
+					"match": "\\b(clear_screen|print|typeof|md5|get_switch|get_router|get_shell|nslookup|whois|is_valid_ip|is_lan_ip|command_info|format_columns|user_input|include_lib|import_code|exit|bitwise|wait|hash|mail_login|get_custom_object)\\b"
 				},
 				{
 					"name": "support.function",
