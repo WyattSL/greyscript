@@ -2,6 +2,7 @@ const vscode = require("vscode");
 //import { Buffer } from 'node:buffer';
 //const { ky } = require('ky-universal');
 
+console.log(`Hello World!`);
 
 var bugout = vscode.window.createOutputChannel("Greyscript Debugger");
 //var bugout = { appendLine: function() {}}
@@ -12,7 +13,7 @@ var ArgData;
 var ReturnData;
 var Examples;
 var HoverData;
-var Encrpytion;
+var Encryption;
 var Nightly;
 
 var CompTypes = {};
@@ -21,17 +22,17 @@ var CompTypes = {};
 
 function ReloadGrammarFromFile() {
 
-    var CompData = require("./computedgrammar/CompletionData.json")
-    var TypeData = require("./computedgrammar/TypeData.json")
-    var ArgData = require("./computedgrammar/ArgData.json")
-    var ReturnData = require("./computedgrammar/ReturnData.json")
-    var Examples = require("./computedgrammar/Examples.json")
-    //var CompTypes = require("./grammar/CompletionTypes.json") // Constant 20 Function 2 Property 9 Method 1 Variable 5 Interface 7
+    CompData = require("./computedgrammar/CompletionData.json")
+    TypeData = require("./computedgrammar/TypeData.json")
+    ArgData = require("./computedgrammar/ArgData.json")
+    ReturnData = require("./computedgrammar/ReturnData.json")
+    Examples = require("./computedgrammar/Examples.json")
+    //CompTypes = require("./grammar/CompletionTypes.json") // Constant 20 Function 2 Property 9 Method 1 Variable 5 Interface 7
     
-    var CompTypes = {};
-    var HoverData = require("./computedgrammar/HoverData.json");
-    var Encryption = require("./computedgrammar/Encryption.json");
-    var Nightly = require("./computedgrammar/Nightly.json")
+    CompTypes = {};
+    HoverData = require("./computedgrammar/HoverData.json");
+    Encryption = require("./computedgrammar/Encryption.json");
+    Nightly = require("./computedgrammar/Nightly.json")
 
 };
 
@@ -48,8 +49,8 @@ async function UpdateGreyDocs() {
     let PullFromGreyDocs = async (path) => {
         bugout.appendLine(`Pull ${path}`)
         try {
-            let res = await fetch(`https://raw.githubusercontent.com/WyattSL/greydocs/main/${path}`);
-            return JSON.parse(res);
+            let res = await (await fetch(`https://raw.githubusercontent.com/WyattSL/greydocs/main/${path}`)).json();
+            return res;
         } catch(err) {
             bugout.appendLine(`PullFromGreyDocs ${path}: ${err}`);
             return null;
@@ -782,10 +783,15 @@ function activate(context) {
     
     // Returns an array of vscode Ranges for any matching text in the document.
     function RegExpToRanges(document, exp, group=0, postfunc=null) {
+        bugout.appendLine(`RETR 1 ${exp} (${group}) [${postfunc}]`)
         let out = [];
         let text = document.getText();
+        bugout.appendLine(`RETR 1.5 DocLen ${text.length}`)
+        exp.global = true;
         let iter = text.matchAll(exp);
+        bugout.appendLine("RETR 2")
         for (let m of iter) {
+            bugout.appendLine(`RETR 3: ${m}`)
             let textbf = text.slice(0,m.index);
             let textaf = text.slice(0,m.index+m[0].length);
             let textbfs = textbf.split("\n");
@@ -798,16 +804,20 @@ function activate(context) {
             let endchar = startchar + m[0].length;
 
             if (group > 0) {
-                let txt = textafs[-1].slice(startchar,endchar);
+                let txt = textafs[textafs.length-1].slice(startchar,endchar);
                 let nind = txt.indexOf(m[group]);
                 startchar += nind;
                 endchar = startchar + m[group].length;
             }
 
-            if (!postfunc) return out.push(new vscode.Range(startline, startchar, endline, endchar))
-            return postfunc()
+            if (!postfunc) out.push(new vscode.Range(startline, startchar, endline, endchar))
+            if (postfunc) {
+                let res = postfunc(textafs, startline, startchar, endline, endchar)
+                for (let i of res) { out.push(i) };
+            }
             // unlimited power!!!
         }
+        bugout.appendLine(`RETR 4 ${out.length}`)
         return out;
     }
     
@@ -821,49 +831,69 @@ function activate(context) {
     }, {
 
         provideDocumentSemanticTokens(document) {
+            try {
             // analyze & return highlighting and stuff.
+            bugout.appendLine(`Proviidng semantics`);
+
             var tokensBuilder = new vscode.SemanticTokensBuilder(SemanticsLegend);
+            let outcount = 0;
 
-            let keywords = RegExpToRanges(document, /\b(if|while|for|function|then|return|end if|end for|end while|end function|else|and|or|in|not|continue|break|new|null)\b/);
-            for (let v of keywords) { tokensBuilder.push(v, "keyword") };
+            let tbPush = (a, b) => { tokensBuilder.push(a, b); outcount++; };
 
-            let classes = RegExpToRanges(document, /\b(Shell|FtpShell|Computer|File|Router|NetSession|Metaxploit|MetaMail|Metalib|Port|Crypto|int|float|number|string|String|Int|Float|Number|bool|map|Map|list|List)\b/);
-            for (let v of classes) { tokensBuilder.push(v, "class") };
+            let keywords = RegExpToRanges(document, /\b(if|while|for|function|then|returnend if|end for|end while|end function|else|and|or|in|not|continue|break|new|null)\b/g);
+            bugout.appendLine(`${keywords.length} keywords`);
+            for (let v of keywords) { tbPush(v, "keyword") };
+
+            let classes = RegExpToRanges(document, /\b(Shell|FtpShell|Computer|File|Router|NetSession|Metaxploit|MetaMail|Metalib|Port|Crypto|int|float|number|string|String|Int|Float|Number|bool|map|Map|list|List)\b/g);
+            bugout.appendLine(`${classes.length} classes`);
+            for (let v of classes) { tbPush(v, "class") };
             
-            let strings = RegExpToRanges(document, /".*"/);
-            for (let v of strings) { tokensBuilder.push(v, "string") };
+            let strings = RegExpToRanges(document, /".*"/g);
+            bugout.appendLine(`${strings.length} strings`);
+            for (let v of strings) { tbPush(v, "string") };
 
-            let numbers = RegExpToRanges(document, /\d(\.\d)?/);
-            for (let v of numbers) { tokensBuilder.push(v, "number") };
+            let numbers = RegExpToRanges(document, /\d(\.\d)?/g);
+            bugout.appendLine(`${numbers.length} numbers`);
+            for (let v of numbers) { tbPush(v, "number") };
 
-            let comments = RegExpToRanges(document, /\/\/.*/);
-            for (let v of comments) { tokensBuilder.push(v, "comment") };
+            let comments = RegExpToRanges(document, /\/\/.*/g);
+            bugout.appendLine(`${comments.length} comments`);
+            for (let v of comments) { tbPush(v, "comment") };
 
             /* // redundant because of variable & function search below
             let funcs = RegExpToRanges(document, /(\w+)(\s|)=(\s|)function/, 1);
-            for (let v of funcs) { tokensBuilder.push(v, "function") };
+            for (let v of funcs) { tbPush(v, "function") };
             */
 
-            let params = RegExpToRanges(document, /\w+(?:\s|)=(?:\s|)function\((.*)\)/, 1, () => {
-                let txt = textafs[-1].slice(startchar,endchar);
+            let params = RegExpToRanges(document, /\w+(?:\s|)=(?:\s|)function\((.*)\)/g, 1, (textafs, startline, startchar, endline, endchar) => {
+                let out = [];
+                let txt = textafs[textafs.length-1].slice(startchar,endchar);
                 let opts = txt.split(",");
                 for (let o of opts) {
                     let s = o.split("=")[0];
-                    let exe = txt.exec(`(?<=^|,\s?)${s}(?=$|,|=)`);
+                    let exe = new RegExp(`(?<=^|,\s?)${s}(?=$|,|=)`).exec(txt);
                     out.push(new vscode.Range(startline, startchar+exe.index, endline, startchar+exe.index+s.length))
                 }
+                return out;
             });
-            for (let v of params) { tokensBuilder.push(v, "parameter") };
+            bugout.appendLine(`${params.length} params`);
+            for (let v of params) { tbPush(v, "parameter") };
 
-            let vars = GetAvailableVariables(document.getText(), document);
+            let vars = GetAvailableVariables(document.getText(), document, true);
+            bugout.appendLine(`${vars.length} vars & funcs`);
             for (let v of vars) {
-                tokensBuilder.push(v.range, v.type ? `function` : `variable`)
+                tbPush(v.range, v.type ? `function` : `variable`)
             }
+
+            bugout.appendLine(`Provided ${outcount} tokens!`)
+        } catch(err) {
+            bugout.appendLine(`Caught error: ${err}`)
+        }
         }
 
     }, SemanticsLegend);
 
-    if (vscode.workspace.getConfiguration('greyscript').get('semanticProvider')) context.subscriptions.push(SemanticProvider);
+    if (vscode.workspace.getConfiguration('greyscript').get('semanticsProvider')) context.subscriptions.push(SemanticProvider);
 
     let ColorPicker = vscode.languages.registerColorProvider('greyscript', {
         async provideDocumentColors(document, token) {
@@ -955,7 +985,7 @@ function activate(context) {
 
     if (vscode.workspace.getConfiguration("greyscript").get("colorpicker")) context.subscriptions.push(ColorPicker)
 
-    let GetAvailableVariables = function(text, document) {
+    let GetAvailableVariables = function(text, document, includeFunctionVars=false) {
         let variableOptions = [];
         //let linesTillLine = document.getText(new vscode.Range(new vscode.Position(0, 0), range.start))
         let linesTillLine = text
@@ -1002,7 +1032,7 @@ function activate(context) {
                     }
 
                     let variable = {"name": variableName, "type": (assignment.startsWith("function") ? 2 : 5), "range": range, "linesBefore": lb}
-                    if(inFunction) functionVars.push(variable);
+                    if(inFunction && !includeFunctionVars) functionVars.push(variable);
                     else variableOptions.push(variable);
                     //bugout.appendLine(`POST MATCH ${match[0]}`)
                 }
@@ -1082,7 +1112,7 @@ let collection = vscode.languages.createDiagnosticCollection("greyscript");
 	let listen2 = vscode.workspace.onDidChangeTextDocument(function(event) {
 		readerror(event.document);
 	});
-	bugout.appendLine("Hello Hackers!!")
+	bugout.appendLine("Hello Hackers!! :>")
 	context.subscriptions.push(collection, listen1, listen2);
     
 	function minify(editor, edit, context) {

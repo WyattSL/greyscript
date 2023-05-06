@@ -13,3 +13,4 @@ SECURITY.md
 tests/
 miniscript/
 original-grammar/
+build.mjs
