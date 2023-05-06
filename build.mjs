@@ -1,13 +1,12 @@
 // This file is called prepublish. It is responsible for placing any required files in the
 // `./computedgrammar` directory to be bundled with the extension.
 
-const fs = require("fs");
-const ky = require("ky"); // We don't need universal here.
+import fs from 'fs';
 
 if (!fs.existsSync(`./computedgrammar`)) fs.mkdirSync(`./computedgrammar`);
 
 let FetchFile = async(path, url) => {
-    let data = await ky.get(url);
+    let data = await (await fetch(url)).text();
     if (!data || !JSON.parse(data)) throw `${path} invalid data response: ${data}`;
     fs.writeFileSync(path, data);
 };

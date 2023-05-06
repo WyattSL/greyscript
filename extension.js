@@ -1,6 +1,10 @@
 const vscode = require("vscode");
 //import { Buffer } from 'node:buffer';
-const { ky } = require('ky-universal');
+//const { ky } = require('ky-universal');
+
+
+var bugout = vscode.window.createOutputChannel("Greyscript Debugger");
+//var bugout = { appendLine: function() {}}
 
 var CompData;
 var TypeData;
@@ -17,17 +21,17 @@ var CompTypes = {};
 
 function ReloadGrammarFromFile() {
 
-    var CompData = require("./grammar/CompletionData.json")
-    var TypeData = require("./grammar/TypeData.json")
-    var ArgData = require("./grammar/ArgData.json")
-    var ReturnData = require("./grammar/ReturnData.json")
-    var Examples = require("./grammar/Examples.json")
+    var CompData = require("./computedgrammar/CompletionData.json")
+    var TypeData = require("./computedgrammar/TypeData.json")
+    var ArgData = require("./computedgrammar/ArgData.json")
+    var ReturnData = require("./computedgrammar/ReturnData.json")
+    var Examples = require("./computedgrammar/Examples.json")
     //var CompTypes = require("./grammar/CompletionTypes.json") // Constant 20 Function 2 Property 9 Method 1 Variable 5 Interface 7
     
     var CompTypes = {};
-    var HoverData = require("./grammar/HoverData.json");
-    var Encryption = require("./grammar/Encryption.json");
-    var Nightly = require("./grammar/Nightly.json")
+    var HoverData = require("./computedgrammar/HoverData.json");
+    var Encryption = require("./computedgrammar/Encryption.json");
+    var Nightly = require("./computedgrammar/Nightly.json")
 
 };
 
@@ -39,12 +43,15 @@ ReloadGrammarFromFile();
 
 async function UpdateGreyDocs() {
 
+    bugout.appendLine("Updating from GD")
+
     let PullFromGreyDocs = async (path) => {
+        bugout.appendLine(`Pull ${path}`)
         try {
-            let res = await ky.get(`https://raw.githubusercontent.com/WyattSL/greydocs/main/${path}`).json();
-            return res;
+            let res = await fetch(`https://raw.githubusercontent.com/WyattSL/greydocs/main/${path}`);
+            return JSON.parse(res);
         } catch(err) {
-            console.warn(`PullFromGreyDocs ${path}: ${err}`);
+            bugout.appendLine(`PullFromGreyDocs ${path}: ${err}`);
             return null;
         }
     }
@@ -66,10 +73,6 @@ async function UpdateGreyDocs() {
     let GD_Nightly = PullFromGreyDocs(`_data/nightly.json`);
     if (GD_Nightly) Nightly = GD_Nightly;
 };
-
-
-var bugout = vscode.window.createOutputChannel("Greyscript Debugger");
-//var bugout = { appendLine: function() {}}
 
 var enumCompTypeText = {
     1: "method",

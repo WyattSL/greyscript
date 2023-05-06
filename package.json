@@ -16,13 +16,13 @@
     },
     "devDependencies": {
         "esbuild": "^0.13.12",
-        "vsce": "^2.2.0",
+        "vsce": "^2.15.0",
         "webpack": "^5.61.0",
         "webpack-cli": "^4.9.1"
     },
     "scripts": {
-        "vscode:prepublish-unminified": "node ./build.js && npm run esbuild-base -- ",
-        "vscode:prepublish": "node ./build.js && npm run esbuild-base -- --minify",
+        "vscode:prepublish-unminified": "node ./build.mjs && npm run esbuild-base -- ",
+        "vscode:prepublish": "node ./build.mjs && npm run esbuild-base --",
         "esbuild-base": "esbuild ./extension.js --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
         "esbuild": "npm run esbuild-base -- --sourcemap",
         "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch"
