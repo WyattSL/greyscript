@@ -1,0 +1,7 @@
+[
+    "NetSession.get_num_users",
+    "NetSession.get_num_portforward",
+    "NetSession.get_num_conn_gateway",
+    "NetSession.is_any_active_user",
+    "NetSession.is_root_active_user"
+]

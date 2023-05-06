@@ -12,3 +12,4 @@ grammar/
 SECURITY.md
 tests/
 miniscript/
+original-grammar/

@@ -1,0 +1,21 @@
+[
+	"General.md5",
+	"Computer.touch",
+	"Crypto.decipher",
+	"File.copy",
+	"File.move",
+	"File.rename",
+	"File.get_content",
+	"File.set_content",
+	"Metaxploit.sniffer",
+	"Metaxploit.net_use",
+	"Metalib.scan",
+	"Metalib.scan_address",
+	"General.user_input",
+	"General.clear_screen",
+	"Shell.connect_service",
+	"FtpShell.connect_service",
+	"Shell.start_terminal",
+	"General.hash",
+	"Computer.show_procs"
+]

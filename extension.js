@@ -1,14 +1,72 @@
 const vscode = require("vscode");
 //import { Buffer } from 'node:buffer';
+const { ky } = require('ky-universal');
 
-var CompData = require("./grammar/CompletionData.json")
-var TypeData = require("./grammar/TypeData.json")
-var ArgData = require("./grammar/ArgData.json")
-var ReturnData = require("./grammar/ReturnData.json")
-var Examples = require("./grammar/Examples.json")
-var CompTypes = require("./grammar/CompletionTypes.json") // Constant 20 Function 2 Property 9 Method 1 Variable 5 Interface 7
-var HoverData = require("./grammar/HoverData.json");
-var Encryption = require("./grammar/Encryption.json");
+var CompData;
+var TypeData;
+var ArgData;
+var ReturnData;
+var Examples;
+var HoverData;
+var Encrpytion;
+var Nightly;
+
+var CompTypes = {};
+// Deprecate CompTypes. For now I'm just going to give them all the same value (default).
+// In the future, it should determine it's value automagically depending on other variables.
+
+function ReloadGrammarFromFile() {
+
+    var CompData = require("./grammar/CompletionData.json")
+    var TypeData = require("./grammar/TypeData.json")
+    var ArgData = require("./grammar/ArgData.json")
+    var ReturnData = require("./grammar/ReturnData.json")
+    var Examples = require("./grammar/Examples.json")
+    //var CompTypes = require("./grammar/CompletionTypes.json") // Constant 20 Function 2 Property 9 Method 1 Variable 5 Interface 7
+    
+    var CompTypes = {};
+    var HoverData = require("./grammar/HoverData.json");
+    var Encryption = require("./grammar/Encryption.json");
+    var Nightly = require("./grammar/Nightly.json")
+
+};
+
+ReloadGrammarFromFile();
+
+
+// Try to pull the above grammar from Greydocs.
+// This means I don't have to update for each grammar change!
+
+async function UpdateGreyDocs() {
+
+    let PullFromGreyDocs = async (path) => {
+        try {
+            let res = await ky.get(`https://raw.githubusercontent.com/WyattSL/greydocs/main/${path}`).json();
+            return res;
+        } catch(err) {
+            console.warn(`PullFromGreyDocs ${path}: ${err}`);
+            return null;
+        }
+    }
+
+    let GD_CompData = PullFromGreyDocs(`_data/functions.json`);
+    if (GD_CompData) CompData = GD_CompData;
+    let GD_TypeData = PullFromGreyDocs(`_data/types.json`);
+    if (GD_TypeData) TypeData = GD_TypeData;
+    let GD_ArgData = PullFromGreyDocs(`_data/arguments.json`);
+    if (GD_ArgData) ArgData = GD_ArgData;
+    let GD_ReturnData = PullFromGreyDocs(`_data/returns.json`);
+    if (GD_ReturnData) ReturnData = GD_ReturnData;
+    let GD_Examples = PullFromGreyDocs(`_data/examples.json`);
+    if (GD_Examples) Examples = GD_Examples;
+    let GD_HoverData = PullFromGreyDocs(`_data/descriptions.json`);
+    if (GD_HoverData) HoverData = GD_HoverData;
+    let GD_Encryption = PullFromGreyDocs(`_data/encryption.json`);
+    if (GD_Encryption) Encryption = GD_Encryption;
+    let GD_Nightly = PullFromGreyDocs(`_data/nightly.json`);
+    if (GD_Nightly) Nightly = GD_Nightly;
+};
+
 
 var bugout = vscode.window.createOutputChannel("Greyscript Debugger");
 //var bugout = { appendLine: function() {}}
@@ -64,6 +122,10 @@ async function HandleImports(t, document) {
 }
 
 function activate(context) {
+
+    let ARG = vscode.workspace.getConfiguration('greyscript').get('remoteGrammar');
+    if (ARG) UpdateGreyDocs();
+
     let hoverD = vscode.languages.registerHoverProvider('greyscript', {
         async provideHover(document,position,token) {
             if (!vscode.workspace.getConfiguration("greyscript").get("hoverdocs")) return;
@@ -288,7 +350,10 @@ function activate(context) {
         docs.description = HoverData[type][cmd] || "";
 
         // Apply encryption text to hover text if available
-        if (Encryption.includes(cmd)) docs.description += "\n\n\**This function cannot be used in encryption.*";
+        if (Encryption.includes(`${type}.${cmd}`)) docs.description += "\n\n\**This function cannot be used in encryption.*";
+
+        // Apply nightly text to hover text if available
+        if (Nightly.includes(`${type}.${cmd}`)) docs.description += "\n\n\**This function is either introduced or changed in the nightly build of the game. These functions are subject to change or removal at any time.";
 
         // Add examples
         let codeExamples = Examples[type] ? Examples[type][cmd] || [] : [];
@@ -711,6 +776,91 @@ function activate(context) {
       
         return "#" + r + g + b;
       }
+    
+    // Returns an array of vscode Ranges for any matching text in the document.
+    function RegExpToRanges(document, exp, group=0, postfunc=null) {
+        let out = [];
+        let text = document.getText();
+        let iter = text.matchAll(exp);
+        for (let m of iter) {
+            let textbf = text.slice(0,m.index);
+            let textaf = text.slice(0,m.index+m[0].length);
+            let textbfs = textbf.split("\n");
+            let textafs = textaf.split("\n");
+
+            let startline = textbfs.length;
+            let endline = textafs.length;
+
+            let startchar = m.index - textbf.length
+            let endchar = startchar + m[0].length;
+
+            if (group > 0) {
+                let txt = textafs[-1].slice(startchar,endchar);
+                let nind = txt.indexOf(m[group]);
+                startchar += nind;
+                endchar = startchar + m[group].length;
+            }
+
+            if (!postfunc) return out.push(new vscode.Range(startline, startchar, endline, endchar))
+            return postfunc()
+            // unlimited power!!!
+        }
+        return out;
+    }
+    
+    let SemanticsLegend = new vscode.SemanticTokensLegend(
+        ['class','parameter','variable','property','function','method','string','keyword','number','comment'],
+        []
+    )
+    let SemanticProvider = vscode.languages.registerDocumentSemanticTokensProvider({
+        language: 'greyscript',
+        scheme: 'file'
+    }, {
+
+        provideDocumentSemanticTokens(document) {
+            // analyze & return highlighting and stuff.
+            var tokensBuilder = new vscode.SemanticTokensBuilder(SemanticsLegend);
+
+            let keywords = RegExpToRanges(document, /\b(if|while|for|function|then|return|end if|end for|end while|end function|else|and|or|in|not|continue|break|new|null)\b/);
+            for (let v of keywords) { tokensBuilder.push(v, "keyword") };
+
+            let classes = RegExpToRanges(document, /\b(Shell|FtpShell|Computer|File|Router|NetSession|Metaxploit|MetaMail|Metalib|Port|Crypto|int|float|number|string|String|Int|Float|Number|bool|map|Map|list|List)\b/);
+            for (let v of classes) { tokensBuilder.push(v, "class") };
+            
+            let strings = RegExpToRanges(document, /".*"/);
+            for (let v of strings) { tokensBuilder.push(v, "string") };
+
+            let numbers = RegExpToRanges(document, /\d(\.\d)?/);
+            for (let v of numbers) { tokensBuilder.push(v, "number") };
+
+            let comments = RegExpToRanges(document, /\/\/.*/);
+            for (let v of comments) { tokensBuilder.push(v, "comment") };
+
+            /* // redundant because of variable & function search below
+            let funcs = RegExpToRanges(document, /(\w+)(\s|)=(\s|)function/, 1);
+            for (let v of funcs) { tokensBuilder.push(v, "function") };
+            */
+
+            let params = RegExpToRanges(document, /\w+(?:\s|)=(?:\s|)function\((.*)\)/, 1, () => {
+                let txt = textafs[-1].slice(startchar,endchar);
+                let opts = txt.split(",");
+                for (let o of opts) {
+                    let s = o.split("=")[0];
+                    let exe = txt.exec(`(?<=^|,\s?)${s}(?=$|,|=)`);
+                    out.push(new vscode.Range(startline, startchar+exe.index, endline, startchar+exe.index+s.length))
+                }
+            });
+            for (let v of params) { tokensBuilder.push(v, "parameter") };
+
+            let vars = GetAvailableVariables(document.getText(), document);
+            for (let v of vars) {
+                tokensBuilder.push(v.range, v.type ? `function` : `variable`)
+            }
+        }
+
+    }, SemanticsLegend);
+
+    if (vscode.workspace.getConfiguration('greyscript').get('semanticProvider')) context.subscriptions.push(SemanticProvider);
 
     let ColorPicker = vscode.languages.registerColorProvider('greyscript', {
         async provideDocumentColors(document, token) {

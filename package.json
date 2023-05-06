@@ -9,7 +9,7 @@
         "url": "https://github.com/WyattSL"
     },
     "icon": "icon.png",
-    "version": "1.9.3",
+    "version": "3.0.1",
     "repository": {
         "type": "git",
         "url": "https://github.com/WyattSL/greyscript.git"
@@ -21,8 +21,8 @@
         "webpack-cli": "^4.9.1"
     },
     "scripts": {
-        "vscode:prepublish-unminified": "npm run esbuild-base -- ",
-        "vscode:prepublish": "npm run esbuild-base -- --minify",
+        "vscode:prepublish-unminified": "node ./build.js && npm run esbuild-base -- ",
+        "vscode:prepublish": "node ./build.js && npm run esbuild-base -- --minify",
         "esbuild-base": "esbuild ./extension.js --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
         "esbuild": "npm run esbuild-base -- --sourcemap",
         "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch"
@@ -107,6 +107,18 @@
                     "default": true,
                     "description": "Search imported files for symbols. (May be slow)",
                     "order": 5
+                },
+                "greyscript.remoteGrammar": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Attempt to update grammar definitions automagically from the Greydocs github repository.",
+                    "order": 6
+                },
+                "greyscript.semanticsProvider": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Use the new semantic provider for syntax highlighting.",
+                    "order": 7
                 }
             }
         }
