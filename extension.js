@@ -810,7 +810,7 @@ function activate(context) {
         bugout.appendLine(`RETR 1.5 DocLen ${text.length}`)
         exp.global = true;
         let iter = text.matchAll(exp);
-        bugout.appendLine("RETR 2")
+        bugout.appendLine(`RETR 2: ${iter}`)
         for (let m of iter) {
             let textbf = text.slice(0, m.index);
             let textaf = text.slice(0, m.index + m[0].length);
@@ -868,7 +868,7 @@ function activate(context) {
 
                 let tbPush = (a, b) => { tokensBuilder.push(a, b); outcount++; bugout.appendLine(`${outcount} ${b} ${a.start.line} ${a.start.character} ${a.end.line} ${a.end.character}`); };
 
-                let keywords = RegExpToRanges(document, /\b(?:if|while|for|function|then|return|end if|end for|end while|end function|else|in|continue|break|null)\b/g);
+                let keywords = RegExpToRanges(document, /\b(?:if|while|for|function|then|isa|or|and|not|new|return|end if|end for|end while|end function|else|in|continue|break|null)\b/g);
                 bugout.appendLine(`${keywords.length} keywords`);
                 for (let v of keywords) { tbPush(v, "keyword") };
 
@@ -893,15 +893,30 @@ function activate(context) {
                 bugout.appendLine(`${types.length} types`);
                 for (let v of types) { tbPush(v, "types") };
 
+                /*
                 let mNG = TypeData.entries().filter(([k,v]) => v != "general").map(([k,v]) => k);
                 let mwG = TypeData.entires().filter(([k,v]) => v == "general").map(([k,v]) => k);
-                let methods =
-                    RegExpToRanges(document, `(?<!".*)(?:${mwG.concat("|")})(?=\(|\s|$)`)
-                  + RegExpToRanges(document, `(?<!".*)(?<=\.)(?:${mNG.concat("|")})(?=\(|\s|$)`);
-                bugout.appendLine(`${methods.length} methods`);
-                for (let v of methods) { tbPush(v, "method") };
+                */
+                let mNG = ``;
+                let mwG = ``;
+                for (let v of CompData.General) {
+                    mwG += `${v}|`
+                }
+                mwG = mwG.slice(0,mwG.length-2);
+                for (let k in CompData) {
+                    for (let v of CompData[k]) {
+                        mNG += `${v}|`;
+                    }
+                }
+                mNG = mNG.slice(0,mNG.length-1);
+                let methods1 = RegExpToRanges(document, `(?<!".*)(?:${mwG})(?=\\(|\\s|$)`)
+                let methods2 = RegExpToRanges(document, `(?<!".*)(?<=\\.)(?:${mNG})(?=\\(|\\s|$)`);
+                bugout.appendLine(`${methods1.length+methods2.length} methods`);
+                for (let v of methods1) { tbPush(v, "method") };
+                for (let v of methods2) { tbPush(v, "method") };
 
-                let ops = RegExpToRanges(document, /(?:\+|\%|\@|\-|\*|\/|=|isa|or|and|not|==|!=|>|<|<=|>=|new|\^|)/g);
+                let ops = RegExpToRanges(document, /(?:\+|\%|\@|\-|\*|\/|=|==|!=|>|<|<=|>=|\^)/g);
+                bugout.appendLine(`${ops.length} operators`);
                 for (let v of ops) { tbPush(v, "operator") }
 
                 /* // redundant because of variable & function search below
@@ -931,11 +946,25 @@ function activate(context) {
                 }
 
                 let validVars = vars.filter((v) => v.type == 5);
-                let varUses = RegExpToRanges(document, `/g\\b(?:${validVars.concat("|")})\\b(?!=|")/g`);
+                bugout.appendLine(`Found ${validVars.length} valid variables!`)
+                let vvTxt = ``;
+                for (let v of validVars) {
+                    vvTxt += `${v.name}|`;
+                }
+                vvTxt = vvTxt.slice(0,vvTxt.length-1)
+                let varUses = RegExpToRanges(document, new RegExp(`\\b(?:${vvTxt})\\b(?!=|")`, `g`));
+                bugout.appendLine(`${varUses.length} variable tokens`);
                 for (let v of varUses) { tbPush(v, "variable") };
 
                 let validFuncs = vars.filter((v) => v.type == 2);
-                let funcUses = RegExpToRanges(document, `/g\\b(?:${validFuncs.concat("|")})\\b(?!=|")/g`);
+                bugout.appendLine(`Found ${validFuncs.length} valid functions!`)
+                let vfTxt = ``;
+                for (let v of validFuncs) {
+                    vfTxt += `${v.name}|`;
+                }
+                vfTxt = vfTxt.slice(0,vfTxt.length-1)
+                let funcUses = RegExpToRanges(document, new RegExp(`\\b(?:${vfTxt})\\b(?!=|")`, `g`));
+                bugout.appendLine(`${funcUses.length} function tokens`);
                 for (let v of funcUses) { tbPush(v, "function") };
 
                 bugout.appendLine(`Provided ${outcount} tokens!`)
@@ -1046,6 +1075,7 @@ function activate(context) {
         let variableOptions = [];
         //let linesTillLine = document.getText(new vscode.Range(new vscode.Position(0, 0), range.start))
         let linesTillLine = text
+        //matches = linesTillLine.matchAll(/\b(\w+(\s|)=|end function)/g);
         matches = linesTillLine.matchAll(/\b(\w+(\s|)=|end function)/g);
         let inFunction = false;
         let functionVars = [];
