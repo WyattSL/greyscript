@@ -833,7 +833,13 @@ function activate(context) {
                     startchar += nind;
                     endchar = startchar + m[group].length;
                 }
-            }
+            };
+
+            // these were consistently off by 1. Simple fix?
+            //if (startchar > 0) { startchar=startchar-1; endchar=endchar-1; };
+            bugout.appendLine(`pRE ${startline} ${endline}`)
+            if (startline > 0) { startline=startline-1; endline=endline-1; };
+            bugout.appendLine(`pOST ${startline} ${endline}`)
 
             if (!postfunc) out.push(new vscode.Range(startline, startchar, endline, endchar))
             if (postfunc) {
@@ -904,7 +910,8 @@ function activate(context) {
                 let vars = GetAvailableVariables(document.getText(), document, true);
                 bugout.appendLine(`${vars.length} vars & funcs`);
                 for (let v of vars) {
-                    tbPush(v.range, v.type ? `function` : `variable`)
+                    bugout.appendLine(`${JSON.stringify(v)} | ${v.range.start.line} ${v.range.start.character} ${v.range.end.line} ${v.range.end.character}`);
+                    tbPush(v.range, v.type == 2 ? `function` : `variable`)
                 }
 
                 bugout.appendLine(`Provided ${outcount} tokens!`)
