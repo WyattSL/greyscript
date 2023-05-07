@@ -2,6 +2,7 @@
 // `./computedgrammar` directory to be bundled with the extension.
 
 import fs from 'fs';
+import fetch from 'node-fetch';
 
 if (!fs.existsSync(`./computedgrammar`)) fs.mkdirSync(`./computedgrammar`);
 
