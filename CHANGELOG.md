@@ -1,6 +1,6 @@
 # 3.0.1
 - Instead of having two separate documentations (extension docs, and greydocs website) the extension will now attempt to pull documentation data from Greydocs on startup. This can be disabled in settings if your paranoid. When the extension is updated, the current Greydocs data will also be bundled with the extension, to permit offline use. (If you disable this in settings, it will always use bundled.)
-- Added semantics! This is the feature that allows highlighting of specific keywords, like variables. The following things are currently classified: classes (Shell, Computer, etc); functions, parameters, variables, methods, strings, keywords, comments, & numbers. Please note I do not handle the colors assigned: those are dependent on your theme. (Thanks Volk for the testing)
+- Added semantics! This is the feature that allows highlighting of specific keywords, like variables. The following things are currently classified: classes (Shell, Computer, etc); functions, parameters, variables, methods, strings, keywords, comments, & numbers. Please note I do not handle the colors assigned: those are dependent on your theme. (Thanks Volk & AweTux for the testing)
 - *if your wondering why this is 3.x.x now, it because of how the Visual Studio marketplace works. These changes do* ***not*** *merit a major bump, but after removing the old preview branch that used 2.x.x, new updates have to be 3.x.x*
 
 # 1.9.3

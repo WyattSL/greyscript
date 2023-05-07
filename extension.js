@@ -853,7 +853,7 @@ function activate(context) {
     }
 
     let SemanticsLegend = new vscode.SemanticTokensLegend(
-        ['class', 'parameter', 'variable', 'property', 'function', 'method', 'string', 'keyword', 'number', 'comment'],
+        ['class', 'parameter', 'variable', 'function', 'method', 'string', 'keyword', 'number', 'comment', 'operator'],
         []
     )
     let SemanticProvider = vscode.languages.registerDocumentSemanticTokensProvider('greyscript', {
@@ -861,14 +861,14 @@ function activate(context) {
         provideDocumentSemanticTokens(document) {
             try {
                 // analyze & return highlighting and stuff.
-                bugout.appendLine(`Proviidng semantics`);
+                bugout.appendLine(`Providing semantics`);
 
                 var tokensBuilder = new vscode.SemanticTokensBuilder(SemanticsLegend);
                 let outcount = 0;
 
                 let tbPush = (a, b) => { tokensBuilder.push(a, b); outcount++; bugout.appendLine(`${outcount} ${b} ${a.start.line} ${a.start.character} ${a.end.line} ${a.end.character}`); };
 
-                let keywords = RegExpToRanges(document, /\b(?:if|while|for|function|then|return|end if|end for|end while|end function|else|and|or|in|not|continue|break|new|null)\b/g);
+                let keywords = RegExpToRanges(document, /\b(?:if|while|for|function|then|return|end if|end for|end while|end function|else|in|continue|break|null)\b/g);
                 bugout.appendLine(`${keywords.length} keywords`);
                 for (let v of keywords) { tbPush(v, "keyword") };
 
@@ -887,6 +887,22 @@ function activate(context) {
                 let comments = RegExpToRanges(document, /\/\/.*/g);
                 bugout.appendLine(`${comments.length} comments`);
                 for (let v of comments) { tbPush(v, "comment") };
+
+                let types = RegExpToRanges(document, /(?:true|false|null|self|globals|locals|params)/g);
+                // not all are types. not really sure what to do about it though.
+                bugout.appendLine(`${types.length} types`);
+                for (let v of types) { tbPush(v, "types") };
+
+                let mNG = TypeData.entries().filter(([k,v]) => v != "general").map(([k,v]) => k);
+                let mwG = TypeData.entires().filter(([k,v]) => v == "general").map(([k,v]) => k);
+                let methods =
+                    RegExpToRanges(document, `(?<!".*)(?:${mwG.concat("|")})(?=\(|\s|$)`)
+                  + RegExpToRanges(document, `(?<!".*)(?<=\.)(?:${mNG.concat("|")})(?=\(|\s|$)`);
+                bugout.appendLine(`${methods.length} methods`);
+                for (let v of methods) { tbPush(v, "method") };
+
+                let ops = RegExpToRanges(document, /(?:\+|\%|\@|\-|\*|\/|=|isa|or|and|not|==|!=|>|<|<=|>=|new|\^|)/g);
+                for (let v of ops) { tbPush(v, "operator") }
 
                 /* // redundant because of variable & function search below
                 let funcs = RegExpToRanges(document, /(\w+)(\s|)=(\s|)function/, 1);
@@ -913,6 +929,14 @@ function activate(context) {
                     bugout.appendLine(`${JSON.stringify(v)} | ${v.range.start.line} ${v.range.start.character} ${v.range.end.line} ${v.range.end.character}`);
                     tbPush(v.range, v.type == 2 ? `function` : `variable`)
                 }
+
+                let validVars = vars.filter((v) => v.type == 5);
+                let varUses = RegExpToRanges(document, `/g\\b(?:${validVars.concat("|")})\\b(?!=|")/g`);
+                for (let v of varUses) { tbPush(v, "variable") };
+
+                let validFuncs = vars.filter((v) => v.type == 2);
+                let funcUses = RegExpToRanges(document, `/g\\b(?:${validFuncs.concat("|")})\\b(?!=|")/g`);
+                for (let v of funcUses) { tbPush(v, "function") };
 
                 bugout.appendLine(`Provided ${outcount} tokens!`)
                 return tokensBuilder.build();
