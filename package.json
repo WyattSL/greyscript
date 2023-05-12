@@ -9,7 +9,7 @@
         "url": "https://github.com/WyattSL"
     },
     "icon": "icon.png",
-    "version": "3.0.2",
+    "version": "3.0.3",
     "repository": {
         "type": "git",
         "url": "https://github.com/WyattSL/greyscript.git"
@@ -115,6 +115,12 @@
                     "order": 7
                 }
             }
-        }
+        },
+        "snippets": [
+            {
+            "language": "greyscript",
+            "path": "./snippets/main.json"
+            }
+        ]
     }
 }

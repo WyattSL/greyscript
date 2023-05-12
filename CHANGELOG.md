@@ -1,3 +1,6 @@
+# 3.0.3
+- Added some snippets for basic keywords, courtesy of @Crater44
+
 # 3.0.2
 - Semantics improved, now colors when variables and functions are used. (Thanks tux for testing)
 
