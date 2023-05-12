@@ -30,7 +30,7 @@
     },
     "homepage": "https://github.com/WyattSL/greyscript/blob/main/CHANGELOG.md",
     "engines": {
-        "vscode": "^1.51.0"
+        "vscode": "^1.63.0"
     },
     "categories": [
         "Programming Languages"
@@ -57,13 +57,6 @@
                     ".gs"
                 ],
                 "configuration": "./language-configuration.json"
-            }
-        ],
-        "grammars": [
-            {
-                "language": "greyscript",
-                "scopeName": "source.src",
-                "path": "./syntaxes/greyscript.tmLanguage.json"
             }
         ],
         "commands": [
