@@ -1,3 +1,6 @@
+# 3.0.4
+- Fixed a bug in the semantics provider which would crash highlighting if a function contained a 'type'.
+
 # 3.0.3
 - Added some snippets for basic keywords, courtesy of @Crater44
 

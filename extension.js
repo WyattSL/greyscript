@@ -853,7 +853,7 @@ function activate(context) {
     }
 
     let SemanticsLegend = new vscode.SemanticTokensLegend(
-        ['class', 'parameter', 'variable', 'function', 'method', 'string', 'keyword', 'number', 'comment', 'operator'],
+        ['class', 'parameter', 'variable', 'function', 'method', 'string', 'keyword', 'number', 'comment', 'operator', 'type'],
         []
     )
     let SemanticProvider = vscode.languages.registerDocumentSemanticTokensProvider('greyscript', {
