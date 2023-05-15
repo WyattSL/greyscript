@@ -891,7 +891,7 @@ function activate(context) {
                 let types = RegExpToRanges(document, /(?:true|false|null|self|globals|locals|params)/g);
                 // not all are types. not really sure what to do about it though.
                 bugout.appendLine(`${types.length} types`);
-                for (let v of types) { tbPush(v, "types") };
+                for (let v of types) { tbPush(v, "type") };
 
                 /*
                 let mNG = TypeData.entries().filter(([k,v]) => v != "general").map(([k,v]) => k);

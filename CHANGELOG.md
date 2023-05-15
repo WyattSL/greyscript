@@ -1,4 +1,4 @@
-# 3.0.4
+# 3.0.5
 - Fixed a bug in the semantics provider which would crash highlighting if a function contained a 'type'.
 
 # 3.0.3
