@@ -1,5 +1,25 @@
 # 3.0.6
-- Added the original semantics provider as a backup. If the semantics provider is disabled or otherwise unavailable, vscode will use the original tmLanguage file. This highlighting does not do some of the fancy stuff the new one does, and does pull from greydocs automatically.
+**This update is for 3.0.1 - 3.0.6 merging from preview into stable.**
+- (3.0.1) Documentation is now automatically pulled from [Greydocs](https://wyattsl.github.io/greydocs)
+- (3.0.1) User-defined variables & functions are now highlighted.
+- (3.0.3) Added some snippets for basic flow control.
+- (3.0.6) Improved the performance of the new semantics provider.
+- (3.0.6) Variables now support comments, and variables assigned to methods will show the return type of that method.
+- (3.0.6) Added JsDoc support! Only `@description`, `@param`, `@returns`, `@example`, `@author`, `@deprecated`, & `@readonly` are supported at this time. Example:
+```js
+// Concatinate or add three strings or numbers.
+// @description (Why is this a function again?)
+// @param a {String|Number} String or number 1
+// @param b {String|Number} String or number 2
+// @param c {String|Number} String or number 3
+// @return {String|Number} The concatination of a, b, and c
+// @author WyattL
+// @example foo("Hello", " ", "There!") // Hello There!
+// @example foo(1,2,5) 
+foo = function(a,b,c)
+    return a+b+c
+end function
+```
 
 # 3.0.5
 - Fixed a bug in the semantics provider which would crash highlighting if a function contained a 'type'.

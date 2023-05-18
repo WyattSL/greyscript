@@ -60,7 +60,7 @@
         "grammars": [
             {
                 "language": "greyscript",
-                "scopeName": "source.src",
+                "scopeName": "text.miniscript.greyscript",
                 "path": "./syntaxes/greyscript.tmLanguage.json"
             }
         ],
