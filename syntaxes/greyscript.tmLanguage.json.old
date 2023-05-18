@@ -1,0 +1,61 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "GreyScript",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#number"
+		},
+		{
+			"include": "#comment"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [
+				{
+					"name": "k",
+					"match": "\\b(if|while|for|function|then|return|end if|end for|end while|end function|else|and|or|in|not|continue|break|new|null)\\b"
+				},
+				{
+					"name": "support.class",
+					"match": "\\b(--CLASSES--)\\b"
+				},
+				{
+					"name": "support.function",
+					"match": "\\.\\b(--NONGENFUNCTIONS--)\\b"
+				},
+				{
+					"name": "support.function",
+					"match": "\\b(--GENFUNCTIONS--)\\b"
+				},
+				{
+					"name": "support.type",
+					"match": "\\b(params|true|false|globals|self|locals)\\b"
+				}
+			]
+		},
+		"strings": {
+			"name": "string.quoted.double.greyscript",
+			"begin": "\"",
+			"end": "\""
+		},
+		"number": {
+			"patterns": [{
+				"name": "constant.numeric",
+				"match": "\\d"
+			}]
+		},
+		"comment": {
+			"name": "comment.line",
+			"begin": "//",
+			"end": "\n"
+		}
+	},
+	"scopeName": "source.src"
+}

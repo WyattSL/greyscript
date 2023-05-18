@@ -1,3 +1,6 @@
+# 3.0.6
+- Added the original semantics provider as a backup. If the semantics provider is disabled or otherwise unavailable, vscode will use the original tmLanguage file. This highlighting does not do some of the fancy stuff the new one does, and does pull from greydocs automatically.
+
 # 3.0.5
 - Fixed a bug in the semantics provider which would crash highlighting if a function contained a 'type'.
 
