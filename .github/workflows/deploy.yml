@@ -31,6 +31,9 @@ jobs:
 
       - name: Install Webpack Dependencies
         run: npm install -g esbuild webpack webpack-cli
+      
+      - name: Install Dependencies
+        run: npm install --include=dev
 
       - name: Package Extension
         run: vsce package -o extension.vsix
