@@ -1,0 +1,57 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "scopeName": "text.miniscript.greyscript",
+    "name": "greyscript",
+    "patterns": [
+        {
+            "name": "comment.line.double-dash",
+            "begin": "\\/\\/",
+            "end": "$",
+            "patterns": [{
+                "name": "storage.modifier",
+                "match": "(?<=\\s*\/\/\\s*)@(param|author|example|return|deprecated|readonly|description)(?=\\s+.*)"
+            }]
+        },
+        {
+            "name": "support.function",
+            "match": "\\b(--GENFUNCTIONS--)\\b"
+        },
+        {
+            "name": "entity.name.function.member",
+            "match": "\\b(--NONGENFUNCTIONS--)\\b"
+        },
+        {
+            "name": "support.class",
+            "match": "(--CLASSES--)"
+        },
+        {
+            "name": "string.quoted.double",
+            "begin": "\"",
+            "end": "\""
+        },
+        {
+            "name": "constant.numeric",
+            "match": "\\b(\\d+)\\b"
+        },
+        {
+            "name": "keyword.control",
+            "match": "\\b(if|else|while|for|return|break|continue|function|end if|end function|end for|end while)\\b"
+        },
+        {
+            "name": "keyword.operator",
+            "match": "\\b(or|and|not)\\b"
+        },
+        {
+            "name": "keyword.other",
+            "match": "\\b(new)\\b"
+        },
+        {
+            "name": "constant.language",
+            "match": "\\b(true|false|null)\\b"
+        },
+        {
+            "name": "support.variable",
+            "match": "\\b(self|local|outer|globals|params|super)\\b"
+        }
+    ]
+}

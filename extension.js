@@ -142,6 +142,75 @@ async function HandleImports(t, document) {
     return t;
 }
 
+const AnnotationExpression = /(?<=^\s*\/\/\s*)@(param|author|example|return|deprecated|readonly|description)(?=\s+.*$)/gm;
+
+// test
+
+
+/**
+ * @param {vscode.TextDocument} document The document to pull text from.
+ * @param {number} line The line to pull text from.
+ * @returns {FancyParse} The parsed JSDoc.
+ */
+function JsDocParse(document, line) {
+    bugout.appendLine(`JsDocParse ${line} ${line-30} ${line-30 >= 0 ? line-30 : 0}`)
+    let range = new vscode.Range(line, 0, line-30 >= 0 ? line-30 : 0, 0);
+    bugout.appendLine(`${range.start.line} ${range.end.line}`)
+    let text = document.getText(range);
+    let comments = [];
+    for (let l of text.split("\n").reverse()) {
+        if (l == "" && comments.length == 0) continue;
+        if (l.trim().startsWith("//")) { comments.push(l.replace(/\s*\/\/\s*/, ``))
+        } else { break }
+    }
+    bugout.appendLine(`Comments: ${comments.length}`);
+    if (comments.length <= 0) return null;
+
+    let FancyParse = {description:``,params:{},return:null,examples:[],author:[],deprecated:false,default:null,readonly:false};
+    let IsInExample = false;
+    let ExStore = ``;
+    for (let line of comments.reverse()) {
+        if (IsInExample) {
+            if (!line.startsWith(`@`)) {
+                ExStore += `\n` + line;
+                continue;
+            } else {
+                FancyParse.examples.push(ExStore);
+                ExStore = ``;
+                IsInExample = false;
+            }
+        }
+        if (line.startsWith(`@description`) || !line.startsWith(`@`)) {
+            if (FancyParse.description != ``) FancyParse.description += `\n`;
+            FancyParse.description += line.replace(`@description`, ``).trim();
+        } else if (line.startsWith(`@param`)) {
+            let dat = line.replace(`@param`, ``).trim();
+            let name = dat.split(` `)[0];
+            let type = dat.includes("{") ? dat.split(`{`)[1].split(`}`)[0] : null;
+            let desc = dat.includes("{") ? dat.split(`{`)[1].split(`}`)[1].trim() : dat.split(` `).slice(1).join(` `);
+            FancyParse.params[name.replace(/\[|\]/g,``)] = {type:type.replace(/(\(|\))/g,``).split(`|`),description:desc,optional:name.includes(`[`)};
+        } else if (line.startsWith(`@return`) || line.startsWith(`@returns`)) {
+            let dat = line.replace(/@returns?/g, ``).trim();
+            let type = dat.includes("{") ? dat.split(`{`)[1].split(`}`)[0] : null;
+            let desc = dat.includes("{") ? dat.split(`{`)[1].split(`}`)[1].trim() : dat.split(` `).slice(1).join(` `);
+            FancyParse.return = {type:type.replace(/(\(|\))/g,``).split(`|`),description:desc};
+        } else if (line.startsWith(`@author`)) {
+            let dat = line.replace(`@author`, ``);
+            FancyParse.author.push(dat);
+        } else if (line.startsWith(`@example`)) {
+            ExStore = line.replace(`@example`,``).trim();
+            IsInExample = true;
+        } else if (line.startsWith(`@readonly`)) {
+            FancyParse.readonly = true
+        } else if (line.startsWith(`@deprecated`)) {
+            FancyParse.deprecated = true
+        }
+    }
+    if (IsInExample) FancyParse.examples.push(ExStore);
+    bugout.appendLine(`JsDocParse ${JSON.stringify(FancyParse)}`)
+    return FancyParse;
+}
+
 function activate(context) {
 
     let ARG = vscode.workspace.getConfiguration('greyscript').get('remoteGrammar');
@@ -182,7 +251,7 @@ function activate(context) {
             }
             else {
                 // Variable hover
-                hoverText = new vscode.MarkdownString("", true);
+                var hoverText = new vscode.MarkdownString("", true);
 
                 // Get Text
                 //let text = document.getText()
@@ -227,46 +296,144 @@ function activate(context) {
                 let assignment = lines[lines.length - 1];
                 if (!assignment || !assignment.match(re)) return;
 
+                let curline = text.slice(0,text.indexOf(assignment)).split(`\n`).length -1;
+
                 let match = assignment.match(re)[0];
                 assignment = assignment.substring(assignment.indexOf(match) + match.length).trim().replace(";", "");
                 assignment = assignment.split(".")
                 assignment = assignment[assignment.length - 1];
 
+                let FP = null;
+                if (!assignment.includes("function")) FP = JsDocParse(document, curline)
+
+                let VarHover = (FP) => {
+                    if (FP.description) hoverText.appendText(FP.description+`\n`);
+                    if (FP.deprecated) hoverText.appendMarkdown(`*@deprecated*  \n`);
+                    if (FP.readonly) hoverText.appendMarkdown(`*@readonly*  \n`);
+                    if (FP.author) for (let a of FP.author) hoverText.appendMarkdown(`*@author* ${a}  \\`);
+                    if (FP.examples) for (let e of FP.examples) hoverText.appendCodeblock(e, `greyscript`);
+                    return new vscode.Hover(hoverText);
+                };
+
                 // If its a string type return the string hover
                 if (assignment.startsWith("\"")) {
                     hoverText.appendCodeblock("(variable) " + word + ": String")
+                    if (FP) return VarHover(FP);
                     return new vscode.Hover(hoverText);
                 }
 
                 // If its a list type return the list hover
                 if (assignment.startsWith("[")) {
                     hoverText.appendCodeblock("(variable) " + word + ": List")
+                    if (FP) return VarHover(FP);
                     return new vscode.Hover(hoverText);
                 }
 
                 // If its a map type return the map hover
                 if (assignment.startsWith("{")) {
                     hoverText.appendCodeblock("(variable) " + word + ": Map")
+                    if (FP) return VarHover(FP);
+                    return new vscode.Hover(hoverText);
+                }
+
+                if (!assignment.startsWith(`function`)) {
+                    let t = assignment.split(".").pop();
+                    //bugout.appendLine(1+":"+t);
+                    t = t.split(" ")[0].split("(")[0];
+                    //bugout.appendLine(2+":"+t);
+                    let rets = [];
+                    for (let tyk in ReturnData) {
+                        let ty = ReturnData[tyk];
+                        for (let k in ty) {
+                            if (k == t) {
+                                for (let i of ty[k]) {
+                                    let tp = i.subType ? `${i.type}[${i.subType}]` : i.type
+                                    if (!rets.includes(tp)) rets.push(tp);
+                                }
+                            }
+                        }
+                    }
+                    if (rets == []) rets = ["any"]
+                    hoverText.appendCodeblock(`(variable) ${word}: ${rets.join("|")}`);
+                    if (FP) return VarHover(FP);
                     return new vscode.Hover(hoverText);
                 }
 
                 // If its a function type return the function hover
+                let FancyParse = null
                 if (assignment.startsWith("function")) {
                     let description = null;
                     //if(linesTillCurLine[linesTillCurLine.indexOf(lines[lines.length - 1]) + 1].startsWith("//")){
                     //    description = linesTillCurLine[linesTillCurLine.indexOf(lines[lines.length - 1]) + 1].substring(2).trim();
-                    let preline = linesTillCurLine[linesTillCurLine.indexOf(lines[lines.length - 1]) + 1]
-                    let thisline = document.getText(new vscode.Range(new vscode.Position(position.line, 0), new vscode.Position(position.line + 1, 0))).replace(`\n`, ``)
-                    let postline = document.getText(new vscode.Range(new vscode.Position(position.line + 1, 0), new vscode.Position(position.line + 2, 0))).replace(`\n`, ``)
-                    bugout.appendLine(preline + `\n` + thisline + `\n` + postline)
-                    bugout.appendLine(new vscode.Position(position.line, 0) + `\n` + new vscode.Position(position.line + 1, 0) + `\n` + new vscode.Range(new vscode.Position(position.line, 0), new vscode.Position(position.line + 1, 0)))
+                    //let preline = linesTillCurLine[linesTillCurLine.indexOf(lines[lines.length - 1]) + 1]
+                    //let thisline = document.getText(new vscode.Range(new vscode.Position(position.line, 0), new vscode.Position(position.line + 1, 0))).replace(`\n`, ``)
+                    //let postline = document.getText(new vscode.Range(new vscode.Position(position.line + 1, 0), new vscode.Position(position.line + 2, 0))).replace(`\n`, ``)
+                    let preline = document.getText(new vscode.Range(curline-1,0,curline,0)).replace(`\n`,``);
+                    let thisline = document.getText(new vscode.Range(curline,0,curline+1,0)).replace(`\n`,``);
+                    let postline = document.getText(new vscode.Range(curline+1,0,curline+2,0)).replace(`\n`,``);
+                    //bugout.appendLine(preline + `\n` + thisline + `\n` + postline)
+                    //bugout.appendLine(new vscode.Position(position.line, 0) + `\n` + new vscode.Position(position.line + 1, 0) + `\n` + new vscode.Range(new vscode.Position(position.line, 0), new vscode.Position(position.line + 1, 0)))
                     if (preline.includes("//")) description = preline.replace(`//`, ``);
                     if (thisline.includes("//")) description = thisline.split(`//`)[1];
                     if (postline.includes("//")) description = postline.replace(`//`, ``);
+
+                    
+                    if (preline.includes("//")) {
+                        let UseFancyParser = false;
+                        //let FancyParsingIs = [`@param`, `@return`, `@description`, `@example`, `@author`, `@deprecated`, `@readonly`]
+                        for (let i = 1; i <= 10; i++) {
+                            let ltcl = linesTillCurLine[linesTillCurLine.indexOf(lines[lines.length - 1]) + i]
+                            if (ltcl && ltcl.includes("//")) {
+                                let v = ltcl.replace(`//`, ``).trim();
+                                /*
+                                for (let fp of FancyParsingIs) {
+                                    if (v.includes(fp)) {
+                                        UseFancyParser = true;
+                                        break
+                                    }
+                                }
+                                */
+                                if (AnnotationExpression.test(`// ${v}`)) { bugout.appendLine(`AE PASS`); UseFancyParser = true; break; }
+                                if (description != v) description += `\n`+v;
+                            } else break;
+                        };
+                        if (UseFancyParser) {
+                            description = ``;
+                            FancyParse = JsDocParse(document, curline);
+                        }
+                    }
+
                     if (!description) description = ``;
+                    if (FancyParse) {
+                        let params = assignment.match(/(?<=\()(.*?)(?=\))/)[0].split(`,`);
+                        let plist = ``;
+                        for (let p of params) {
+                            let pd = FancyParse.params[p] ? FancyParse.params[p] : {type:[`any`],description:``,optional:false};
+                            plist += `${p}${pd.optional ? '?' : ''}: ${pd.type.join("|")}, `;
+                        };
+                        plist=plist.trim();
+                        if (plist.endsWith(`,`)) plist = plist.slice(0,-1);
+                        hoverText.appendCodeblock(`function ${word}(${plist}) : ${FancyParse.return && FancyParse.return.type ? FancyParse.return.type.join("|") : 'any'}`, `greyscript`);
+                        if (FancyParse.description) description = FancyParse.description + `\n` + description;
+                        if (description && description != ``) { hoverText.appendText(description); description = `` };
+                        let revpar = Object.keys(FancyParse.params);
+                        //revpar.reverse();
+                        for (let p of revpar) {
+                            hoverText.appendMarkdown(`*@param* \`${p}\` — ${FancyParse.params[p].description}  \n`)
+                        }
+                        if (FancyParse.return) hoverText.appendMarkdown(`  \n*@return* \`${FancyParse.return.type.join(" | ")}\` — ${FancyParse.return.description}  \n`)
+                        for (let a of FancyParse.author) {
+                            hoverText.appendMarkdown(`*@author* ${a}  \n`);
+                        }
+                        if (FancyParse.examples) {
+                            for (let e of FancyParse.examples) {
+                                hoverText.appendCodeblock(e, `greyscript`);
+                            }
+                        }
+                        if (FancyParse.deprecated) hoverText.appendMarkdown(`*@deprecated*  \n`);
+                    } else hoverText.appendCodeblock("(function) " + word + "(" + assignment.match(/(?<=\()(.*?)(?=\))/)[0] + ")", `greyscript`)
                     if (word.includes("gk")) description += `\ngk258 is my hero!`;
-                    hoverText.appendCodeblock("(function) " + word + "(" + assignment.match(/(?<=\()(.*?)(?=\))/)[0] + ")")
-                    if (description && description != ``) hoverText.appendText(description);
+                    if (description && description != ``) hoverText.appendText(description.trim());
                     return new vscode.Hover(hoverText);
                 }
             }
@@ -804,13 +971,13 @@ function activate(context) {
 
     // Returns an array of vscode Ranges for any matching text in the document.
     function RegExpToRanges(document, exp, group = 0, postfunc = null) {
-        bugout.appendLine(`RETR 1 ${exp} (${group}) [${postfunc}]`)
+        //bugout.appendLine(`RETR 1 ${exp} (${group}) [${postfunc}]`)
         let out = [];
         let text = document.getText();
-        bugout.appendLine(`RETR 1.5 DocLen ${text.length}`)
+        //bugout.appendLine(`RETR 1.5 DocLen ${text.length}`)
         exp.global = true;
         let iter = text.matchAll(exp);
-        bugout.appendLine("RETR 2")
+        //bugout.appendLine(`RETR 2: ${iter}`)
         for (let m of iter) {
             let textbf = text.slice(0, m.index);
             let textaf = text.slice(0, m.index + m[0].length);
@@ -824,7 +991,7 @@ function activate(context) {
             let startchar = textbfs[textbfs.length-1].length;
             let endchar = startchar + m[0].length;
 
-            bugout.appendLine(`RETR 3: ${m} | ${startline} ${endline} ${startchar} ${endchar} | ${textbf.length} ${textbfs.length} ${textaf.length} ${textafs.length} ${m.index} | ${JSON.stringify(m)}`)
+            // bugout.appendLine(`RETR 3: ${m} | ${startline} ${endline} ${startchar} ${endchar} | ${textbf.length} ${textbfs.length} ${textaf.length} ${textafs.length} ${m.index} | ${JSON.stringify(m)}`)
 
             if (group > 0) {
                 let txt = textafs[textafs.length - 1].slice(startchar, endchar);
@@ -837,9 +1004,9 @@ function activate(context) {
 
             // these were consistently off by 1. Simple fix?
             //if (startchar > 0) { startchar=startchar-1; endchar=endchar-1; };
-            bugout.appendLine(`pRE ${startline} ${endline}`)
+            //bugout.appendLine(`pRE ${startline} ${endline}`)
             if (startline > 0) { startline=startline-1; endline=endline-1; };
-            bugout.appendLine(`pOST ${startline} ${endline}`)
+            //bugout.appendLine(`pOST ${startline} ${endline}`)
 
             if (!postfunc) out.push(new vscode.Range(startline, startchar, endline, endchar))
             if (postfunc) {
@@ -848,45 +1015,85 @@ function activate(context) {
             }
             // unlimited power!!!
         }
-        bugout.appendLine(`RETR 4 ${out.length}`)
+        //bugout.appendLine(`RETR 4 ${out.length}`)
         return out;
     }
 
     let SemanticsLegend = new vscode.SemanticTokensLegend(
-        ['class', 'parameter', 'variable', 'property', 'function', 'method', 'string', 'keyword', 'number', 'comment'],
-        []
+        //['class', 'parameter', 'variable', 'function', 'method', 'string', 'keyword', 'number', 'comment', 'operator', 'type', 'decorator'],
+        ['variable','function','parameter']
+        ['deprecated', 'readonly']
     )
-    let SemanticProvider = vscode.languages.registerDocumentSemanticTokensProvider('greyscript', {
+    if (vscode.workspace.getConfiguration('greyscript').get('semanticsProvider'))
+        vscode.languages.registerDocumentSemanticTokensProvider('greyscript', {
 
         provideDocumentSemanticTokens(document) {
             try {
                 // analyze & return highlighting and stuff.
-                bugout.appendLine(`Proviidng semantics`);
+                bugout.appendLine(`Providing semantics`);
 
                 var tokensBuilder = new vscode.SemanticTokensBuilder(SemanticsLegend);
                 let outcount = 0;
 
-                let tbPush = (a, b) => { tokensBuilder.push(a, b); outcount++; bugout.appendLine(`${outcount} ${b} ${a.start.line} ${a.start.character} ${a.end.line} ${a.end.character}`); };
+                let tbPush = (a, b) => { tokensBuilder.push(a, b); outcount++;
+                    bugout.appendLine(`${outcount} ${b} ${a.start.line} ${a.start.character} ${a.end.line} ${a.end.character}`);
+                };
 
-                let keywords = RegExpToRanges(document, /\b(?:if|while|for|function|then|return|end if|end for|end while|end function|else|and|or|in|not|continue|break|new|null)\b/g);
-                bugout.appendLine(`${keywords.length} keywords`);
+                // Apparently it's better to do these in Textmate. I'll leave them here for now.
+                /*
+
+                let keywords = RegExpToRanges(document, /\b(?:if|while|for|function|then|isa|or|and|not|new|return|end if|end for|end while|end function|else|in|continue|break|null)\b/g);
+                //bugout.appendLine(`${keywords.length} keywords`);
                 for (let v of keywords) { tbPush(v, "keyword") };
 
                 let classes = RegExpToRanges(document, /\b(?:Shell|FtpShell|Computer|File|Router|NetSession|Metaxploit|MetaMail|Metalib|Port|Crypto|int|float|number|string|String|Int|Float|Number|bool|map|Map|list|List)\b/g);
-                bugout.appendLine(`${classes.length} classes`);
+                //bugout.appendLine(`${classes.length} classes`);
                 for (let v of classes) { tbPush(v, "class") };
 
                 let strings = RegExpToRanges(document, /".*?"/g);
-                bugout.appendLine(`${strings.length} strings`);
+                //bugout.appendLine(`${strings.length} strings`);
                 for (let v of strings) { tbPush(v, "string") };
 
                 let numbers = RegExpToRanges(document, /\d(\.\d)?/g);
-                bugout.appendLine(`${numbers.length} numbers`);
+                //bugout.appendLine(`${numbers.length} numbers`);
                 for (let v of numbers) { tbPush(v, "number") };
 
-                let comments = RegExpToRanges(document, /\/\/.*/g);
-                bugout.appendLine(`${comments.length} comments`);
+                let comments = RegExpToRanges(document, /\/\/.* /g);
+                //bugout.appendLine(`${comments.length} comments`);
                 for (let v of comments) { tbPush(v, "comment") };
+
+                let anots = RegExpToRanges(document, AnnotationExpression);
+                bugout.appendLine(`@{anots.length} annotations`);
+                for (let v of anots) { tbPush(v, "decorator") };
+
+                let types = RegExpToRanges(document, /(?:true|false|null|self|globals|locals|params)/g);
+                // not all are types. not really sure what to do about it though.
+                //bugout.appendLine(`${types.length} types`);
+                for (let v of types) { tbPush(v, "type") };
+
+                let mNG = ``;
+                let mwG = ``;
+                for (let v of CompData.General) {
+                    mwG += `${v}|`
+                }
+                mwG = mwG.slice(0,mwG.length-2);
+                for (let k in CompData) {
+                    for (let v of CompData[k]) {
+                        mNG += `${v}|`;
+                    }
+                }
+                mNG = mNG.slice(0,mNG.length-1);
+                let methods1 = RegExpToRanges(document, `(?<!".*)(?:${mwG})(?=\\(|\\s|$)`)
+                let methods2 = RegExpToRanges(document, `(?<!".*)(?<=\\.)(?:${mNG})(?=\\(|\\s|$)`);
+                //bugout.appendLine(`${methods1.length+methods2.length} methods`);
+                for (let v of methods1) { tbPush(v, "method") };
+                for (let v of methods2) { tbPush(v, "method") };
+
+                let ops = RegExpToRanges(document, /(?:\+|\%|\@|\-|\*|\/|=|==|!=|>|<|<=|>=|\^)/g);
+                //bugout.appendLine(`${ops.length} operators`);
+                for (let v of ops) { tbPush(v, "operator") }
+
+                */
 
                 /* // redundant because of variable & function search below
                 let funcs = RegExpToRanges(document, /(\w+)(\s|)=(\s|)function/, 1);
@@ -904,15 +1111,37 @@ function activate(context) {
                     }
                     return out;
                 });
-                bugout.appendLine(`${params.length} params`);
+                //bugout.appendLine(`${params.length} params`);
                 for (let v of params) { tbPush(v, "parameter") };
 
                 let vars = GetAvailableVariables(document.getText(), document, true);
-                bugout.appendLine(`${vars.length} vars & funcs`);
+                //bugout.appendLine(`${vars.length} vars & funcs`);
                 for (let v of vars) {
-                    bugout.appendLine(`${JSON.stringify(v)} | ${v.range.start.line} ${v.range.start.character} ${v.range.end.line} ${v.range.end.character}`);
+                    //bugout.appendLine(`${JSON.stringify(v)} | ${v.range.start.line} ${v.range.start.character} ${v.range.end.line} ${v.range.end.character}`);
                     tbPush(v.range, v.type == 2 ? `function` : `variable`)
                 }
+
+                let validVars = vars.filter((v) => v.type == 5);
+                //bugout.appendLine(`Found ${validVars.length} valid variables!`)
+                let vvTxt = ``;
+                for (let v of validVars) {
+                    vvTxt += `${v.name}|`;
+                }
+                vvTxt = vvTxt.slice(0,vvTxt.length-1)
+                let varUses = RegExpToRanges(document, new RegExp(`\\b(?:${vvTxt})\\b(?!=|")`, `g`));
+                //bugout.appendLine(`${varUses.length} variable tokens`);
+                for (let v of varUses) { tbPush(v, "variable") };
+
+                let validFuncs = vars.filter((v) => v.type == 2);
+                //bugout.appendLine(`Found ${validFuncs.length} valid functions!`)
+                let vfTxt = ``;
+                for (let v of validFuncs) {
+                    vfTxt += `${v.name}|`;
+                }
+                vfTxt = vfTxt.slice(0,vfTxt.length-1)
+                let funcUses = RegExpToRanges(document, new RegExp(`\\b(?:${vfTxt})\\b(?!=|")`, `g`));
+                //bugout.appendLine(`${funcUses.length} function tokens`);
+                for (let v of funcUses) { tbPush(v, "function") };
 
                 bugout.appendLine(`Provided ${outcount} tokens!`)
                 return tokensBuilder.build();
@@ -922,11 +1151,6 @@ function activate(context) {
         }
 
     }, SemanticsLegend);
-
-    if (vscode.workspace.getConfiguration('greyscript').get('semanticsProvider')) {
-        context.subscriptions.push(SemanticProvider);
-        bugout.appendLine(`added sem prov`)
-    }
 
     let ColorPicker = vscode.languages.registerColorProvider('greyscript', {
         async provideDocumentColors(document, token) {
@@ -1022,6 +1246,7 @@ function activate(context) {
         let variableOptions = [];
         //let linesTillLine = document.getText(new vscode.Range(new vscode.Position(0, 0), range.start))
         let linesTillLine = text
+        //matches = linesTillLine.matchAll(/\b(\w+(\s|)=|end function)/g);
         matches = linesTillLine.matchAll(/\b(\w+(\s|)=|end function)/g);
         let inFunction = false;
         let functionVars = [];

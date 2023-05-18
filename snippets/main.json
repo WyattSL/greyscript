@@ -1,0 +1,117 @@
+{
+	"If": {
+		"scope": "greyscript",
+		"prefix": "if",
+		"body": [
+			"if $1 then",
+			"$0",
+			"end if",
+		],
+		"description": "If snippet"
+	},
+	"If-Else": {
+		"scope": "greyscript",
+		"prefix": "ife",
+		"body": [
+			"if $1 then",
+			"$2",
+			"else",
+			"$0",
+			"end if",
+		],
+		"description": "If else snippet"
+	},
+	"If-Else-If": {
+		"scope": "greyscript",
+		"prefix": "eli",
+		"body": [
+			"if $1 then",
+			"$2",
+			"else if $3 then",
+			"$4",
+			"else",
+			"$0",
+			"end if",
+		],
+		"description": "If else snippet"
+	},
+	"Short-If": {
+		"scope": "greyscript",
+		"prefix": "if",
+		"body": [
+			"if $1 then $2",
+		],
+		"description": "Short If snippet"
+	},
+
+	"Ternary": {
+		"scope": "greyscript",
+		"prefix": "ter",
+		"body": [
+			"if $1 then $2 else $0",
+		],
+		"description": "Ternary if-else snippet"
+	},
+	"For-Loop": {
+		"scope": "greyscript",
+		"prefix": "for",
+		"body": [
+			"for i in $1",
+			"$0",
+			"end for",
+		],
+		"description": "For Loop Snippet"
+	},
+	"While-Loop": {
+		"scope": "greyscript",
+		"prefix": "whi",
+		"body": [
+			"while $1",
+			"$0",
+			"end while",
+		],
+		"description": "For Loop Snippet"
+	},
+	"Continue": {
+		"scope": "greyscript",
+		"prefix": "con",
+		"body": [
+			"continue",
+		],
+		"description": "Continue Snippet"
+	},
+	"Break": {
+		"scope": "greyscript",
+		"prefix": "bre",
+		"body": [
+			"break",
+		],
+		"description": "Break Snippet"
+	},
+	"Return": {
+		"scope": "greyscript",
+		"prefix": "ret",
+		"body": [
+			"return",
+		],
+		"description": "Return Snippet"
+	},
+	"Function": {
+		"scope": "greyscript",
+		"prefix": "fun",
+		"body": [
+			"function($1)",
+			"$0",
+			"end function",
+		],
+		"description": "Function Snippet"
+	},
+	"Range": {
+		"scope": "greyscript",
+		"prefix": "ran",
+		"body": [
+			"range($0)",
+		],
+		"description": "Range function Snippet"
+	},
+}

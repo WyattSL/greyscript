@@ -9,7 +9,7 @@
         "url": "https://github.com/WyattSL"
     },
     "icon": "icon.png",
-    "version": "3.0.1",
+    "version": "3.0.6",
     "repository": {
         "type": "git",
         "url": "https://github.com/WyattSL/greyscript.git"
@@ -30,7 +30,7 @@
     },
     "homepage": "https://github.com/WyattSL/greyscript/blob/main/CHANGELOG.md",
     "engines": {
-        "vscode": "^1.51.0"
+        "vscode": "^1.75.0"
     },
     "categories": [
         "Programming Languages"
@@ -41,9 +41,7 @@
         "url": "https://github.com/WyattSL/greyscript/issues",
         "email": "wyattlipscomb20@gmail.com"
     },
-    "activationEvents": [
-        "onLanguage:greyscript"
-    ],
+    "activationEvents": [],
     "contributes": {
         "languages": [
             {
@@ -62,7 +60,7 @@
         "grammars": [
             {
                 "language": "greyscript",
-                "scopeName": "source.src",
+                "scopeName": "text.miniscript.greyscript",
                 "path": "./syntaxes/greyscript.tmLanguage.json"
             }
         ],
@@ -122,6 +120,12 @@
                     "order": 7
                 }
             }
-        }
+        },
+        "snippets": [
+            {
+            "language": "greyscript",
+            "path": "./snippets/main.json"
+            }
+        ]
     }
 }
