@@ -22,7 +22,7 @@
         },
         {
             "name": "support.class",
-            "match": "(--CLASSES--)"
+            "match": "\\b(--CLASSES--)\\b"
         },
         {
             "name": "string.quoted.double",
@@ -35,7 +35,7 @@
         },
         {
             "name": "keyword.control",
-            "match": "\\b(if|else|while|for|return|break|continue|function|end if|end function|end for|end while)\\b"
+            "match": "\\b(if|else|while|then|for|in|return|break|continue|function|end if|end function|end for|end while)\\b"
         },
         {
             "name": "keyword.operator",

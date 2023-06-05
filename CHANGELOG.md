@@ -1,3 +1,6 @@
+# 3.0.7
+- Fix some syntax
+
 # 3.0.6
 **This update is for 3.0.1 - 3.0.6 merging from preview into stable.**
 - (3.0.1) Documentation is now automatically pulled from [Greydocs](https://wyattsl.github.io/greydocs)
