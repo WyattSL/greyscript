@@ -408,6 +408,7 @@ function activate(context) {
                         let params = assignment.match(/(?<=\()(.*?)(?=\))/)[0].split(`,`);
                         let plist = ``;
                         for (let p of params) {
+                            p=p.trim();
                             let pd = FancyParse.params[p] ? FancyParse.params[p] : {type:[`any`],description:``,optional:false};
                             plist += `${p}${pd.optional ? '?' : ''}: ${pd.type.join("|")}, `;
                         };
@@ -536,7 +537,7 @@ function activate(context) {
         }
 
         // Add result
-        docs.title += ": " + (ReturnData[type][cmd] || []).map(d => d.type + (d.type == "Map" || d.type == "List" ? `[${d.subType}]` : "")).join(" or ");
+        docs.title += ": " + (ReturnData[type][cmd] || []).map(d => d.type + (d.type == "Map" || d.type == "List" ? `[${d.subType}]` : "")).join("|");
 
         // Add info/hover text
         docs.description = HoverData[type][cmd] || "";
@@ -946,18 +947,20 @@ function activate(context) {
     }
 
     function hexToRgb(hex) {
-        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
         return result ? {
             r: parseInt(result[1], 16),
             g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
+            b: parseInt(result[3], 16),
+            a: result[4] ? parseInt(result[4], 16) : 255,
         } : null;
     }
 
-    function rgbToHex(r, g, b) {
+    function rgbToHex(r, g, b, a) {
         r = (r * 255).toString(16);
         g = (g * 255).toString(16);
         b = (b * 255).toString(16);
+        a = (a * 255).toString(16);
 
         if (r.length == 1)
             r = "0" + r;
@@ -965,8 +968,10 @@ function activate(context) {
             g = "0" + g;
         if (b.length == 1)
             b = "0" + b;
+        if (a.length == 1)
+            a = "0"+a;
 
-        return "#" + r + g + b;
+        return "#" + r + g + b + a;
     }
 
     // Returns an array of vscode Ranges for any matching text in the document.
@@ -1028,7 +1033,7 @@ function activate(context) {
         vscode.languages.registerDocumentSemanticTokensProvider('greyscript', {
 
         provideDocumentSemanticTokens(document) {
-            try {
+            //try {
                 // analyze & return highlighting and stuff.
                 bugout.appendLine(`Providing semantics`);
 
@@ -1101,11 +1106,13 @@ function activate(context) {
                 */
 
                 let params = RegExpToRanges(document, /\w+(?:\s|)=(?:\s|)function\((.*)\)/g, 1, (textafs, startline, startchar, endline, endchar) => {
+                    if (!textafs || typeof(textafs) != "string") return;
                     let out = [];
                     let txt = textafs[textafs.length - 1].slice(startchar, endchar);
                     let opts = txt.split(",");
                     for (let o of opts) {
                         let s = o.split("=")[0];
+                        if (!s) continue;
                         let exe = new RegExp(`(?<=^|,\s?)${s}(?=$|,|=)`).exec(txt);
                         out.push(new vscode.Range(startline, startchar + exe.index, endline, startchar + exe.index + s.length))
                     }
@@ -1145,9 +1152,9 @@ function activate(context) {
 
                 bugout.appendLine(`Provided ${outcount} tokens!`)
                 return tokensBuilder.build();
-            } catch (err) {
+            /*} catch (err) {
                 bugout.appendLine(`Caught error: ${err}`)
-            }
+            }*/
         }
 
     }, SemanticsLegend);
@@ -1156,7 +1163,7 @@ function activate(context) {
         async provideDocumentColors(document, token) {
             //let txt = document.getText();
             let txt = await GetDocumentText(document);
-            let reg = /(?:(?:<color=)?(#[0-9a-f]{6})|<color=\"?(black|blue|green|orange|purple|red|white|yellow)\"?)>/gi
+            let reg = /(?:(?:<(?:color|mark)=)?(#[0-9a-f]{6,8})|<(?:color|mark)=\"?(black|blue|green|orange|purple|red|white|yellow)\"?)>/gi
             let mchs = txt.matchAll(reg);
             let out = [];
             let startPos = 0;
@@ -1234,9 +1241,9 @@ function activate(context) {
             return out;
         },
         provideColorPresentations(color, ctx, token) {
-            let hex = rgbToHex(color.red, color.green, color.blue);
+            let hex = rgbToHex(color.red, color.green, color.blue, color.alpha);
             ctx.range = new vscode.Range(ctx.range.start, new vscode.Position(ctx.range.end.line, ctx.range.start.character + hex.length))
-            return [vscode.ColorPresentation(hex)]
+            return [new vscode.ColorPresentation(hex)]
         }
     });
 
