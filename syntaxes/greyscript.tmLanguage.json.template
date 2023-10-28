@@ -51,7 +51,7 @@
         },
         {
             "name": "support.variable",
-            "match": "\\b(self|local|outer|globals|params|super)\\b"
+            "match": "\\b(self|locals|outer|globals|params|super)\\b"
         }
     ]
 }
