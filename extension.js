@@ -1347,6 +1347,7 @@ function activate(context) {
     if (vscode.workspace.getConfiguration("greyscript").get("symbols")) context.subscriptions.push(SymbolProvider);
 
     function LookForErrors(source) {
+        return;
         let outp = [];
         let reg = new RegExp(`$(Encode|Decode)(?:\\s)?=(?:\\s)?function\\(.+\\).*(${Encryption.join("|")}).*end function`, "s");
         let m = source.match(reg);

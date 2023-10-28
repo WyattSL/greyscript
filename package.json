@@ -5,11 +5,11 @@
     "publisher": "WyattL",
     "author": {
         "name": "Wyatt",
-        "email": "wyattlipscomb20@gmail.com",
+        "email": "urgent@wyatt.world",
         "url": "https://github.com/WyattSL"
     },
     "icon": "icon.png",
-    "version": "3.0.7",
+    "version": "3.0.8",
     "repository": {
         "type": "git",
         "url": "https://github.com/WyattSL/greyscript.git"

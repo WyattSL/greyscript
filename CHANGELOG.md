@@ -1,3 +1,8 @@
+# 3.0.8
+- If JSDoc parsing fails, append to the description instead of crashing.
+- Fix `local` being highlighted instead of `locals`.
+- The new methods (`get_ctf`, `CTFEvent`, etc.) have been shipped for offline use with this version. (While online, the extension will pull from [Greydocs](https://wyattsl.github.io/greydocs) to provide semantics)
+
 # 3.0.7
 - Fix some syntax
 
