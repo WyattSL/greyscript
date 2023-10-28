@@ -153,62 +153,67 @@ const AnnotationExpression = /(?<=^\s*\/\/\s*)@(param|author|example|return|depr
  * @returns {FancyParse} The parsed JSDoc.
  */
 function JsDocParse(document, line) {
-    bugout.appendLine(`JsDocParse ${line} ${line-30} ${line-30 >= 0 ? line-30 : 0}`)
-    let range = new vscode.Range(line, 0, line-30 >= 0 ? line-30 : 0, 0);
-    bugout.appendLine(`${range.start.line} ${range.end.line}`)
-    let text = document.getText(range);
-    let comments = [];
-    for (let l of text.split("\n").reverse()) {
-        if (l == "" && comments.length == 0) continue;
-        if (l.trim().startsWith("//")) { comments.push(l.replace(/\s*\/\/\s*/, ``))
-        } else { break }
-    }
-    bugout.appendLine(`Comments: ${comments.length}`);
-    if (comments.length <= 0) return null;
+    try {
+        bugout.appendLine(`JsDocParse ${line} ${line-30} ${line-30 >= 0 ? line-30 : 0}`)
+        let range = new vscode.Range(line, 0, line-30 >= 0 ? line-30 : 0, 0);
+        bugout.appendLine(`${range.start.line} ${range.end.line}`)
+        let text = document.getText(range);
+        let comments = [];
+        for (let l of text.split("\n").reverse()) {
+            if (l == "" && comments.length == 0) continue;
+            if (l.trim().startsWith("//")) { comments.push(l.replace(/\s*\/\/\s*/, ``))
+            } else { break }
+        }
+        bugout.appendLine(`Comments: ${comments.length}`);
+        if (comments.length <= 0) return null;
 
-    let FancyParse = {description:``,params:{},return:null,examples:[],author:[],deprecated:false,default:null,readonly:false};
-    let IsInExample = false;
-    let ExStore = ``;
-    for (let line of comments.reverse()) {
-        if (IsInExample) {
-            if (!line.startsWith(`@`)) {
-                ExStore += `\n` + line;
-                continue;
-            } else {
-                FancyParse.examples.push(ExStore);
-                ExStore = ``;
-                IsInExample = false;
+        let FancyParse = {description:``,params:{},return:null,examples:[],author:[],deprecated:false,default:null,readonly:false};
+        let IsInExample = false;
+        let ExStore = ``;
+        for (let line of comments.reverse()) {
+            if (IsInExample) {
+                if (!line.startsWith(`@`)) {
+                    ExStore += `\n` + line;
+                    continue;
+                } else {
+                    FancyParse.examples.push(ExStore);
+                    ExStore = ``;
+                    IsInExample = false;
+                }
+            }
+            if (line.startsWith(`@description`) || !line.startsWith(`@`)) {
+                if (FancyParse.description != ``) FancyParse.description += `\n`;
+                FancyParse.description += line.replace(`@description`, ``).trim();
+            } else if (line.startsWith(`@param`)) {
+                let dat = line.replace(`@param`, ``).trim();
+                let name = dat.split(` `)[0];
+                let type = dat.includes("{") ? dat.split(`{`)[1].split(`}`)[0] : null;
+                let desc = dat.includes("{") ? dat.split(`{`)[1].split(`}`)[1].trim() : dat.split(` `).slice(1).join(` `);
+                FancyParse.params[name.replace(/\[|\]/g,``)] = {type:type.replace(/(\(|\))/g,``).split(`|`),description:desc,optional:name.includes(`[`)};
+            } else if (line.startsWith(`@return`) || line.startsWith(`@returns`)) {
+                let dat = line.replace(/@returns?/g, ``).trim();
+                let type = dat.includes("{") ? dat.split(`{`)[1].split(`}`)[0] : null;
+                let desc = dat.includes("{") ? dat.split(`{`)[1].split(`}`)[1].trim() : dat.split(` `).slice(1).join(` `);
+                FancyParse.return = {type:type.replace(/(\(|\))/g,``).split(`|`),description:desc};
+            } else if (line.startsWith(`@author`)) {
+                let dat = line.replace(`@author`, ``);
+                FancyParse.author.push(dat);
+            } else if (line.startsWith(`@example`)) {
+                ExStore = line.replace(`@example`,``).trim();
+                IsInExample = true;
+            } else if (line.startsWith(`@readonly`)) {
+                FancyParse.readonly = true
+            } else if (line.startsWith(`@deprecated`)) {
+                FancyParse.deprecated = true
             }
         }
-        if (line.startsWith(`@description`) || !line.startsWith(`@`)) {
-            if (FancyParse.description != ``) FancyParse.description += `\n`;
-            FancyParse.description += line.replace(`@description`, ``).trim();
-        } else if (line.startsWith(`@param`)) {
-            let dat = line.replace(`@param`, ``).trim();
-            let name = dat.split(` `)[0];
-            let type = dat.includes("{") ? dat.split(`{`)[1].split(`}`)[0] : null;
-            let desc = dat.includes("{") ? dat.split(`{`)[1].split(`}`)[1].trim() : dat.split(` `).slice(1).join(` `);
-            FancyParse.params[name.replace(/\[|\]/g,``)] = {type:type.replace(/(\(|\))/g,``).split(`|`),description:desc,optional:name.includes(`[`)};
-        } else if (line.startsWith(`@return`) || line.startsWith(`@returns`)) {
-            let dat = line.replace(/@returns?/g, ``).trim();
-            let type = dat.includes("{") ? dat.split(`{`)[1].split(`}`)[0] : null;
-            let desc = dat.includes("{") ? dat.split(`{`)[1].split(`}`)[1].trim() : dat.split(` `).slice(1).join(` `);
-            FancyParse.return = {type:type.replace(/(\(|\))/g,``).split(`|`),description:desc};
-        } else if (line.startsWith(`@author`)) {
-            let dat = line.replace(`@author`, ``);
-            FancyParse.author.push(dat);
-        } else if (line.startsWith(`@example`)) {
-            ExStore = line.replace(`@example`,``).trim();
-            IsInExample = true;
-        } else if (line.startsWith(`@readonly`)) {
-            FancyParse.readonly = true
-        } else if (line.startsWith(`@deprecated`)) {
-            FancyParse.deprecated = true
-        }
+        if (IsInExample) FancyParse.examples.push(ExStore);
+        bugout.appendLine(`JsDocParse ${JSON.stringify(FancyParse)}`)
+        return FancyParse;
+    } catch(err) {
+        bugout.appendLine(`JS Doc Parse failure: ${err}`)
+        return {description: `Could not parse JSDoc information. Is it malformed?`,params:{},return:null,examples:[],author:[],deprecated:false,default:null,readonly:false};
     }
-    if (IsInExample) FancyParse.examples.push(ExStore);
-    bugout.appendLine(`JsDocParse ${JSON.stringify(FancyParse)}`)
-    return FancyParse;
 }
 
 function activate(context) {
